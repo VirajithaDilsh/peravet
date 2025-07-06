@@ -110,16 +110,16 @@ export default function Home(){
               <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-50">
                   {/* About Section */}
                   <div>
-                      <p className="mb-4">
-                          Some footer text about the Agency. Just a little description to help people understand you better
-                      </p>
                       <div className="flex space-x-4 mb-4">
-                          <a href="#" className={" hover:scale-120"}> <Image src="/social/fb.svg" alt="facebook" width={40} height={40} className="rounded-lg"/></a>
-                          <a href="#" className={" hover:scale-120"}> <Image src="/social/twitter.svg" alt="twitter" width={40} height={40} className="rounded-lg"/></a>
-                          <a href="#" className={" hover:scale-120"}> <Image src="/social/linkin.svg" alt="linkin" width={40} height={40} className="rounded-lg"/></a>
-                          <a href="#" className={" hover:scale-120"}> <Image src="/social/insta.svg" alt="instagram" width={40} height={40} className="rounded-lg"/></a>
+                          <a href="https://web.facebook.com/vtfperadeniya/about/?_rdc=1&_rdr#" target="_blank" rel="noopener noreferrer" className={" hover:scale-125 transition-transform"}> <Image src="/social/fb.svg" alt="facebook" width={40} height={40} className="rounded-lg"/></a>
+                          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className={" hover:scale-125 transition-transform"}> <Image src="/social/twitter.svg" alt="twitter" width={40} height={40} className="rounded-lg"/></a>
+                          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className={" hover:scale-125 transition-transform"}> <Image src="/social/linkin.svg" alt="linkin" width={40} height={40} className="rounded-lg"/></a>
+                          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className={" hover:scale-125 transition-transform"}> <Image src="/social/insta.svg" alt="instagram" width={40} height={40} className="rounded-lg"/></a>
                       </div>
-                      <p>Copyright Team codeX 2025</p>
+                      <div className={"flex mt-30"}>
+                          <p>Copyright Team codeX 2025</p>
+                      </div>
+
                   </div>
 
                   {/* Quick Links */}
@@ -136,10 +136,11 @@ export default function Home(){
                   {/* Address */}
                   <div>
                       <h3 className="font-bold mb-4">Address</h3>
-                      <p>Design Agency Head Office.<br />
-                          Airport Road<br />
-                          United Arab Emirate
-                      </p>
+                      <p>Veterinary Teaching Farm<br/>
+                          Udaperadeniya<br/>
+                          Peradeniya<br/>
+                          Sri Lanka<br/>
+                          20400</p>
                   </div>
               </div>
           </footer>
