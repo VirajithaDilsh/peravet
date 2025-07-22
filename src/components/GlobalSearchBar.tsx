@@ -15,7 +15,7 @@ const dummyResults = [
 
 export default function GlobalSearchBar() {
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<typeof dummyResults>([]);
     const router = useRouter();
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,24 +35,27 @@ export default function GlobalSearchBar() {
     };
 
     return (
-        <div className="relative max-w-md w-full">
-            <div className="flex items-center bg-white border rounded-lg px-3 py-2 shadow-sm">
+        <div className="relative w-full max-w-xs sm:max-w-[500px] md:max-w-md lg:max-w-lg">
+            {/* Search Input */}
+            <div className="flex items-center bg-white border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-sm">
                 <Search size={16} className="text-[#8F9BBA] mr-2" />
                 <input
                     type="text"
                     value={query}
                     onChange={handleSearch}
-                    placeholder="Search anything..."
-                    className="flex-1 bg-transparent outline-none text-[#8F9BBA] placeholder-[#8F9BBA]"
+                    placeholder="Search"
+                    className="flex-1 bg-transparent outline-none text-xs sm:text-sm text-[#8F9BBA] placeholder-[#8F9BBA]"
                 />
             </div>
+
+            {/* Results Dropdown */}
             {results.length > 0 && (
                 <ul className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
                     {results.map((item, index) => (
                         <li
                             key={index}
                             onClick={() => handleSelect(item.path)}
-                            className="px-4 py-2 hover:bg-green-100 cursor-pointer text-sm"
+                            className="px-3 py-2 hover:bg-green-100 cursor-pointer text-xs sm:text-sm"
                         >
                             {item.label}
                         </li>
