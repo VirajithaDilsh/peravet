@@ -20,12 +20,13 @@ export default function Home(): JSX.Element {
         <main className="font-[Poppins,sans-serif] relative scroll-smooth">
             {/* HERO BACKGROUND */}
             <div
-                className="min-h-screen bg-cover bg-top"
+                className="min-h-screen bg-cover bg-center bg-no-repeat"
                 style={{
                     backgroundImage: "url('/cow.png')",
-                    backgroundAttachment: "fixed",
+                    backgroundPosition: "center 0px",
                 }}
             >
+
 
             {/* HEADER */}
                 <header className="relative w-full h-20 md:h-24">
