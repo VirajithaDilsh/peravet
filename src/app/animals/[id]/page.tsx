@@ -1,7 +1,14 @@
 import { cattleData } from "@/data/CattleData";
 import { notFound } from "next/navigation";
 
-export default function AnimalDetailPage({ params }: any) {
+// ✅ Explicitly define your own type
+type AnimalDetailPageProps = {
+    params: {
+        id: string;
+    };
+};
+
+export default function AnimalDetailPage({ params }: AnimalDetailPageProps) {
     const animalId = Number(params.id);
 
     const animal = cattleData.find((a) => a.id === animalId);
