@@ -1,15 +1,15 @@
 import { cattleData } from "@/data/CattleData";
 import { notFound } from "next/navigation";
 
-interface Props {
+export default function AnimalDetailPage({
+                                             params,
+                                         }: {
     params: { id: string };
-}
-
-export default function AnimalDetailPage({ params }: Props) {
+}) {
     const animalId = Number(params.id);
 
     // find the clicked animal
-    const animal = cattleData.find(a => a.id === animalId);
+    const animal = cattleData.find((a) => a.id === animalId);
 
     if (!animal) return notFound(); // show 404 if no match
 
