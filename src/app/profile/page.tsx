@@ -1,5 +1,3 @@
-import Sidebar from '@/components/Sidebar'; // adjust path accordingly
-
 export default function Home() {
     return (
         <div className="flex bg-white">
