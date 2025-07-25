@@ -28,26 +28,10 @@ export default function Home(): JSX.Element {
             >
 
             {/* HEADER */}
-                <header className="flex justify-between items-center p-4 md:p-6">
-                    {/* Mobile logo */}
-                    <motion.div
-                        className="flex-shrink-0 block sm:hidden ml-4"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <Image
-                            src="/logo-mobile.png"
-                            alt="mobile logo"
-                            width={80}
-                            height={25}
-                            className="rounded-lg"
-                        />
-                    </motion.div>
-
+                <header className="relative w-full h-20 md:h-24">
                     {/* Desktop/Tablet logo */}
                     <motion.div
-                        className="flex-shrink-0 hidden sm:block"
+                        className="absolute top-0 left-8 hidden sm:block"
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6 }}
@@ -61,8 +45,26 @@ export default function Home(): JSX.Element {
                         />
                     </motion.div>
 
+
+
+                    {/* Mobile logo */}
+                    <motion.div
+                        className="absolute top-4 left-4 block sm:hidden"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <Image
+                            src="/logo-mobile.png"
+                            alt="mobile logo"
+                            width={80}
+                            height={25}
+                            className="rounded-lg"
+                        />
+                    </motion.div>
+
                     {/* Nav + Buttons */}
-                    <div className="flex items-center space-x-6">
+                    <div className="absolute top-10 right-10 flex items-center space-x-6">
                         {/* Desktop Nav */}
                         <nav className="hidden md:flex space-x-6">
                             {["Home", "Features", "About", "Contact"].map((link) => (
