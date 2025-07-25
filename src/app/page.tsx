@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {JSX, useState} from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Head from "next/head";
 
 export default function Home(): JSX.Element {
     const router = useRouter();
@@ -17,6 +18,21 @@ export default function Home(): JSX.Element {
     };
 
     return (
+        <>
+        <Head>
+            <title>Veterinary Teaching Farm Peradeniya </title>
+            <meta name="description" content="This website is designed to help veterinary doctors and farm staff manage animals more easily.
+                You can view animal details, track vaccinations, monitor treatments, and improve communication — all in one place." />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            {/* Open Graph (for social media sharing) */}
+            <meta property="og:title" content="Veterinary Teaching Farm Peradeniya" />
+            <meta property="og:description" content="This website is designed to help veterinary doctors and farm staff manage animals more easily.
+                You can view animal details, track vaccinations, monitor treatments, and improve communication — all in one place" />
+            <meta property="og:type" content="website" />
+            <meta property="og:url" content="https://peravtf.com" />
+            <meta property="og:image" content="https://peravtf.com/logo.png" />
+            <meta name="keywords" content="peravtf,veterinary teaching farm,peradeniya,udaperadeniya,cow farming, dairy cows, cattle management, livestock care, organic farming" />
+        </Head>
         <main className="font-[Poppins,sans-serif] relative scroll-smooth">
             {/* HERO BACKGROUND */}
             <div
@@ -409,5 +425,6 @@ export default function Home(): JSX.Element {
                 </div>
             </footer>
         </main>
+        </>
     );
 }
