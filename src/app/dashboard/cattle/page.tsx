@@ -8,7 +8,7 @@ import { cattleData } from "@/data/CattleData";
 
 
 export default function Home() {
-    const [animals, setAnimals] = useState<string[]>([]);
+    const [, setAnimals] = useState<string[]>([]);
 
     const handleAddAnimal = (animal: string) => {
         setAnimals((prev) => [...prev, animal]);
