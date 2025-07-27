@@ -265,7 +265,7 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center space-x-2">
                                 <GoatIcon className="w-5 h-5 fill-current" />
-                                <span>Ruminants</span>
+                                <span>Small Ruminants</span>
                             </div>
                             {openMenus.ruminants ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                         </button>
