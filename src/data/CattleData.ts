@@ -1,16 +1,30 @@
 export interface Cattle {
     id: number;
-    name: string;
+    sex: string;
+    breed: string;
+    weight: number;
     age: number;
-    vaccine: string;
-    status: "Vaccinated" | "Pending" | "Unknown";
+    lastAIdate?:Date;
+    pregnancyStatus?: "Pregnant" | "Not pregnant" | "To be check"|"Infertile";
+    expectedCalvingDate?:Date;
+    status:"Live" | "Died" | "Culled"|"Sold"|"Diseased";
 }
 
 export const cattleData: Cattle[] = [
-    { id: 1, name: "Cow A", age: 4, vaccine: "FMD", status: "Vaccinated" },
-    { id: 2, name: "Cow B", age: 2, vaccine: "PPR", status: "Pending" },
-    { id: 3, name: "Cow C", age: 3, vaccine: "Enterotoxemia", status: "Vaccinated" },
-    { id: 4, name: "Cow D", age: 5, vaccine: "HS", status: "Pending" },
-    { id: 5, name: "Cow E", age: 5, vaccine: "HS", status: "Pending" },
+    { id: 1, sex: "Female", breed: "JF", weight: 100, age:12,lastAIdate: new Date('2025-07-27'),pregnancyStatus:"Pregnant",expectedCalvingDate: new Date('2026-04-15'), status: "Live"},
+    { id: 2, sex: "Male", breed: "JF", weight: 100, age:12, status: "Live"},
+    { id: 3, sex: "Female", breed: "JF", weight: 100, age:12,lastAIdate: new Date('2025-07-27'),pregnancyStatus:"Pregnant",expectedCalvingDate: new Date('2026-04-15'), status: "Live"},
+    { id: 4, sex: "Female", breed: "JF", weight: 100, age:12,lastAIdate: new Date('2025-07-27'),pregnancyStatus:"Pregnant",expectedCalvingDate: new Date('2026-04-15'), status: "Live"},
+    { id: 5, sex: "Female", breed: "JF", weight: 100, age:12,lastAIdate: new Date('2025-07-27'),pregnancyStatus:"Pregnant",expectedCalvingDate: new Date('2026-04-15'), status: "Live"},
+    { id: 6, sex: "Female", breed: "JF", weight: 100, age:12,lastAIdate: new Date('2025-07-27'),pregnancyStatus:"Pregnant",expectedCalvingDate: new Date('2026-04-15'), status: "Live"},
+    { id: 7, sex: "Female", breed: "JF", weight: 100, age:12,lastAIdate: new Date('2025-07-27'),pregnancyStatus:"Pregnant",expectedCalvingDate: new Date('2026-04-15'), status: "Live"},
+    { id: 8, sex: "Male", breed: "JF", weight: 100, age:12, status: "Live"},
+    { id: 9, sex: "Male", breed: "JF", weight: 100, age:12, status: "Live"},
+    { id: 10, sex: "Male", breed: "JF", weight: 100, age:12, status: "Live"},
+    { id: 11, sex: "Male", breed: "JF", weight: 100, age:12, status: "Live"},
+
+
+
+
     // add more cattle here
 ];

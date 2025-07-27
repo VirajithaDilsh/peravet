@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import AddAnimalButton from "@/components/AddAnimalButton";
-import CattleIcon from '@/icons/pageicon/cattle.svg';
 import CattleTable from "@/components/CattleTable";
 import TagInput from "@/components/TagInput";
 import { cattleData } from "@/data/CattleData";
@@ -43,31 +42,61 @@ export default function Home() {
                 </div>
             </main>
             {/*Total cattle box*/}
-            <div
-                className="
-                            w-[150px]
-                            h-[60px]
-                            bg-green-300
-                            rounded-lg
-                            text-black
-                            p-2
-                          "
-            >
-                <div className="flex flex-row items-center gap-2">
+            <div className="w-full max-w-5xl bg-green-300 rounded-lg text-black p-2">
+                <div className="grid grid-cols-7 divide-x divide-black text-center">
 
-                    {/* Fixed-size Icon */}
-                    <div className="w-10 h-10 flex items-center justify-center">
-                        <CattleIcon />
+                    <div className="px-2">
+                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
+                            Calves
+                        </p>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">10</span>
                     </div>
 
-                    {/* Fixed Text */}
-                    <h2 className="flex flex-col items-start justify-center text-[15px] leading-tight">
-                        Total Cattle
-                        <span className="text-lg font-bold leading-none self-center">{cattleData.length}</span>
-                    </h2>
+                    <div className="px-2">
+                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
+                            Heifers
+                        </p>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">30</span>
+                    </div>
+
+                    <div className="px-2">
+                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
+                            Dry
+                        </p>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">15</span>
+                    </div>
+
+                    <div className="px-2">
+                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
+                            Milking
+                        </p>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">12</span>
+                    </div>
+
+                    <div className="px-2">
+                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
+                            Pregnant
+                        </p>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">50</span>
+                    </div>
+
+                    <div className="px-2">
+                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
+                            Bulls
+                        </p>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">8</span>
+                    </div>
+                    <div className="px-2">
+                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
+                            Total Cattle
+                        </p>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleData.length}</span>
+                    </div>
 
                 </div>
             </div>
+
+
 
 
 
