@@ -1,24 +1,25 @@
-type AddAnimalButtonProps = {
-    animalType: string;
-    onAdd: (animal: string) => void;
-};
+"use client";
+import { useRouter } from "next/navigation";
 
-export default function AddAnimalButton({ animalType, onAdd }: AddAnimalButtonProps) {
+interface AddAnimalButtonProps {
+    animalType: string; // e.g., "Cattle", "Goat", etc.
+}
+
+export default function AddAnimalButton({ animalType }: AddAnimalButtonProps) {
+    const router = useRouter();
+
+    const handleClick = () => {
+        // Pass animalType as query param
+        router.push(`/animals/new-animal?species=${animalType}`);
+    };
+
     return (
         <button
-            onClick={() => onAdd(animalType)}
-            className="
-    px-2 sm:px-3 md:px-4
-    py-1 sm:py-1.5
-    text-xs sm:text-sm
-    bg-green-600 text-white
-    rounded-md sm:rounded-lg
-    hover:bg-green-700
-    transition-all duration-200
-  "
+            onClick={handleClick}
+            className="bg-green-600 text-white px-4 py-2 rounded-2xl hover:bg-green-700"
+            type="button"
         >
-            + Add {animalType}
+            Add {animalType}
         </button>
-
     );
 }

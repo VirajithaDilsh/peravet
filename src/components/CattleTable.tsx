@@ -1,131 +1,154 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
+import { useAnimalContext } from "@/app/context/AnimalContext";
+import { Cattle } from "@/types/animals";
+import { Trash2,SquarePen,Eye  } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { cattleData } from "@/data/CattleData";
-import SearchBarWithFilter from "@/components/SearchBar";
 
-const CattleTable: React.FC = () => {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedFilter, setSelectedFilter] = useState("Tag No");
+
+
+export default function CattleTable() {
+    const { animals, deleteAnimal } = useAnimalContext();
+    const [search, setSearch] = useState("");
     const router = useRouter();
+    const cattleOnly = animals.filter(
+        (a): a is Cattle => a.species === "Cattle"
+    );
 
-    const handleFilterSearch = (filterKey: string, query: string) => {
-        setSelectedFilter(filterKey);
-        setSearchQuery(query);
-    };
-
-    const filteredData = cattleData.filter(({ id, sex, breed, age, weight, status }) => {
-        const q = searchQuery.toLowerCase();
-
-        switch (selectedFilter) {
-            case "Tag No":
-                return id.toString().includes(q);
-            case "Gender":
-                return sex.toLowerCase().includes(q);
-            case "Age":
-                return age.toString().includes(q);
-            case "Weight":
-                return weight.toString().includes(q);
-            case "Breed":
-                return breed.toLowerCase().includes(q);
-            case "Status":
-                return status.toLowerCase().includes(q);
-            default:
-                return (
-                    id.toString().includes(q) ||
-                    sex.toLowerCase().includes(q) ||
-                    age.toString().includes(q) ||
-                    weight.toString().includes(q) ||
-                    breed.toLowerCase().includes(q) ||
-                    status.toLowerCase().includes(q)
-                );
-        }
-    });
+    const filteredCattle = cattleOnly.filter(
+        (animal) =>
+            animal.tag.toLowerCase().includes(search.toLowerCase()) ||
+            animal.breed.toLowerCase().includes(search.toLowerCase()) ||
+            animal.gender.toLowerCase().includes(search.toLowerCase())
+    );
 
     return (
-        <div className="w-full">
-            <div className="flex justify-end">
-                <SearchBarWithFilter
-                    placeholder="Search cattle"
-                    showFilterButton={true}
-                    onFilterSearch={handleFilterSearch}
+        <div className="p-4 text-black">
+            <h2 className="text-xl font-bold mb-4">Cattle Records</h2>
+
+            <div className="flex justify-end mb-4">
+                <input
+                    type="text"
+                    placeholder="Search by tag, breed, gender..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="p-2 w-full max-w-sm rounded-lg bg-white border border-gray-300"
                 />
             </div>
 
-            <div className="overflow-x-auto mt-4">
-                <table className="min-w-full border border-black text-black">
-                    <thead className="bg-gray-100">
-                    <tr>
-                        {[
-                            "Tag No",
-                            "Sex",
-                            "Breed",
-                            "Age",
-                            "Weight",
-                            "Last AI Date",
-                            "Pregnancy Status",
-                            "Expected Calving Date",
-                            "Current Status",
-                        ].map((header) => (
-                            <th
-                                key={header}
-                                className="border border-black px-2 py-2 text-left text-xs sm:text-sm md:text-base lg:text-lg"
-                            >
-                                {header}
-                            </th>
-                        ))}
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {filteredData.length > 0 ? (
-                        filteredData.map(
-                            ({
-                                 id,
-                                 sex,
-                                 age,
-                                 weight,
-                                 breed,
-                                 lastAIdate,
-                                 pregnancyStatus,
-                                 expectedCalvingDate,
-                                 status,
-                             }) => (
-                                <tr
-                                    key={id}
-                                    className="hover:bg-gray-200 cursor-pointer"
-                                    onClick={() => router.push(`/animals/${id}`)}
-                                >
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">{id}</td>
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">{sex}</td>
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">{breed}</td>
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">{age}</td>
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">{weight}</td>
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">
-                                        {lastAIdate ? lastAIdate.toLocaleDateString() : "N/A"}
-                                    </td>
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">
-                                        {pregnancyStatus ? pregnancyStatus.toString() : "N/A"}
-                                    </td>
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">
-                                        {expectedCalvingDate ? expectedCalvingDate.toLocaleDateString() : "N/A"}
-                                    </td>
-                                    <td className="border border-black px-2 py-2 text-xs sm:text-sm md:text-base lg:text-lg">{status}</td>
-                                </tr>
-                            )
-                        )
-                    ) : (
+            {/* Scrollable container with fixed height */}
+            <div className="overflow-x-auto border rounded shadow-sm">
+                <div className="max-h-[400px] overflow-y-auto">
+                    <table className="min-w-[800px] w-full table-fixed border-collapse">
+                        <thead className="bg-gray-200">
                         <tr>
-                            <td colSpan={9} className="text-center py-4 text-gray-500">
-                                No matching cattle found.
-                            </td>
+                            {/* Sticky headers */}
+                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                Tag No
+                            </th>
+                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                Breed
+                            </th>
+                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                Gender
+                            </th>
+                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                Weight
+                            </th>
+                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                Last AI Date
+                            </th>
+                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                Pregnancy Status
+                            </th>
+                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                Expected Calving Date
+                            </th>
+                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                Actions
+                            </th>
                         </tr>
-                    )}
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody>
+                        {filteredCattle.length > 0 ? (
+                            filteredCattle.map((animal) => (
+                                <tr
+                                    key={animal.tag}
+                                    className="hover:bg-gray-50 transition cursor-pointer"
+                                >
+                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                        {animal.tag}
+                                    </td>
+                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                        {animal.breed}
+                                    </td>
+                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                        {animal.gender}
+                                    </td>
+                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                        {animal.weight}
+                                    </td>
+                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                        {animal.lastAiDate || "-"}
+                                    </td>
+                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                        {animal.pregnancyStatus || "-"}
+                                    </td>
+                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                        {animal.expectedCalvingDate || "-"}
+                                    </td>
+                                    <td className="py-2 px-4 border border-gray-300 whitespace-nowrap text-sm md:text-base">
+                                        <div className={"flex items-center justify-center"}>
+                                            <Link
+                                                href={`/animals/${animal.tag}`}
+                                                className="text-blue-600 hover:underline mr-2"
+                                            >
+                                                <Eye className="h-5 w-5" />
+                                            </Link>
+                                            <button
+                                                onClick={() => {
+                                                    router.push(`/edit/${animal.tag}`);
+                                                }}
+                                                className="text-yellow-600 hover:text-yellow-800"
+                                            >
+                                                <SquarePen className="h-5 w-5" />
+                                            </button>
+
+                                            <button
+                                                className="text-red-600 hover:underline"
+                                                onClick={() => {
+                                                    if (
+                                                        confirm(
+                                                            `Are you sure you want to delete ${animal.tag}?`
+                                                        )
+                                                    ) {
+                                                        deleteAnimal(animal.tag);
+                                                    }
+                                                }}
+                                            >
+                                                <Trash2 className="h-5 w-5" />
+                                            </button>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td
+                                    colSpan={7}
+                                    className="text-center py-4 text-sm md:text-base"
+                                >
+                                    No cattle records found.
+                                </td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
-};
-
-export default CattleTable;
+}

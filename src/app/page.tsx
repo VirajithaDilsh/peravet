@@ -251,7 +251,7 @@ export default function Home(): JSX.Element {
                         },
                         {
                             img: "/features/Heart.svg",
-                            title: "Improves Animal Care",
+                            title: "Improves Animals Care",
                             desc: "Veterinary tracking and animal history records.",
                         },
                         {

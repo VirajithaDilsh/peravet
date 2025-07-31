@@ -3,16 +3,13 @@ import { useState } from "react";
 import AddAnimalButton from "@/components/AddAnimalButton";
 import CattleTable from "@/components/CattleTable";
 import TagInput from "@/components/TagInput";
-import { cattleData } from "@/data/CattleData";
+import { getCattle } from "@/utils/animalStatus";
+import { useAnimalContext } from "@/app/context/AnimalContext";
+
 
 
 export default function Home() {
-    const [, setAnimals] = useState<string[]>([]);
 
-    const handleAddAnimal = (animal: string) => {
-        setAnimals((prev) => [...prev, animal]);
-        console.log("Added:", animal);
-    };
     const [tag, setTag] = useState("");
     const [date, setDate] = useState("");
     const [milker, setMilker] = useState("");
@@ -29,6 +26,9 @@ export default function Home() {
         // await fetch("/api/save", { method: "POST", body: JSON.stringify(formData) })
     };
 
+    const { animals } = useAnimalContext();
+    const cattleStats = getCattle(animals);
+
 
     return (
         <div>
@@ -38,7 +38,7 @@ export default function Home() {
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-black">Cattle</h1>
 
                     {/* Right side: Button */}
-                    <AddAnimalButton animalType="Cattle" onAdd={handleAddAnimal} />
+                    <AddAnimalButton animalType="Cattle" />
                 </div>
             </main>
             {/*Total cattle box*/}
@@ -47,50 +47,50 @@ export default function Home() {
 
                     <div className="px-2">
                         <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Calves
+                            Cow
                         </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">10</span>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.cow}</span>
                     </div>
 
                     <div className="px-2">
                         <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
                             Heifers
                         </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">30</span>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.heifers}</span>
                     </div>
 
                     <div className="px-2">
                         <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
                             Dry
                         </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">15</span>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.dry}</span>
                     </div>
 
                     <div className="px-2">
                         <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
                             Milking
                         </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">12</span>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.milking}</span>
                     </div>
 
                     <div className="px-2">
                         <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
                             Pregnant
                         </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">50</span>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.pregnant}</span>
                     </div>
 
                     <div className="px-2">
                         <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
                             Bulls
                         </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">8</span>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.males}</span>
                     </div>
                     <div className="px-2">
                         <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Total Cattle
+                            Total Animals
                         </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleData.length}</span>
+                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.total}</span>
                     </div>
 
                 </div>
@@ -153,7 +153,7 @@ export default function Home() {
             </div>
 
 
-            {/* Cattle table section */}
+            {/* Animals table section */}
             <div className="flexp-4 p-4 sm:p-6">
                 {/* Table itself */}
                 <CattleTable />
