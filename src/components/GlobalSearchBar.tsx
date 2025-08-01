@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const dummyResults = [
-    { label: "Cattle", path: "/dashboard/cattle" },
+    { label: "Animals", path: "/dashboard/cattle" },
     { label: "Buffalo", path: "/dashboard/buffalo" },
     { label: "Pig", path: "/dashboard/swine" },
     { label: "Layer", path: "/dashboard/poultry/layer" },
