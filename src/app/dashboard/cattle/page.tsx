@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import AddAnimalButton from "@/components/AddAnimalButton";
-import CattleTable from "@/components/CattleTable";
+import CattleTable from "@/components/tables/CattleTable";
 import TagInput from "@/components/TagInput";
 import { getCattle } from "@/utils/animalStatus";
 import { useAnimalContext } from "@/app/context/AnimalContext";
@@ -88,7 +88,7 @@ export default function Home() {
                     </div>
                     <div className="px-2">
                         <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Total Animals
+                            Total Cattle
                         </p>
                         <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.total}</span>
                     </div>
