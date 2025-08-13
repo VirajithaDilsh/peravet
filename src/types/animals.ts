@@ -45,11 +45,57 @@ export interface Cattle extends BaseAnimal {
 export interface Buffalo extends BaseAnimal {
     dam: string;
     sire: string;
+    birthWeight: number;
+    lastCalvingDate?: string;
+    lactationStage?: string;
+    lastAiDate?: string;
+    nextAiDate?: string;
+    pregnancyStatus?: string;
+    ageOfPregnancy?: number;
+    expectedCalvingDate?: string;
+    lastHeatDate?: string;
+    reproductiveComment?: string;
+    vaccinationType: string;
+    vaccinationDate: string;
+    nextVaccinationDate: string;
+    dewormingType: string;
+    lastDewormingDate: string;
+    nextDewormingDate: string;
+    diseaseComment?: string;
+    treatmentComment?: string;
 }
 
 export interface Pig extends BaseAnimal {
-    dam: string;
-    sire: string;
+    // Birth info
+    dam: string; // mother pig ID
+    sire: string; // father boar ID
+    birthWeight: number; // in kg
+    litterSize?: number; // number of piglets in litter
+    birthDate: string;
+
+    // Reproductive info (for sows)
+    lastFarrowingDate?: string;
+    nextExpectedFarrowingDate?: string;
+    pregnancyStatus?: string;
+    parity?: number; // number of litters the sow has had
+    weaningDate?: string;
+
+    // Growth & weight info
+    currentWeight?: number; // kg
+    weaningWeight?: number;
+
+    // Health info
+    vaccinationType?: string;
+    vaccinationDate?: string;
+    nextVaccinationDate?: string;
+    dewormingType?: string;
+    lastDewormingDate?: string;
+    nextDewormingDate?: string;
+    diseaseComment?: string;
+    treatmentComment?: string;
+
+    // Optional notes
+    generalComment?: string;
 }
 export interface Goat extends BaseAnimal {
     dam: string;

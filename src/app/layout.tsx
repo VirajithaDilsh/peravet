@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { AnimalProvider } from "@/app/context/AnimalContext";
+import { TasksProvider } from "@/context/TasksContext";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -26,7 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body className="antialiased">
         <AuthProvider>
             <AnimalProvider> {/* ✅ Wrap children with AnimalProvider */}
-                {children}
+                <TasksProvider>
+                    {children}
+                </TasksProvider>
             </AnimalProvider>
         </AuthProvider>
         </body>

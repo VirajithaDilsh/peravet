@@ -284,6 +284,17 @@ export default function AnimalEntryForm({
                             {...methods.register("nextDewormingDate")}
                             className="border border-gray-700 rounded-lg"
                         />
+                        <label>Disease Comment:</label>
+                        <textarea
+                            {...methods.register("diseaseComment")}
+                            className="bg-gray-50 w-[600px] border border-gray-300 text-black text-lg rounded-lg p-4"
+                        />
+                        <label>Treatments Comment:</label>
+                        <textarea
+                            {...methods.register("treatmentComment")}
+                            className="bg-gray-50 w-[600px] border border-gray-300 text-black text-lg rounded-lg p-4"
+                        />
+
                     </div>
                 )}
 
