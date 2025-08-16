@@ -10,13 +10,11 @@ import { useAnimalContext } from "@/app/context/AnimalContext";
 
 export default function Home() {
 
-    const [tag, setTag] = useState("");
     const [date, setDate] = useState("");
     const [milker, setMilker] = useState("");
 
     const handleSubmit = () => {
         const formData = {
-            tag,
             date,
             milker,
         };
@@ -30,6 +28,7 @@ export default function Home() {
     const cattleStats = getCattle(animals);
 
 
+
     return (
         <div>
             <main className="flex flex-col">
@@ -38,68 +37,58 @@ export default function Home() {
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-black">Cattle</h1>
 
                     {/* Right side: Button */}
-                    <AddAnimalButton animalType="Cattle" />
+                        <AddAnimalButton animalType="Cattle" className="ml-2 sm:ml-4 md:ml-0" />
+
                 </div>
             </main>
-            {/*Total cattle box*/}
-            <div className="w-full max-w-5xl bg-green-300 rounded-lg text-black p-2">
-                <div className="grid grid-cols-7 divide-x divide-black text-center">
+            {/* Total Cattle Stats */}
+            <div className="w-full max-w-5xl mx-auto p-2 sm:p-4">
+                <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center">
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Cow
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.cow}</span>
+                    {/* Cow */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-green-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.cow}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Cow</p>
                     </div>
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Heifers
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.heifers}</span>
+                    {/* Heifers */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-blue-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.heifers}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Heifers</p>
                     </div>
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Dry
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.dry}</span>
+                    {/* Dry */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-yellow-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.dry}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Dry</p>
                     </div>
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Milking
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.milking}</span>
+                    {/* Milking */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-pink-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.milking}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Milking</p>
                     </div>
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Pregnant
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.pregnant}</span>
+                    {/* Pregnant */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-purple-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.pregnant}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Pregnant</p>
                     </div>
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Bulls
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.males}</span>
+                    {/* Bulls */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-red-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.males}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Bulls</p>
                     </div>
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Total Cattle
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{cattleStats.total}</span>
+
+                    {/* Total Cattle */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-black text-[10px] sm:text-lg font-bold truncate">{cattleStats.total}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Total Cattle</p>
                     </div>
 
                 </div>
             </div>
-
-
-
-
-
 
             {/*Milk production update*/}
             <div className="flex justify-start p-4 sm:p-6">
@@ -108,16 +97,6 @@ export default function Home() {
 
             <div className="flex-col w-full max-w-[743px] bg-[#DDF4EF] rounded-xl text-black px-4 sm:px-6 py-3 sm:py-4 ml-2 sm:ml-4">
                 <div className="flex flex-row flex-wrap items-end gap-2 sm:gap-4 w-full">
-
-                    <div className="flex-1 min-w-[100px] sm:min-w-[140px]">
-                        <TagInput
-                            label="Tag No."
-                            placeholder="Type tag number here"
-                            value={tag}
-                            onChangeAction={setTag}
-                            type="text"
-                        />
-                    </div>
 
                     <div className="flex-1 min-w-[100px] sm:min-w-[140px]">
                         <TagInput
@@ -153,12 +132,9 @@ export default function Home() {
             </div>
 
 
-            {/* Animals table section */}
-            <div className="flexp-4 p-4 sm:p-6">
-                {/* Table itself */}
+            <div className="flex  p-4 sm:p-6">
                 <CattleTable />
             </div>
-
         </div>
     );
 }
