@@ -13,6 +13,8 @@ const dummyResults = [
     { label: "Admin Panel", path: "/dashboard/admin" },
 ];
 
+
+
 export default function GlobalSearchBar() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<typeof dummyResults>([]);
@@ -37,7 +39,7 @@ export default function GlobalSearchBar() {
     return (
         <div className="relative w-full max-w-xs sm:max-w-[500px] md:max-w-md lg:max-w-lg">
             {/* Search Input */}
-            <div className="flex items-center bg-white border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-sm">
+            <div className="flex items-center bg-white border rounded-lg px-2 sm:px-3 py-1 sm:py-1 shadow-sm">
                 <Search size={16} className="text-[#8F9BBA] mr-2" />
                 <input
                     type="text"
@@ -50,7 +52,7 @@ export default function GlobalSearchBar() {
 
             {/* Results Dropdown */}
             {results.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-60 overflow-y-auto">
+                <ul className="absolute z-10 w-full bg-white border mt-1 rounded shadow max-h-52 sm:max-h-60 overflow-y-auto">
                     {results.map((item, index) => (
                         <li
                             key={index}

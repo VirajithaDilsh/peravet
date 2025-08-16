@@ -15,6 +15,7 @@ import StudentIcon from "@/icons/students.svg";
 import SettingsIcon from "@/icons/settings.svg";
 import GoatIcon from "@/icons/goat.svg";
 import RoosterIcon from "@/icons/rooster.svg";
+import UnionIcon from "@/icons/union.svg";
 
 type MenuKey = "dairy" | "swine" | "poultry" | "ruminants";
 
@@ -61,7 +62,7 @@ const Sidebar = () => {
             {!isMobileOpen && (
                 <button
                     onClick={() => setIsMobileOpen(true)}
-                    className="absolute top-10 right-0 z-50 p-2 text-green-600 md:hidden"
+                    className="absolute top-8 right-3 z-50 p-2 text-green-600 md:hidden"
                 >
                     <Menu size={28} />
                 </button>
@@ -95,6 +96,13 @@ const Sidebar = () => {
                         <X size={24} />
                     </button>
                 </div>
+                {/*union icon on mobile*/}
+                <div className="flex justify-start md:hidden p-4 absolute top-2 left-2 z-50">
+                    <Link href="/profile">
+                        <UnionIcon className="w-8 h-8 cursor-pointer hover:scale-105 transition-transform" />
+                    </Link>
+                </div>
+
 
                 {/* Logo (desktop only) */}
                 <div className="hidden md:flex justify-center items-center p-4 border-b">

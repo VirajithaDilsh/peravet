@@ -21,29 +21,41 @@ export default function DashboardLayout({
                         <div className="hidden sm:flex items-center justify-between h-16">
                             <GlobalSearchBar />
                             {/* Profile icon only visible on desktop */}
-                            <Link href="/profile" className="hidden lg:block">
+                            <Link href="/profile" className="hidden md:block lg:block">
                                 <UnionIcon className="w-8 h-8 cursor-pointer hover:scale-105 transition-transform" />
                             </Link>
                         </div>
 
                         {/* ✅ Mobile layout */}
-                        <div className="sm:hidden relative flex flex-row items-center h-16 space-x-4">
-                            {/* Left: Logo */}
-                            <div>
+                        <div className="sm:hidden flex items-center h-16 gap-4">
+                            {/* Logo */}
+                            <div className={"flex items-center justify-start"}>
                                 <Image
                                     src="/logo-mobile.png"
                                     alt="mobile logo"
-                                    width={80}
-                                    height={80}
+                                    width={70}
+                                    height={70}
                                     className="rounded-2xl"
                                 />
                             </div>
 
-                            {/* Right: Search bar takes remaining space */}
-                            <div className="flex-grow max-w-xs w-full mt-4">
-                                <GlobalSearchBar />
+
+                            {/* Search bar (fills remaining space) */}
+                            <div className="flex-grow flex justify-center">
+                                <div className="w-full max-w-xs">
+                                    <GlobalSearchBar />
+                                </div>
                             </div>
+
+                            {/* Sidebar toggle icon */}
+                            <button
+                                onClick={() => console.log("Open sidebar")}
+                                className="p-2 mt-1 rounded-md hover:bg-green-200 -translate-y-1"
+                            >
+                            </button>
                         </div>
+
+
 
                     </header>
 
