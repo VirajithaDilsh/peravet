@@ -27,7 +27,7 @@ export default function DashboardLayout({
                         </div>
 
                         {/* ✅ Mobile layout */}
-                        <div className="sm:hidden flex items-center h-16 gap-4">
+                        <div className="sm:hidden pda flex items-center h-16 gap-4">
                             {/* Logo */}
                             <div className={"flex items-center justify-start"}>
                                 <Image

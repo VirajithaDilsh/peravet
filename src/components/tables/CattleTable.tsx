@@ -1,31 +1,32 @@
 "use client";
-import React, { useState } from "react";
-import Link from "next/link";
+import React, { useState, MouseEvent, KeyboardEvent } from "react";
 import { useAnimalContext } from "@/app/context/AnimalContext";
 import { Cattle } from "@/types/animals";
-import { Trash2,SquarePen,Eye  } from "lucide-react";
+import { Trash2, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-
 
 export default function CattleTable() {
     const { animals, deleteAnimal } = useAnimalContext();
     const [search, setSearch] = useState("");
     const router = useRouter();
-    const cattleOnly = animals.filter(
-        (a): a is Cattle => a.species === "Cattle"
+
+    const cattleOnly = animals.filter((a): a is Cattle => a.species === "Cattle");
+
+    const filteredCattle = cattleOnly.filter((animal) =>
+        [animal.tag, animal.breed, animal.gender].some((field) =>
+            field.toLowerCase().includes(search.toLowerCase())
+        )
     );
 
-    const filteredCattle = cattleOnly.filter(
-        (animal) =>
-            animal.tag.toLowerCase().includes(search.toLowerCase()) ||
-            animal.breed.toLowerCase().includes(search.toLowerCase()) ||
-            animal.gender.toLowerCase().includes(search.toLowerCase())
-    );
+    const goToDetails = (tag: string) => {
+        router.push(`/animals/${tag}`);
+    };
+
+    const stop = (e: MouseEvent | KeyboardEvent) => e.stopPropagation();
 
     return (
-        <div className="p-4 text-black">
-            <h2 className="text-xl font-bold mb-4">Cattle Records</h2>
+        <div className="p-4 text-black w-full">
+            <h2 className="text-2xl font-semibold mb-4">Cattle Records</h2>
 
             <div className="flex justify-end mb-4">
                 <input
@@ -33,114 +34,95 @@ export default function CattleTable() {
                     placeholder="Search by tag, breed, gender..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="p-2 w-full max-w-sm rounded-lg bg-white border border-gray-300"
+                    className="p-2 w-full max-w-sm rounded-2xl bg-white  border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
             </div>
 
-            {/* Scrollable container with fixed height */}
-            <div className="overflow-x-auto border rounded shadow-sm">
-                <div className="max-h-[400px] overflow-y-auto">
-                    <table className="min-w-[800px] w-full table-fixed border-collapse">
-                        <thead className="bg-gray-200">
+            {/* Desktop & Tablet - Table View */}
+            <div className="hidden md:block">
+                <div className="border rounded-lg shadow overflow-x-auto max-h-[500px] w-full">
+                    <table className="w-full table-auto border-collapse text-xs md:text-sm min-w-[700px]">
+                        <thead className="bg-blue-100 text-left sticky top-0 z-10">
                         <tr>
-                            {/* Sticky headers */}
-                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
-                                Tag No
-                            </th>
-                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
-                                Breed
-                            </th>
-                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
-                                Gender
-                            </th>
-                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
-                                Weight
-                            </th>
-                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
-                                Last AI Date
-                            </th>
-                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
-                                Pregnancy Status
-                            </th>
-                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
-                                Expected Calving Date
-                            </th>
-                            <th className="sticky top-0 z-10 bg-gray-200 py-2 px-4 border border-gray-300 text-sm md:text-base">
-                                Actions
-                            </th>
+                            {[
+                                "Tag No",
+                                "Breed",
+                                "Gender",
+                                "Weight",
+                                "Last AI Date",
+                                "Pregnancy Status",
+                                "Expected Calving Date",
+                                "Actions",
+                            ].map((head) => (
+                                <th
+                                    key={head}
+                                    className="py-2 px-2 md:py-3 md:px-4 border border-gray-300 font-medium whitespace-nowrap"
+                                >
+                                    {head}
+                                </th>
+                            ))}
                         </tr>
                         </thead>
-
                         <tbody>
                         {filteredCattle.length > 0 ? (
-                            filteredCattle.map((animal) => (
+                            filteredCattle.map((animal, idx) => (
                                 <tr
                                     key={animal.tag}
-                                    className="hover:bg-gray-50 transition cursor-pointer"
+                                    className={`cursor-pointer hover:bg-blue-50 transition-colors ${
+                                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                    }`}
+                                    onClick={() => goToDetails(animal.tag)}
                                 >
-                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.tag}
                                     </td>
-                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.breed}
                                     </td>
-                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.gender}
                                     </td>
-                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.weight}
                                     </td>
-                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.lastAiDate || "-"}
                                     </td>
-                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.pregnancyStatus || "-"}
                                     </td>
-                                    <td className="py-2 px-4 border border-gray-300 text-sm md:text-base">
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.expectedCalvingDate || "-"}
                                     </td>
-                                    <td className="py-2 px-4 border border-gray-300 whitespace-nowrap text-sm md:text-base">
-                                        <div className={"flex items-center justify-center"}>
-                                            <Link
-                                                href={`/animals/${animal.tag}`}
-                                                className="text-blue-600 hover:underline mr-2"
-                                            >
-                                                <Eye className="h-5 w-5" />
-                                            </Link>
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
+                                        <div className="flex gap-1 md:gap-2 justify-center">
                                             <button
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    stop(e);
                                                     router.push(`/edit/${animal.tag}`);
                                                 }}
-                                                className="text-yellow-600 hover:text-yellow-800"
+                                                className="text-yellow-600 hover:text-yellow-800 p-1 rounded hover:bg-yellow-100 transition"
+                                                title="Edit"
                                             >
-                                                <SquarePen className="h-5 w-5" />
+                                                <SquarePen className="h-4 w-4 md:h-5 md:w-5" />
                                             </button>
-
                                             <button
-                                                className="text-red-600 hover:underline"
-                                                onClick={() => {
-                                                    if (
-                                                        confirm(
-                                                            `Are you sure you want to delete ${animal.tag}?`
-                                                        )
-                                                    ) {
-                                                        deleteAnimal(animal.tag);
-                                                    }
+                                                onClick={(e) => {
+                                                    stop(e);
+                                                    if (confirm(`Delete ${animal.tag}?`)) deleteAnimal(animal.tag);
                                                 }}
+                                                className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
+                                                title="Delete"
                                             >
-                                                <Trash2 className="h-5 w-5" />
+                                                <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
                                             </button>
                                         </div>
-
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td
-                                    colSpan={7}
-                                    className="text-center py-4 text-sm md:text-base"
-                                >
+                                <td colSpan={8} className="text-center py-4 text-gray-500 border border-gray-300">
                                     No cattle records found.
                                 </td>
                             </tr>
@@ -149,6 +131,56 @@ export default function CattleTable() {
                     </table>
                 </div>
             </div>
+
+
+            {/* Mobile - Card View with Y-axis scroll */}
+            <div className="md:hidden border rounded-lg shadow overflow-y-auto min-h-[300px] max-h-[500px]">
+                <div className="flex flex-col">
+                    {filteredCattle.length > 0 ? (
+                        filteredCattle.map((animal) => (
+                            <div
+                                key={animal.tag}
+                                onClick={() => goToDetails(animal.tag)}
+                                className="border-b last:border-b-0 p-3 bg-white hover:bg-blue-50 transition cursor-pointer"
+                            >
+                                <div className="flex justify-between items-center mb-2">
+                                    <h3 className="font-semibold text-blue-800 text-sm">Tag No:{animal.tag}</h3>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                stop(e);
+                                                router.push(`/edit/${animal.tag}`);
+                                            }}
+                                            className="text-yellow-600 hover:text-yellow-800 p-1 rounded hover:bg-yellow-100 transition"
+                                        >
+                                            <SquarePen className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                stop(e);
+                                                if (confirm(`Delete ${animal.tag}?`)) deleteAnimal(animal.tag);
+                                            }}
+                                            className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-600">Breed: {animal.breed}</p>
+                                <p className="text-xs text-gray-600">Gender: {animal.gender}</p>
+                                <p className="text-xs text-gray-600">Weight: {animal.weight}</p>
+                                <p className="text-xs text-gray-600">Last AI Date: {animal.lastAiDate || "-"}</p>
+                                <p className="text-xs text-gray-600">Pregnancy: {animal.pregnancyStatus || "-"}</p>
+                                <p className="text-xs text-gray-600">Calving Date: {animal.expectedCalvingDate || "-"}</p>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-gray-500 p-4">No cattle records found.</p>
+                    )}
+                </div>
+            </div>
+
+
         </div>
     );
 }
