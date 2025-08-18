@@ -27,33 +27,31 @@ export default function DashboardLayout({
                         </div>
 
                         {/* ✅ Mobile layout */}
-                        <div className="sm:hidden pda flex items-center h-16 gap-4">
+                        <div className="sm:hidden flex items-center h-16 px-4 gap-4">
                             {/* Logo */}
-                            <div className={"flex items-center justify-start"}>
+                            <div className="flex-shrink-0">
                                 <Image
                                     src="/logo-mobile.png"
                                     alt="mobile logo"
-                                    width={70}
-                                    height={70}
+                                    width={48}
+                                    height={48}
                                     className="rounded-2xl"
                                 />
                             </div>
 
-
-                            {/* Search bar (fills remaining space) */}
-                            <div className="flex-grow flex justify-center">
-                                <div className="w-full max-w-xs">
-                                    <GlobalSearchBar />
-                                </div>
+                            {/* Search bar */}
+                            <div className="flex-grow">
+                                <GlobalSearchBar />
                             </div>
 
                             {/* Sidebar toggle icon */}
                             <button
                                 onClick={() => console.log("Open sidebar")}
-                                className="p-2 mt-1 rounded-md hover:bg-green-200 -translate-y-1"
+                                className="flex-shrink-0 p-2 rounded-md hover:bg-green-200"
                             >
                             </button>
                         </div>
+
 
 
 
