@@ -2,7 +2,7 @@
 import AddAnimalButton from "@/components/AddAnimalButton";
 import PigTable from "@/components/tables/PigTable";
 import { getPig } from "@/utils/animalStatus"; //count
-import { useAnimalContext } from "@/app/context/AnimalContext";
+import { useAnimalContext } from "@/context/AnimalContext";
 
 
 

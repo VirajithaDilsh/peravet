@@ -1,9 +1,17 @@
+import AddAnimalButton from "@/components/AddAnimalButton";
+
 export default function Home() {
     return (
         <div className="flex">
-            <main className="flex-1 p-4 text-black">
-                {/* Main content goes here */}
-                <h1>Hello, main layer!</h1>
+            <main className="flex flex-col">
+                <div className="flex justify-between items-center p-6">
+                    {/* Left side: Title */}
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-black">Layer</h1>
+
+                    {/* Right side: Button */}
+                    <AddAnimalButton animalType="Layer" className="ml-2 sm:ml-4 md:ml-0" />
+
+                </div>
             </main>
         </div>
     );
