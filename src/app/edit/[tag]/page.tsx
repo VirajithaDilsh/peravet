@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useAnimalContext } from "@/app/context/AnimalContext";
+import { useAnimalContext } from "@/context/AnimalContext";
 import AnimalEntryForm from "@/components/AnimalEntryForm";
 
 export default function EditPage() {

@@ -8,7 +8,7 @@ import {
     ResponsiveContainer,
     Legend,
 } from "recharts";
-import { useAnimalContext } from "@/app/context/AnimalContext";
+import { useAnimalContext } from "@/context/AnimalContext";
 
 const COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#0EA5E9", "#14B8A6"];
 

@@ -4,7 +4,7 @@ import AddAnimalButton from "@/components/AddAnimalButton";
 import BuffaloTable from "@/components/tables/BuffaloTable";
 import TagInput from "@/components/TagInput";
 import { getBuffalo } from "@/utils/animalStatus";
-import { useAnimalContext } from "@/app/context/AnimalContext";
+import { useAnimalContext } from "@/context/AnimalContext";
 
 
 

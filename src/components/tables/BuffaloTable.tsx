@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { useAnimalContext } from "@/app/context/AnimalContext";
+import { useAnimalContext } from "@/context/AnimalContext";
 import { Buffalo } from "@/types/animals";
 import { Trash2,SquarePen,Eye  } from "lucide-react";
 import { useRouter } from "next/navigation";

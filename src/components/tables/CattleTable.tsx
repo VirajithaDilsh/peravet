@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, MouseEvent, KeyboardEvent } from "react";
-import { useAnimalContext } from "@/app/context/AnimalContext";
+import { useAnimalContext } from "@/context/AnimalContext";
 import { Cattle } from "@/types/animals";
 import { Trash2, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";

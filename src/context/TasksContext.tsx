@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import { Task } from "@/types/Task";
 import { buildTasksFromAnimals } from "@/utils/taskUtils";
 import { daysBetween, toDate } from "@/utils/date";
-import { useAnimalContext } from "@/app/context/AnimalContext"; // your existing context
+import { useAnimalContext } from "@/context/AnimalContext"; // your existing context
 
 // Local UI state persisted in localStorage
 interface CompletedMap { [taskKey: string]: string /* completedAt ISO */ }

@@ -8,19 +8,55 @@ export type Animal =
     | Layer
     | Broiler;
 
+export interface Treatment {
+    type: "Vaccination" | "Deworming" | "Other" | "";
+    treatment?:string;
+    dueDate?: string;
+    nextDate?: string;
+    comment?: string;
+
+    //layer
+    drug?: string;
+    dosage?:number;
+    root?:string;
+    prescribe?:string;
+
+}
+export interface poultryVaccinations {
+    date?: string;
+    vaccinations?:string[];
+    route?: string;
+
+
+}
+
+export interface poultryFeedManagement{
+    type:"Starter"|"Grower"|"Layer Feed"
+    feedRequirement?:string;
+    feedIntake:string;
+}
+export interface poultryWaterManagement{
+    waterRequirement?:string;
+    waterIntake:string;
+    choloring?:string;
+}
+
 export interface BaseAnimal {
     species: string;
-    tag: string;
-    breed: string;
+    tag: string;// flock id(birds)
+    breed: string; //strains(birds)
     gender: string;
     weight: number;
-    age?: number;// optional
+    age?: number;// age of flock(birds)
     status: string;
+    treatments?: Treatment[];
+    diseaseComment?: string;
 }
 
 export interface Cattle extends BaseAnimal {
     dam: string;
     sire: string;
+    birthDate: string;
     birthWeight: number;
     lastCalvingDate?: string;
     lactationStage?: string;
@@ -31,20 +67,14 @@ export interface Cattle extends BaseAnimal {
     expectedCalvingDate?: string;
     lastHeatDate?: string;
     reproductiveComment?: string;
-    vaccinationType: string;
-    vaccinationDate: string;
-    nextVaccinationDate: string;
-    dewormingType: string;
-    lastDewormingDate: string;
-    nextDewormingDate: string;
     diseaseComment?: string;
-    treatmentComment?: string;
 
 }
 
 export interface Buffalo extends BaseAnimal {
     dam: string;
     sire: string;
+    birthDate: string;
     birthWeight: number;
     lastCalvingDate?: string;
     lactationStage?: string;
@@ -55,13 +85,7 @@ export interface Buffalo extends BaseAnimal {
     expectedCalvingDate?: string;
     lastHeatDate?: string;
     reproductiveComment?: string;
-    vaccinationType: string;
-    vaccinationDate: string;
-    nextVaccinationDate: string;
-    dewormingType: string;
-    lastDewormingDate: string;
-    nextDewormingDate: string;
-    diseaseComment?: string;
+
     treatmentComment?: string;
 }
 
@@ -106,11 +130,19 @@ export interface Sheep extends BaseAnimal {
     sire: string;
 }
 export interface Layer extends BaseAnimal {
-    dam: string;
-    sire: string;
+   initialFlockSize?:number;
+   currentFlockSize?:number;
+   mortilityRate:number;
+   treatments?: Treatment[];
+   vaccinations?:poultryVaccinations;
+   feedManagement?: poultryFeedManagement;
+   waterManagement?: poultryWaterManagement;
+
 }
 export interface Broiler extends BaseAnimal {
-    dam: string;
-    sire: string;
+    initialFlockSize:number;
+    currentFlockSize:number;
+    mortilityRate:number;
+    treatments?: Treatment[];
 }
 

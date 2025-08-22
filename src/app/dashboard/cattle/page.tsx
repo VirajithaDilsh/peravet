@@ -4,7 +4,7 @@ import AddAnimalButton from "@/components/AddAnimalButton";
 import CattleTable from "@/components/tables/CattleTable";
 import TagInput from "@/components/TagInput";
 import { getCattle } from "@/utils/animalStatus";
-import { useAnimalContext } from "@/app/context/AnimalContext";
+import { useAnimalContext } from "@/context/AnimalContext";
 
 
 
@@ -110,7 +110,7 @@ export default function Home() {
 
                     <div className="flex-1 min-w-[110px] sm:min-w-[150px]">
                         <TagInput
-                            label="Total (Milker)"
+                            label="Total Milk Yeild"
                             placeholder=""
                             value={milker}
                             onChangeAction={setMilker}
