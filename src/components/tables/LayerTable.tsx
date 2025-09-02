@@ -1,18 +1,18 @@
 "use client";
 import React, { useState, MouseEvent, KeyboardEvent } from "react";
 import { useAnimalContext } from "@/context/AnimalContext";
-import { Pig } from "@/types/animals";
+import { Layer } from "@/types/animals";
 import { Trash2, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function PigTable() {
+export default function LayerTable() {
     const { animals, deleteAnimal } = useAnimalContext();
     const [search, setSearch] = useState("");
     const router = useRouter();
 
-    const PigOnly = animals.filter((a): a is Pig => a.species === "Pig");
+    const layerOnly = animals.filter((a): a is Layer => a.species === "Layer");
 
-    const filteredPig = PigOnly.filter((animal) =>
+    const filteredCattle = layerOnly.filter((animal) =>
         [animal.tag, animal.breed, animal.gender].some((field) =>
             field.toLowerCase().includes(search.toLowerCase())
         )
@@ -26,12 +26,12 @@ export default function PigTable() {
 
     return (
         <div className="p-4 text-black w-full">
-            <h2 className="text-2xl font-semibold mb-4">Pig Records</h2>
+            <h2 className="text-2xl font-semibold mb-4">Layer Records</h2>
 
             <div className="flex justify-end mb-4">
                 <input
                     type="text"
-                    placeholder="Search by tag, breed, gender..."
+                    placeholder="Search by flock id, strains ..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="p-2 w-full max-w-sm rounded-2xl bg-white  border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -45,10 +45,11 @@ export default function PigTable() {
                         <thead className="bg-blue-100 text-left sticky top-0 z-10">
                         <tr>
                             {[
-                                "Tag No",
-                                "Breed",
-                                "Gender",
-                                "Weight",
+                                "Flock ID",
+                                "Strains",
+                                "Initial Flock Size",
+                                "Current Flock Size",
+                                "Mortality Rate",
                                 "Actions",
                             ].map((head) => (
                                 <th
@@ -61,8 +62,8 @@ export default function PigTable() {
                         </tr>
                         </thead>
                         <tbody>
-                        {filteredPig.length > 0 ? (
-                            filteredPig.map((animal, idx) => (
+                        {filteredCattle.length > 0 ? (
+                            filteredCattle.map((animal, idx) => (
                                 <tr
                                     key={animal.tag}
                                     className={`cursor-pointer hover:bg-blue-50 transition-colors ${
@@ -77,11 +78,18 @@ export default function PigTable() {
                                         {animal.breed}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.gender}
+                                        {animal.initialFlockSize}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.weight}
+                                        {animal.currentFlockSize}
                                     </td>
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                        {animal.initialFlockSize && animal.currentFlockSize
+                                            ? (((animal.initialFlockSize - animal.currentFlockSize) / animal.initialFlockSize) * 100).toFixed(2) + "%"
+                                            : "N/A"}
+                                    </td>
+
+
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
                                         <div className="flex gap-1 md:gap-2 justify-center">
                                             <button
@@ -111,7 +119,7 @@ export default function PigTable() {
                         ) : (
                             <tr>
                                 <td colSpan={8} className="text-center py-4 text-gray-500 border border-gray-300">
-                                    No pig records found.
+                                    No layer records found.
                                 </td>
                             </tr>
                         )}
@@ -124,15 +132,15 @@ export default function PigTable() {
             {/* Mobile - Card View with Y-axis scroll */}
             <div className="md:hidden border rounded-lg shadow overflow-y-auto min-h-[300px] max-h-[500px]">
                 <div className="flex flex-col">
-                    {filteredPig.length > 0 ? (
-                        filteredPig.map((animal) => (
+                    {filteredCattle.length > 0 ? (
+                        filteredCattle.map((animal) => (
                             <div
                                 key={animal.tag}
                                 onClick={() => goToDetails(animal.tag)}
                                 className="border-b last:border-b-0 p-3 bg-white hover:bg-blue-50 transition cursor-pointer"
                             >
                                 <div className="flex justify-between items-center mb-2">
-                                    <h3 className="font-semibold text-blue-800 text-sm">Tag No:{animal.tag}</h3>
+                                    <h3 className="font-semibold text-blue-800 text-sm">Flock ID:{animal.tag}</h3>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={(e) => {
@@ -154,13 +162,20 @@ export default function PigTable() {
                                         </button>
                                     </div>
                                 </div>
-                                <p className="text-xs text-gray-600">Breed: {animal.breed}</p>
-                                <p className="text-xs text-gray-600">Gender: {animal.gender}</p>
-                                <p className="text-xs text-gray-600">Weight: {animal.weight}</p>
+                                <p className="text-xs text-gray-600">Strains: {animal.breed}</p>
+                                <p className="text-xs text-gray-600">Initial Flock Size: {animal.initialFlockSize}</p>
+                                <p className="text-xs text-gray-600">Current Flock Size: {animal.currentFlockSize}</p>
+                                <p className="text-xs text-gray-600">
+                                    Mortality Rate:{" "}
+                                    {animal.initialFlockSize && animal.currentFlockSize
+                                        ? (((animal.initialFlockSize - animal.currentFlockSize) / animal.initialFlockSize) * 100).toFixed(2) + "%"
+                                        : "N/A"}
+                                </p>
+
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-gray-500 p-4">No buffalo records found.</p>
+                        <p className="text-center text-gray-500 p-4">No layer records found.</p>
                     )}
                 </div>
             </div>

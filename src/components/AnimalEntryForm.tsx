@@ -39,7 +39,7 @@ const AnimalEntryForm: React.FC<AnimalEntryFormProps> = ({
     let steps: { title: string; fields: (keyof AnimalForm)[] }[] = [
         {
             title: "Basic Information",
-            fields: ["species", "tag", "breed", "gender"],
+            fields: ["species", "tag", "breed", "gender","initialFlockSize","currentFlockSize","mortilityRate"],
         },
         {
             title: "Birth Info",
@@ -56,17 +56,35 @@ const AnimalEntryForm: React.FC<AnimalEntryFormProps> = ({
     ];
 
     // ✅ Only show reproductive info for female
-    steps = steps.filter((s) => s.title !== "Reproductive Info" || gender === "Female");
+    const species = methods.watch("species") || defaultValues?.species;
+
+    const poultryHides = new Set(["Birth Info" , "Health Info"]);
+
+    steps = steps.filter((s) =>
+        !(
+            (s.title === "Reproductive Info" && gender !== "Female") ||
+            ((species === "Layer" || species === "Broiler") && poultryHides.has(s.title))
+        )
+    );
+
+
 
     const handleNext = () => {
-        if (step === 0) {
-            const required: (keyof AnimalForm)[] = ["species", "tag", "gender"];
-            const valid = required.every((f) => !!methods.getValues(f));
-            if (!valid) {
-                alert("Please fill required fields (Species, Tag, Gender) before continuing.");
-                return;
-            }
+        const required: (keyof AnimalForm)[] = ["species", "tag", "breed"]; // always needed
+
+        const species = methods.getValues("species");
+
+        // only require gender if not Layer or Broiler
+        if (species !== "Layer" && species !== "Broiler") {
+            required.push("gender");
         }
+
+        const valid = required.every((f) => !!methods.getValues(f));
+        if (!valid) {
+            alert(`Please fill required fields: ${required.join(", ")} before continuing.`);
+            return;
+        }
+
         setStep((s) => s + 1);
     };
 

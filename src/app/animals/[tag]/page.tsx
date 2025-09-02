@@ -2,23 +2,40 @@
 import { useParams, useRouter } from "next/navigation";
 import { useAnimalContext } from "@/context/AnimalContext";
 import keyDisplayNames from "@/constants/animalFieldLabels";
-import {Animal, Cattle, Buffalo, Pig, Goat, Sheep, Layer, Broiler, Treatment,} from "@/types/animals";
+import {
+    Animal,
+    Cattle,
+    Buffalo,
+    Pig,
+    Goat,
+    Sheep,
+    Layer,
+    Broiler,
+    Treatment,
+} from "@/types/animals";
 import { useState, useEffect } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
+import PoultryHealthTables from "@/components/tables/PoultryHealthTables";
 
 type AnimalKeys = keyof (Cattle & Buffalo & Pig & Goat & Sheep & Layer & Broiler);
 type TreatmentField = keyof Treatment;
 
-// Type guard for Cattle
+// Type guards
 function isCattle(animal: Animal): animal is Cattle {
     return animal.species === "Cattle";
 }
 function isBuffalo(animal: Animal): animal is Buffalo {
     return animal.species === "Buffalo";
 }
+function isLayer(animal: Animal): animal is Layer {
+    return animal.species === "Layer";
+}
+function isBroiler(animal: Animal): animal is Broiler {
+    return animal.species === "Broiler";
+}
 
-const pregnancyOptions = ["Pregnant", "Not Pregnant","To be Check","Infertile"];
-const lactationOptions = ["Early","Mid","Late", "Dry"];
+const pregnancyOptions = ["Pregnant", "Not Pregnant", "To be Check", "Infertile"];
+const lactationOptions = ["Early", "Mid", "Late", "Dry"];
 
 export default function AnimalDetailPage() {
     const { tag } = useParams();
@@ -33,11 +50,16 @@ export default function AnimalDetailPage() {
     const [diseaseValue, setDiseaseValue] = useState("");
     const [treatments, setTreatments] = useState<Treatment[]>([]);
 
-    // Initialize state once animal is loaded
+    // Flock state for Layer & Broiler
+    const [initialFlockSize, setInitialFlockSize] = useState<number>(0);
+    const [currentFlockSize, setCurrentFlockSize] = useState<number>(0);
+    const [mortalityRate, setMortalityRate] = useState<number>(0);
+
+    // Initialize state
     useEffect(() => {
         if (!animal) return;
 
-        if (isCattle(animal)||isBuffalo(animal)) {
+        if (isCattle(animal) || isBuffalo(animal)) {
             setReproValues({
                 lastCalvingDate: animal.lastCalvingDate,
                 lactationStage: animal.lactationStage,
@@ -53,7 +75,24 @@ export default function AnimalDetailPage() {
 
         setDiseaseValue(animal.diseaseComment || "");
         setTreatments(animal.treatments || []);
+
+        if (isLayer(animal) || isBroiler(animal)) {
+            setInitialFlockSize(animal.initialFlockSize || 0);
+            setCurrentFlockSize(animal.currentFlockSize || 0);
+            setMortalityRate(
+                animal.initialFlockSize && animal.currentFlockSize
+                    ? ((animal.initialFlockSize - animal.currentFlockSize) / animal.initialFlockSize) * 100
+                    : 0
+            );
+        }
     }, [animal]);
+
+    // Update mortalityRate whenever flock size changes
+    useEffect(() => {
+        if (initialFlockSize > 0) {
+            setMortalityRate(((initialFlockSize - currentFlockSize) / initialFlockSize) * 100);
+        }
+    }, [initialFlockSize, currentFlockSize]);
 
     if (!animal) {
         return (
@@ -75,7 +114,7 @@ export default function AnimalDetailPage() {
     };
 
     const saveReproField = <K extends keyof Cattle>(key: K) => {
-        if (isCattle(animal)) {
+        if (isCattle(animal) || isBuffalo(animal)) {
             editAnimal({ ...animal, [key]: reproValues[key] });
             setEditingRepro({ ...editingRepro, [key]: false });
         }
@@ -97,15 +136,11 @@ export default function AnimalDetailPage() {
     };
 
     const addTreatment = () => {
-        setTreatments([
-            ...treatments,
-            { type: "", treatment: "", dueDate: "", nextDate: "", comment: "" },
-        ]);
+        setTreatments([...treatments, { type: "", treatment: "", dueDate: "", nextDate: "", comment: "" }]);
     };
 
     const deleteTreatment = (index: number) => {
-        const newTreatments = treatments.filter((_, i) => i !== index);
-        setTreatments(newTreatments);
+        setTreatments(treatments.filter((_, i) => i !== index));
     };
 
     const isValuePresent = (value: unknown) =>
@@ -114,6 +149,7 @@ export default function AnimalDetailPage() {
     const fieldGroups: Record<string, AnimalKeys[]> = {
         "Basic Information": ["species", "tag", "breed", "gender", "weight", "age", "status"],
         "Birth Information": ["dam", "sire", "birthDate", "birthWeight"],
+        "Flock Information": ["initialFlockSize", "currentFlockSize", "mortalityRate"],
         "Reproductive Information": [
             "lastCalvingDate",
             "lactationStage",
@@ -128,6 +164,11 @@ export default function AnimalDetailPage() {
         "Health Information": ["treatments", "diseaseComment"],
     };
 
+    const getLabel = (key: string) => {
+        const speciesKey = animal.species in keyDisplayNames ? animal.species : "default";
+        return keyDisplayNames[speciesKey]?.[key] || keyDisplayNames.default[key] || key;
+    };
+
     return (
         <div className="w-full min-h-screen p-4 md:p-6 text-black bg-gray-50 overflow-auto">
             <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-6">
@@ -139,14 +180,18 @@ export default function AnimalDetailPage() {
                     let visibleFields: string[] = [];
 
                     if (groupName === "Reproductive Information") {
-                        if (!isCattle(animal)||!isBuffalo(animal)) return null;
+                        if (!isCattle(animal) && !isBuffalo(animal)) return null;
                         visibleFields = keys.filter((key) => isValuePresent(animal[key as keyof Cattle]));
+                    } else if (groupName === "Flock Information") {
+                        if (!isLayer(animal) && !isBroiler(animal)) return null;
+                        visibleFields = keys;
                     } else {
                         visibleFields = keys.filter((key) => isValuePresent(animal[key as keyof Animal]));
                     }
 
                     if (visibleFields.length === 0) return null;
 
+                    // Reproductive group
                     if (groupName === "Reproductive Information") {
                         return (
                             <div key={groupName} className="mb-4 md:mb-6">
@@ -161,75 +206,40 @@ export default function AnimalDetailPage() {
                                         const isSelectField = key === "pregnancyStatus" || key === "lactationStage";
 
                                         return (
-                                            <div
-                                                key={key}
-                                                className="bg-gray-100 p-3 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center justify-between"
-                                            >
+                                            <div key={key} className="bg-gray-100 p-3 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center justify-between">
                                                 <div className="flex-1">
-                                                    <p className="text-sm md:text-base font-semibold text-gray-500">
-                                                        {keyDisplayNames[key as string] || key}
-                                                    </p>
+                                                    <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel(key)}</p>
                                                     {isEditing ? (
                                                         isDateField ? (
-                                                            <input
-                                                                type="date"
-                                                                value={value as string}
-                                                                onChange={(e) =>
-                                                                    handleReproChange(key as keyof Cattle, e.target.value)
-                                                                }
-                                                                className="border rounded px-2 py-1 mt-1 w-full"
-                                                            />
+                                                            <input type="date" value={value as string} onChange={(e) => handleReproChange(key as keyof Cattle, e.target.value)} className="border rounded px-2 py-1 mt-1 w-full" />
                                                         ) : isSelectField ? (
-                                                            <select
-                                                                value={value as string}
-                                                                onChange={(e) =>
-                                                                    handleReproChange(key as keyof Cattle, e.target.value)
-                                                                }
-                                                                className="border rounded px-2 py-1 mt-1 w-full"
-                                                            >
-                                                                {(key === "pregnancyStatus"
-                                                                        ? pregnancyOptions
-                                                                        : lactationOptions
-                                                                ).map((opt) => (
-                                                                    <option key={opt} value={opt}>
-                                                                        {opt}
-                                                                    </option>
+                                                            <select value={value as string} onChange={(e) => handleReproChange(key as keyof Cattle, e.target.value)} className="border rounded px-2 py-1 mt-1 w-full">
+                                                                {(key === "pregnancyStatus" ? pregnancyOptions : lactationOptions).map((opt) => (
+                                                                    <option key={opt} value={opt}>{opt}</option>
                                                                 ))}
                                                             </select>
                                                         ) : (
-                                                            <input
-                                                                type="text"
-                                                                value={value as string}
+                                                            <textarea
+                                                                value={reproValues.reproductiveComment || ""}
                                                                 onChange={(e) =>
-                                                                    handleReproChange(key as keyof Cattle, e.target.value)
+                                                                    setReproValues({ ...reproValues, reproductiveComment: e.target.value })
                                                                 }
-                                                                className="border rounded px-2 py-1 mt-1 w-full"
+                                                                className="w-full border rounded px-2 py-1 mt-1 text-sm md:text-base h-24 overflow-auto break-words"
                                                             />
+
+
                                                         )
                                                     ) : (
-                                                        <p className="text-base md:text-lg font-medium text-gray-800">
-                                                            {String(value)}
-                                                        </p>
+                                                        <div className="h-24 overflow-y-auto break-words mt-1">
+                                                            <p className="text-base md:text-lg text-gray-800">{String(value) || "No comment"}</p>
+                                                        </div>
                                                     )}
                                                 </div>
                                                 <div className="mt-2 sm:mt-0 sm:ml-2 flex-shrink-0">
                                                     {isEditing ? (
-                                                        <button
-                                                            onClick={() => saveReproField(key as keyof Cattle)}
-                                                            className="text-green-600 font-bold text-sm md:text-base"
-                                                        >
-                                                            Save
-                                                        </button>
+                                                        <button onClick={() => saveReproField(key as keyof Cattle)} className="text-green-600 font-bold text-sm md:text-base">Save</button>
                                                     ) : (
-                                                        <Pencil
-                                                            className="w-5 h-5 text-blue-600 cursor-pointer"
-                                                            onClick={() =>
-                                                                setEditingRepro({
-                                                                    ...editingRepro,
-                                                                    [key as keyof Cattle]: true,
-                                                                })
-                                                            }
-                                                        />
+                                                        <Pencil className="w-5 h-5 text-blue-600 cursor-pointer" onClick={() => setEditingRepro({...editingRepro, [key as keyof Cattle]: true})} />
                                                     )}
                                                 </div>
                                             </div>
@@ -240,95 +250,56 @@ export default function AnimalDetailPage() {
                         );
                     }
 
+                    // Health group
                     if (groupName === "Health Information") {
                         return (
                             <div key={groupName} className="mb-4 md:mb-6">
-                                <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">
-                                    {groupName}
-                                </h2>
-
+                                <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">{groupName}</h2>
                                 <div className="overflow-x-auto w-full mb-3">
                                     <table className="w-full border-collapse border border-gray-300 text-sm md:text-base">
                                         <thead className="bg-gray-100">
                                         <tr>
-                                            {["Type", "Treatment", "Due Date", "Next Date", "Comment", "Actions"].map(
-                                                (h) => (
-                                                    <th key={h} className="border p-1 md:p-2">
-                                                        {h}
-                                                    </th>
-                                                )
-                                            )}
+                                            {["Type", "Treatment", "Due Date", "Next Date", "Comment", "Actions"].map(h => (
+                                                <th key={h} className="border p-1 md:p-2">{h}</th>
+                                            ))}
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {treatments.map((t, i) => (
                                             <tr key={i} className="even:bg-gray-50">
-                                                {(["type", "treatment", "dueDate", "nextDate", "comment"] as TreatmentField[]).map(
-                                                    (f) => (
-                                                        <td key={f} className="border p-1 md:p-2">
-                                                            <input
-                                                                type={f.toLowerCase().includes("date") ? "date" : "text"}
-                                                                value={t[f]}
-                                                                onChange={(e) => handleTreatmentChange(i, f, e.target.value)}
-                                                                className="w-full border rounded px-1 py-0.5"
-                                                            />
-                                                        </td>
-                                                    )
-                                                )}
+                                                {(["type", "treatment", "dueDate", "nextDate", "comment"] as TreatmentField[]).map(f => (
+                                                    <td key={f} className="border p-1 md:p-2">
+                                                        <input type={f.toLowerCase().includes("date") ? "date" : "text"} value={t[f]} onChange={(e) => handleTreatmentChange(i, f, e.target.value)} className="w-full border rounded px-1 py-0.5" />
+                                                    </td>
+                                                ))}
                                                 <td className="border p-1 md:p-2">
-                                                    <Trash2
-                                                        className="w-4 h-4 text-red-600 cursor-pointer"
-                                                        onClick={() => deleteTreatment(i)}
-                                                    />
+                                                    <Trash2 className="w-4 h-4 text-red-600 cursor-pointer" onClick={() => deleteTreatment(i)} />
                                                 </td>
                                             </tr>
                                         ))}
                                         </tbody>
                                     </table>
                                     <div className="flex flex-wrap gap-2 mt-2">
-                                        <button
-                                            onClick={addTreatment}
-                                            className="flex items-center gap-1 text-blue-600 text-sm md:text-base"
-                                        >
-                                            <Plus className="w-4 h-4" /> Add Treatment
-                                        </button>
-                                        <button
-                                            onClick={saveTreatments}
-                                            className="px-3 py-1 bg-green-500 text-white rounded text-sm md:text-base"
-                                        >
-                                            Save Treatments
-                                        </button>
+                                        <button onClick={addTreatment} className="flex items-center gap-1 text-blue-600 text-sm md:text-base"><Plus className="w-4 h-4" /> Add Treatment</button>
+                                        <button onClick={saveTreatments} className="px-3 py-1 bg-green-500 text-white rounded text-sm md:text-base">Save Treatments</button>
                                     </div>
                                 </div>
-
                                 <div className="mt-2 bg-gray-100 p-3 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start">
                                     <div className="flex-1">
-                                        <p className="text-sm md:text-base font-semibold text-gray-500">
-                                            Disease Comment
-                                        </p>
+                                        <p className="text-sm md:text-base font-semibold text-gray-500">Disease Comment</p>
                                         {editingDisease ? (
-                                            <textarea
-                                                value={diseaseValue}
-                                                onChange={(e) => setDiseaseValue(e.target.value)}
-                                                className="w-full border rounded px-2 py-1 mt-1 text-sm md:text-base"
-                                            />
+                                            <textarea value={diseaseValue} onChange={(e) => setDiseaseValue(e.target.value)} className="w-full border rounded px-2 py-1 mt-1 text-sm md:text-base h-24 overflow-y-auto" />
                                         ) : (
-                                            <p className="text-base md:text-lg text-gray-800">{diseaseValue}</p>
+                                            <div className="h-24 overflow-y-auto break-words mt-1">
+                                                <p className="text-base md:text-lg text-gray-800">{diseaseValue || "No comment"}</p>
+                                            </div>
                                         )}
                                     </div>
                                     <div className="mt-2 sm:mt-0 sm:ml-2 flex-shrink-0">
                                         {editingDisease ? (
-                                            <button
-                                                onClick={handleDiseaseSave}
-                                                className="text-green-600 font-bold text-sm md:text-base"
-                                            >
-                                                Save
-                                            </button>
+                                            <button onClick={handleDiseaseSave} className="text-green-600 font-bold text-sm md:text-base">Save</button>
                                         ) : (
-                                            <Pencil
-                                                className="w-5 h-5 text-blue-600 cursor-pointer"
-                                                onClick={() => setEditingDisease(true)}
-                                            />
+                                            <Pencil className="w-5 h-5 text-blue-600 cursor-pointer" onClick={() => setEditingDisease(true)} />
                                         )}
                                     </div>
                                 </div>
@@ -336,21 +307,38 @@ export default function AnimalDetailPage() {
                         );
                     }
 
-                    // Default rendering for other field groups
+                    // Flock group
+                    if (groupName === "Flock Information") {
+                        return (
+                            <div key={groupName} className="mb-4 md:mb-6">
+                                <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">{groupName}</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                                    <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
+                                        <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("initialFlockSize")}</p>
+                                        <input type="number" value={initialFlockSize} onChange={(e) => setInitialFlockSize(Number(e.target.value))} className="border rounded px-2 py-1 mt-1 w-full" />
+                                    </div>
+                                    <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
+                                        <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("currentFlockSize")}</p>
+                                        <input type="number" value={currentFlockSize} onChange={(e) => setCurrentFlockSize(Number(e.target.value))} className="border rounded px-2 py-1 mt-1 w-full" />
+                                    </div>
+                                    <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
+                                        <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("mortalityRate")}</p>
+                                        <p className="text-base md:text-lg font-medium text-gray-800">{mortalityRate.toFixed(2)}%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    // Default group
                     return (
                         <div key={groupName} className="mb-4 md:mb-6">
-                            <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">
-                                {groupName}
-                            </h2>
+                            <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">{groupName}</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                                 {visibleFields.map((key) => (
                                     <div key={key} className="bg-gray-100 p-3 rounded-lg shadow-sm">
-                                        <p className="text-sm md:text-base font-semibold text-gray-500">
-                                            {keyDisplayNames[key as string] || key}
-                                        </p>
-                                        <p className="text-base md:text-lg font-medium text-gray-800">
-                                            {String(animal[key as keyof Animal] ?? "")}
-                                        </p>
+                                        <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel(key)}</p>
+                                        <p className="text-base md:text-lg font-medium text-gray-800">{String(animal[key as keyof Animal] ?? "")}</p>
                                     </div>
                                 ))}
                             </div>
@@ -358,19 +346,16 @@ export default function AnimalDetailPage() {
                     );
                 })}
 
+                {isLayer(animal) && (
+                    <div className="mb-6">
+                        <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Poultry Health Management</h2>
+                        <PoultryHealthTables animal={animal} onUpdate={(updatedLayer) => editAnimal(updatedLayer)} />
+                    </div>
+                )}
+
                 <div className="mt-4 md:mt-6 flex flex-wrap gap-2 md:gap-3">
-                    <button
-                        onClick={() => router.push(`/animals/edit/${animal.tag}`)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 md:px-5 md:py-2 rounded-lg shadow-md transition text-sm md:text-base"
-                    >
-                        ✏️ Edit Full
-                    </button>
-                    <button
-                        onClick={() => handleDelete(animal)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 md:px-5 md:py-2 rounded-lg shadow-md transition text-sm md:text-base"
-                    >
-                        🗑 Delete
-                    </button>
+                    <button onClick={() => router.push(`/animals/edit/${animal.tag}`)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 md:px-5 md:py-2 rounded-lg shadow-md transition text-sm md:text-base">✏️ Edit Full</button>
+                    <button onClick={() => handleDelete(animal)} className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 md:px-5 md:py-2 rounded-lg shadow-md transition text-sm md:text-base">🗑 Delete</button>
                 </div>
             </div>
         </div>

@@ -15,14 +15,33 @@ interface StepFormProps {
 }
 
 const speciesFieldsMap: Record<string, (keyof AnimalForm)[]> = {
-    Cattle: ["species","tag","breed","gender","dam","sire","birthDate","birthWeight","lastCalvingDate","lactationStage","lastAiDate","nextAiDate","pregnancyStatus","treatments","diseaseComment","weight","lastHeatDate","reproductiveComment"],
-    Buffalo: ["species","tag","breed","gender","dam","sire","birthDate","birthWeight","lastCalvingDate","lastAiDate","nextAiDate","pregnancyStatus","treatments","diseaseComment","treatmentComment"],
-    Pig: ["species","tag","breed","gender","dam","sire","birthDate","birthWeight","litterSize","lastFarrowingDate","nextExpectedFarrowingDate","pregnancyStatus","parity","weaningDate","currentWeight","weaningWeight","vaccinationType","vaccinationDate","nextVaccinationDate","dewormingType","lastDewormingDate","nextDewormingDate","diseaseComment","treatmentComment","generalComment"],
+    Cattle: [
+        "species","tag","breed","gender","dam","sire","birthDate","birthWeight",
+        "lastCalvingDate","lactationStage","lastAiDate","nextAiDate",
+        "pregnancyStatus","treatments","diseaseComment","weight","lastHeatDate","reproductiveComment"
+    ],
+    Buffalo: [
+        "species","tag","breed","gender","dam","sire","birthDate","birthWeight",
+        "lastCalvingDate","lastAiDate","nextAiDate","pregnancyStatus","treatments","diseaseComment","treatmentComment"
+    ],
+    Pig: [
+        "species","tag","breed","gender","dam","sire","birthDate","birthWeight",
+        "litterSize","lastFarrowingDate","nextExpectedFarrowingDate","pregnancyStatus",
+        "parity","weaningDate","currentWeight","weaningWeight","vaccinationType",
+        "vaccinationDate","nextVaccinationDate","dewormingType","lastDewormingDate",
+        "nextDewormingDate","treatments","diseaseComment","treatmentComment","generalComment"
+    ],
     Goat: ["species","tag","breed","gender","dam","sire","diseaseComment","treatmentComment"],
     Sheep: ["species","tag","breed","gender","dam","sire","diseaseComment","treatmentComment"],
-    Layer: ["species","tag","breed","gender","initialFlockSize","currentFlockSize","mortilityRate","diseaseComment","treatmentComment"],
-    Broiler: ["species","tag","breed","gender","initialFlockSize","currentFlockSize","mortilityRate","diseaseComment","treatmentComment"],
+    Layer: [
+        "species","tag","breed","gender","initialFlockSize","currentFlockSize","treatments","diseaseComment","treatmentComment"
+    ],
+    Broiler: [
+        "species","tag","breed","gender","initialFlockSize","currentFlockSize"
+       ,"treatments","diseaseComment","treatmentComment"
+    ],
 };
+
 
 const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBack, disableSpecies = false }) => {
     const searchParams = useSearchParams();
@@ -95,6 +114,19 @@ const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBac
                                 { value: "To be Check", label: "To be Check" },
                                 { value: "Infertile", label: "Infertile" },
                             ];
+                        }else if (species === "Layer" || species === "Broiler") {
+                            steps.push(
+                                { title: "Poultry Vaccination", fields: ["vaccinationSchedule"] },
+                                { title: "Poultry Deworming", fields: ["dewormingSchedule"] },
+                                { title: "Feed Management", fields: ["feedManagement"] },
+                                { title: "Water Management", fields: ["waterManagement"] }
+                            );
+                        }
+
+                        else if (species === "Cattle" || species === "Buffalo") {
+                            steps.push(
+                                { title: "Cattle Health", fields: ["cattleHealth"] }
+                            );
                         }
 
                         return (

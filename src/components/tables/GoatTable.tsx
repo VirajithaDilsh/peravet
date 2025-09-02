@@ -1,18 +1,18 @@
 "use client";
 import React, { useState, MouseEvent, KeyboardEvent } from "react";
 import { useAnimalContext } from "@/context/AnimalContext";
-import { Pig } from "@/types/animals";
+import { Goat } from "@/types/animals";
 import { Trash2, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function PigTable() {
+export default function GoatTable() {
     const { animals, deleteAnimal } = useAnimalContext();
     const [search, setSearch] = useState("");
     const router = useRouter();
 
-    const PigOnly = animals.filter((a): a is Pig => a.species === "Pig");
+    const goatOnly = animals.filter((a): a is Goat => a.species === "Goat");
 
-    const filteredPig = PigOnly.filter((animal) =>
+    const filteredGoat = goatOnly.filter((animal) =>
         [animal.tag, animal.breed, animal.gender].some((field) =>
             field.toLowerCase().includes(search.toLowerCase())
         )
@@ -26,7 +26,7 @@ export default function PigTable() {
 
     return (
         <div className="p-4 text-black w-full">
-            <h2 className="text-2xl font-semibold mb-4">Pig Records</h2>
+            <h2 className="text-2xl font-semibold mb-4">Cattle Records</h2>
 
             <div className="flex justify-end mb-4">
                 <input
@@ -49,6 +49,9 @@ export default function PigTable() {
                                 "Breed",
                                 "Gender",
                                 "Weight",
+                                "Last AI Date",
+                                "Pregnancy Status",
+                                "Expected Calving Date",
                                 "Actions",
                             ].map((head) => (
                                 <th
@@ -61,8 +64,8 @@ export default function PigTable() {
                         </tr>
                         </thead>
                         <tbody>
-                        {filteredPig.length > 0 ? (
-                            filteredPig.map((animal, idx) => (
+                        {filteredGoat.length > 0 ? (
+                            filteredGoat.map((animal, idx) => (
                                 <tr
                                     key={animal.tag}
                                     className={`cursor-pointer hover:bg-blue-50 transition-colors ${
@@ -81,6 +84,15 @@ export default function PigTable() {
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.weight}
+                                    </td>
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                        {animal.lastAiDate || "-"}
+                                    </td>
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                        {animal.pregnancyStatus || "-"}
+                                    </td>
+                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                        {animal.expectedCalvingDate || "-"}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
                                         <div className="flex gap-1 md:gap-2 justify-center">
@@ -111,7 +123,7 @@ export default function PigTable() {
                         ) : (
                             <tr>
                                 <td colSpan={8} className="text-center py-4 text-gray-500 border border-gray-300">
-                                    No pig records found.
+                                    No cattle records found.
                                 </td>
                             </tr>
                         )}
@@ -124,8 +136,8 @@ export default function PigTable() {
             {/* Mobile - Card View with Y-axis scroll */}
             <div className="md:hidden border rounded-lg shadow overflow-y-auto min-h-[300px] max-h-[500px]">
                 <div className="flex flex-col">
-                    {filteredPig.length > 0 ? (
-                        filteredPig.map((animal) => (
+                    {filteredGoat.length > 0 ? (
+                        filteredGoat.map((animal) => (
                             <div
                                 key={animal.tag}
                                 onClick={() => goToDetails(animal.tag)}
@@ -157,10 +169,13 @@ export default function PigTable() {
                                 <p className="text-xs text-gray-600">Breed: {animal.breed}</p>
                                 <p className="text-xs text-gray-600">Gender: {animal.gender}</p>
                                 <p className="text-xs text-gray-600">Weight: {animal.weight}</p>
+                                <p className="text-xs text-gray-600">Last AI Date: {animal.lastAiDate || "-"}</p>
+                                <p className="text-xs text-gray-600">Pregnancy: {animal.pregnancyStatus || "-"}</p>
+                                <p className="text-xs text-gray-600">Calving Date: {animal.expectedCalvingDate || "-"}</p>
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-gray-500 p-4">No buffalo records found.</p>
+                        <p className="text-center text-gray-500 p-4">No cattle records found.</p>
                     )}
                 </div>
             </div>

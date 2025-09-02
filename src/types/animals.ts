@@ -1,4 +1,3 @@
-
 export type Animal =
     | Cattle
     | Buffalo
@@ -8,51 +7,55 @@ export type Animal =
     | Layer
     | Broiler;
 
+// ------------------- Treatment -------------------
 export interface Treatment {
     type: "Vaccination" | "Deworming" | "Other" | "";
-    treatment?:string;
+    treatment?: string;
     dueDate?: string;
     nextDate?: string;
     comment?: string;
 
-    //layer
+    // Layer-specific
     drug?: string;
-    dosage?:number;
-    root?:string;
-    prescribe?:string;
-
+    dosage?: number;
+    route?: string;
+    prescribe?: string;
 }
-export interface poultryVaccinations {
+
+// ------------------- Poultry -------------------
+export interface PoultryVaccination {
     date?: string;
-    vaccinations?:string[];
+    vaccine?: string;
     route?: string;
 
-
 }
 
-export interface poultryFeedManagement{
-    type:"Starter"|"Grower"|"Layer Feed"
-    feedRequirement?:string;
-    feedIntake:string;
-}
-export interface poultryWaterManagement{
-    waterRequirement?:string;
-    waterIntake:string;
-    choloring?:string;
+export interface PoultryFeedManagement {
+    type: "Starter" | "Grower" | "Layer Feed";
+    feedRequirement?: string;
+    feedIntake: string;
 }
 
+export interface PoultryWaterManagement {
+    waterRequirement?: string;
+    waterIntake: string;
+    chlorinating?: string;
+}
+
+// ------------------- Base -------------------
 export interface BaseAnimal {
     species: string;
-    tag: string;// flock id(birds)
-    breed: string; //strains(birds)
+    tag: string; // flock ID (birds)
+    breed: string; // strains (birds)
     gender: string;
-    weight: number;
-    age?: number;// age of flock(birds)
+    weight?: number;
+    age?: number; // age of flock (birds)
     status: string;
     treatments?: Treatment[];
     diseaseComment?: string;
 }
 
+// ------------------- Cattle -------------------
 export interface Cattle extends BaseAnimal {
     dam: string;
     sire: string;
@@ -67,10 +70,9 @@ export interface Cattle extends BaseAnimal {
     expectedCalvingDate?: string;
     lastHeatDate?: string;
     reproductiveComment?: string;
-    diseaseComment?: string;
-
 }
 
+// ------------------- Buffalo -------------------
 export interface Buffalo extends BaseAnimal {
     dam: string;
     sire: string;
@@ -85,64 +87,69 @@ export interface Buffalo extends BaseAnimal {
     expectedCalvingDate?: string;
     lastHeatDate?: string;
     reproductiveComment?: string;
-
     treatmentComment?: string;
 }
 
+// ------------------- Pig -------------------
 export interface Pig extends BaseAnimal {
-    // Birth info
-    dam: string; // mother pig ID
-    sire: string; // father boar ID
-    birthWeight: number; // in kg
-    litterSize?: number; // number of piglets in litter
+    dam: string;
+    sire: string;
+    birthWeight: number;
     birthDate: string;
-
-    // Reproductive info (for sows)
-    lastFarrowingDate?: string;
-    nextExpectedFarrowingDate?: string;
-    pregnancyStatus?: string;
-    parity?: number; // number of litters the sow has had
-    weaningDate?: string;
-
-    // Growth & weight info
-    currentWeight?: number; // kg
-    weaningWeight?: number;
-
-    // Health info
-    vaccinationType?: string;
-    vaccinationDate?: string;
-    nextVaccinationDate?: string;
-    dewormingType?: string;
-    lastDewormingDate?: string;
-    nextDewormingDate?: string;
-    diseaseComment?: string;
-    treatmentComment?: string;
-
-    // Optional notes
-    generalComment?: string;
+    dateOfEntry:string;
 }
+
+// ------------------- Goat -------------------
 export interface Goat extends BaseAnimal {
     dam: string;
     sire: string;
+    birthDate: string;
+    birthWeight: number;
+    lastCalvingDate?: string;
+    lactationStage?: string;
+    lastAiDate?: string;
+    nextAiDate?: string;
+    pregnancyStatus?: string;
+    ageOfPregnancy?: number;
+    expectedCalvingDate?: string;
+    lastHeatDate?: string;
+    reproductiveComment?: string;
+    treatmentComment?: string;
 }
+
+// ------------------- Sheep -------------------
 export interface Sheep extends BaseAnimal {
     dam: string;
     sire: string;
+    birthDate: string;
+    birthWeight: number;
+    lastCalvingDate?: string;
+    lactationStage?: string;
+    lastAiDate?: string;
+    nextAiDate?: string;
+    pregnancyStatus?: string;
+    ageOfPregnancy?: number;
+    expectedCalvingDate?: string;
+    lastHeatDate?: string;
+    reproductiveComment?: string;
+    treatmentComment?: string;
 }
-export interface Layer extends BaseAnimal {
-   initialFlockSize?:number;
-   currentFlockSize?:number;
-   mortilityRate:number;
-   treatments?: Treatment[];
-   vaccinations?:poultryVaccinations;
-   feedManagement?: poultryFeedManagement;
-   waterManagement?: poultryWaterManagement;
 
+// ------------------- Layer -------------------
+export interface Layer extends BaseAnimal {
+    initialFlockSize?: number;
+    currentFlockSize?: number;
+    mortalityRate: number;
+    treatments?: Treatment[];
+    vaccinations?: PoultryVaccination[]; // multiple vaccinations
+    feedManagement?: PoultryFeedManagement[]; // multiple feed entries
+    waterManagement?: PoultryWaterManagement[]; // multiple water entries
 }
+
+// ------------------- Broiler -------------------
 export interface Broiler extends BaseAnimal {
-    initialFlockSize:number;
-    currentFlockSize:number;
-    mortilityRate:number;
+    initialFlockSize: number;
+    currentFlockSize: number;
+    mortilityRate: number;
     treatments?: Treatment[];
 }
-
