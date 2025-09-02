@@ -1,4 +1,4 @@
-import {Animal, Cattle, Buffalo, Pig} from "@/types/animals";
+import {Animal, Cattle, Buffalo, Pig, Layer} from "@/types/animals";
 
 // Count total animals by species
 export function countBySpecies(animals: Animal[], species: string): number {
@@ -64,7 +64,13 @@ export function getPig(animals: Animal[]) {
         females: pig.filter(c => c.gender === "Female").length,
         pregnant: pig
             .filter(c => c.gender === "Female")
-            .filter(c => c.pregnancyStatus === "Pregnant").length,
+           // .filter(c => c.pregnancyStatus === "Pregnant").length,
+    };
+}
+export function getLayer(animals: Animal[]) {
+    const layer = animals.filter((a): a is Layer => a.species === "Layer");
+    return {
+        total: layer.length,
     };
 }
 

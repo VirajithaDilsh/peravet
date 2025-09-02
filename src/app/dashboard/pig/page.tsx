@@ -23,36 +23,24 @@ export default function Home() {
                     <AddAnimalButton animalType="Pig" />
                 </div>
             </main>
-            {/*Total cattle box*/}
-            <div className="w-full max-w-5xl bg-green-300 rounded-lg text-black p-2">
-                <div className="grid grid-cols-4 divide-x divide-black text-center">
+            <div className="w-full max-w-5xl mx-auto p-2 sm:p-4">
+                <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center">
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Male
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{pigStats.males}</span>
+                    {/* Cow */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-green-600 text-[10px] sm:text-lg font-bold truncate">{pigStats.females}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Female</p>
                     </div>
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Female
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{pigStats.females}</span>
+                    {/* Heifers */}
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-blue-600 text-[10px] sm:text-lg font-bold truncate">{pigStats.males}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Male</p>
                     </div>
 
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Pregnant
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{pigStats.pregnant}</span>
-                    </div>
-
-                    <div className="px-2">
-                        <p className="text-xs sm:text-sm md:text-base font-medium leading-tight">
-                            Total Pigs
-                        </p>
-                        <span className="text-sm sm:text-base md:text-lg font-bold">{pigStats.total}</span>
+                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
+                        <span className="text-black text-[10px] sm:text-lg font-bold truncate">{pigStats.total}</span>
+                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Total Pigs</p>
                     </div>
 
                 </div>
