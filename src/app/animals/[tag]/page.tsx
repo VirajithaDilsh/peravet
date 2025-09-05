@@ -16,6 +16,8 @@ import {
 import { useState, useEffect } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import PoultryHealthTables from "@/components/tables/PoultryHealthTables";
+import BroilerHealthTables from "@/components/tables/BroilerHealthTables";
+
 
 type AnimalKeys = keyof (Cattle & Buffalo & Pig & Goat & Sheep & Layer & Broiler);
 type TreatmentField = keyof Treatment;
@@ -350,6 +352,12 @@ export default function AnimalDetailPage() {
                     <div className="mb-6">
                         <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Poultry Health Management</h2>
                         <PoultryHealthTables animal={animal} onUpdate={(updatedLayer) => editAnimal(updatedLayer)} />
+                    </div>
+                )}
+                {isBroiler(animal) && (
+                    <div className="mb-6">
+                        <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Broiler Health Management</h2>
+                        <BroilerHealthTables animal={animal} onUpdate={(updatedLayer) => editAnimal(updatedLayer)} />
                     </div>
                 )}
 

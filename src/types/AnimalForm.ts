@@ -1,5 +1,4 @@
-import { Treatment } from "@/types/animals";
-import { PoultryFeedManagement, PoultryWaterManagement, PoultryVaccinationSchedule, PoultryDewormingSchedule, CattleHealthRecord } from "@/types/animalHealth";
+import { Treatment,PoultryVaccination,PoultryFeedManagement,WaterManagement } from "@/types/animals";
 
 export type AnimalForm = Partial<{
     // BaseAnimal
@@ -51,11 +50,9 @@ export type AnimalForm = Partial<{
     mortilityRate: number;
 
     //PoultryHealth
-    vaccinationSchedule: PoultryVaccinationSchedule[];
-    dewormingSchedule: PoultryDewormingSchedule[];
+    vaccinationSchedule: PoultryVaccination[];
     feedManagement: PoultryFeedManagement[];
-    waterManagement: PoultryWaterManagement[];
+    waterManagement: WaterManagement[];
 
-    // Cattle health
-    cattleHealth: CattleHealthRecord;
+
 }>;

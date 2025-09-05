@@ -7,6 +7,8 @@ export type Animal =
     | Layer
     | Broiler;
 
+
+
 // ------------------- Treatment -------------------
 export interface Treatment {
     type: "Vaccination" | "Deworming" | "Other" | "";
@@ -22,9 +24,10 @@ export interface Treatment {
     prescribe?: string;
 }
 
-// ------------------- Poultry -------------------
+// ------------------- Layer -------------------
 export interface PoultryVaccination {
     date?: string;
+    nextDate?: string;
     vaccine?: string;
     route?: string;
 
@@ -35,12 +38,28 @@ export interface PoultryFeedManagement {
     feedRequirement?: string;
     feedIntake: string;
 }
+//-----------------------Broiler-------------------
+export interface BroilerVaccination {
+    date?: string;
+    vaccine?: string;
+    route?: string;
 
-export interface PoultryWaterManagement {
+}
+
+export interface BroilerFeedManagement {
+    type: "Starter" | "Grower" | "Layer Feed";
+    feedRequirement?: string;
+    feedIntake: string;
+}
+
+    //for layers and broilers
+export interface WaterManagement {
     waterRequirement?: string;
     waterIntake: string;
     chlorinating?: string;
 }
+
+
 
 // ------------------- Base -------------------
 export interface BaseAnimal {
@@ -143,13 +162,16 @@ export interface Layer extends BaseAnimal {
     treatments?: Treatment[];
     vaccinations?: PoultryVaccination[]; // multiple vaccinations
     feedManagement?: PoultryFeedManagement[]; // multiple feed entries
-    waterManagement?: PoultryWaterManagement[]; // multiple water entries
+    waterManagement?: WaterManagement[]; // multiple water entries
 }
 
 // ------------------- Broiler -------------------
 export interface Broiler extends BaseAnimal {
-    initialFlockSize: number;
-    currentFlockSize: number;
-    mortilityRate: number;
+    initialFlockSize?: number;
+    currentFlockSize?: number;
+    mortalityRate: number;
     treatments?: Treatment[];
+    vaccinations?: PoultryVaccination[]; // multiple vaccinations
+    feedManagement?: PoultryFeedManagement[]; // multiple feed entries
+    waterManagement?: WaterManagement[]; // multiple water entries
 }
