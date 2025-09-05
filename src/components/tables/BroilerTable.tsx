@@ -1,18 +1,18 @@
 "use client";
 import React, { useState, MouseEvent, KeyboardEvent } from "react";
 import { useAnimalContext } from "@/context/AnimalContext";
-import { Goat } from "@/types/animals";
+import { Broiler } from "@/types/animals";
 import { Trash2, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function GoatTable() {
+export default function BroilerTable() {
     const { animals, deleteAnimal } = useAnimalContext();
     const [search, setSearch] = useState("");
     const router = useRouter();
 
-    const goatOnly = animals.filter((a): a is Goat => a.species === "Goat");
+    const broilerOnly = animals.filter((a): a is Broiler => a.species === "Broiler");
 
-    const filteredGoat = goatOnly.filter((animal) =>
+    const filteredBroiler = broilerOnly.filter((animal) =>
         [animal.tag, animal.breed, animal.gender].some((field) =>
             field.toLowerCase().includes(search.toLowerCase())
         )
@@ -26,12 +26,12 @@ export default function GoatTable() {
 
     return (
         <div className="p-4 text-black w-full">
-            <h2 className="text-2xl font-semibold mb-4">Goat Records</h2>
+            <h2 className="text-2xl font-semibold mb-4">Broiler Records</h2>
 
             <div className="flex justify-end mb-4">
                 <input
                     type="text"
-                    placeholder="Search by tag, breed, gender..."
+                    placeholder="Search by flock id, strains ..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="p-2 w-full max-w-sm rounded-2xl bg-white  border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -45,13 +45,11 @@ export default function GoatTable() {
                         <thead className="bg-blue-100 text-left sticky top-0 z-10">
                         <tr>
                             {[
-                                "Tag No",
-                                "Breed",
-                                "Gender",
-                                "Weight",
-                                "Last AI Date",
-                                "Pregnancy Status",
-                                "Expected Calving Date",
+                                "Flock ID",
+                                "Strains",
+                                "Initial Flock Size",
+                                "Current Flock Size",
+                                "Mortality Rate",
                                 "Actions",
                             ].map((head) => (
                                 <th
@@ -64,8 +62,8 @@ export default function GoatTable() {
                         </tr>
                         </thead>
                         <tbody>
-                        {filteredGoat.length > 0 ? (
-                            filteredGoat.map((animal, idx) => (
+                        {filteredBroiler.length > 0 ? (
+                            filteredBroiler.map((animal, idx) => (
                                 <tr
                                     key={animal.tag}
                                     className={`cursor-pointer hover:bg-blue-50 transition-colors ${
@@ -80,20 +78,18 @@ export default function GoatTable() {
                                         {animal.breed}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.gender}
+                                        {animal.initialFlockSize}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.weight}
+                                        {animal.currentFlockSize}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.lastAiDate || "-"}
+                                        {animal.initialFlockSize && animal.currentFlockSize
+                                            ? (((animal.initialFlockSize - animal.currentFlockSize) / animal.initialFlockSize) * 100).toFixed(2) + "%"
+                                            : "N/A"}
                                     </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.pregnancyStatus || "-"}
-                                    </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.expectedCalvingDate || "-"}
-                                    </td>
+
+
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
                                         <div className="flex gap-1 md:gap-2 justify-center">
                                             <button
@@ -123,7 +119,7 @@ export default function GoatTable() {
                         ) : (
                             <tr>
                                 <td colSpan={8} className="text-center py-4 text-gray-500 border border-gray-300">
-                                    No Goat records found.
+                                    No broiler records found.
                                 </td>
                             </tr>
                         )}
@@ -136,15 +132,15 @@ export default function GoatTable() {
             {/* Mobile - Card View with Y-axis scroll */}
             <div className="md:hidden border rounded-lg shadow overflow-y-auto min-h-[300px] max-h-[500px]">
                 <div className="flex flex-col">
-                    {filteredGoat.length > 0 ? (
-                        filteredGoat.map((animal) => (
+                    {filteredBroiler.length > 0 ? (
+                        filteredBroiler.map((animal) => (
                             <div
                                 key={animal.tag}
                                 onClick={() => goToDetails(animal.tag)}
                                 className="border-b last:border-b-0 p-3 bg-white hover:bg-blue-50 transition cursor-pointer"
                             >
                                 <div className="flex justify-between items-center mb-2">
-                                    <h3 className="font-semibold text-blue-800 text-sm">Tag No:{animal.tag}</h3>
+                                    <h3 className="font-semibold text-blue-800 text-sm">Flock ID:{animal.tag}</h3>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={(e) => {
@@ -166,16 +162,20 @@ export default function GoatTable() {
                                         </button>
                                     </div>
                                 </div>
-                                <p className="text-xs text-gray-600">Breed: {animal.breed}</p>
-                                <p className="text-xs text-gray-600">Gender: {animal.gender}</p>
-                                <p className="text-xs text-gray-600">Weight: {animal.weight}</p>
-                                <p className="text-xs text-gray-600">Last AI Date: {animal.lastAiDate || "-"}</p>
-                                <p className="text-xs text-gray-600">Pregnancy: {animal.pregnancyStatus || "-"}</p>
-                                <p className="text-xs text-gray-600">Calving Date: {animal.expectedCalvingDate || "-"}</p>
+                                <p className="text-xs text-gray-600">Strains: {animal.breed}</p>
+                                <p className="text-xs text-gray-600">Initial Flock Size: {animal.initialFlockSize}</p>
+                                <p className="text-xs text-gray-600">Current Flock Size: {animal.currentFlockSize}</p>
+                                <p className="text-xs text-gray-600">
+                                    Mortality Rate:{" "}
+                                    {animal.initialFlockSize && animal.currentFlockSize
+                                        ? (((animal.initialFlockSize - animal.currentFlockSize) / animal.initialFlockSize) * 100).toFixed(2) + "%"
+                                        : "N/A"}
+                                </p>
+
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-gray-500 p-4">No Goat records found.</p>
+                        <p className="text-center text-gray-500 p-4">No layer records found.</p>
                     )}
                 </div>
             </div>

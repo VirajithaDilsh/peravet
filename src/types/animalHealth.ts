@@ -22,6 +22,7 @@ export interface Treatment {
 
 export interface PoultryVaccinationSchedule {
     date?: string;
+    nextDate?: string;
     vaccinations?: string[];
     route?: string;
 }

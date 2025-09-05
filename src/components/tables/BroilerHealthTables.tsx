@@ -1,225 +1,101 @@
 "use client";
-import {
-    Layer,
-    PoultryVaccination,
-    PoultryFeedManagement,
-    WaterManagement,
-} from "@/types/animals";
+import { Broiler, BroilerVaccination, BroilerFeedManagement,WaterManagement } from "@/types/animals";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import { addDays, addWeeks, format } from "date-fns";
 
-export default function PoultryHealthTables({
+export default function BroilerHealthTables({
                                                 animal,
                                                 onUpdate,
                                             }: {
-    animal: Layer;
-    onUpdate: (updated: Layer) => void;
+    animal: Broiler;
+    onUpdate: (updated: Broiler) => void;
 }) {
-    const [customVaccines, setCustomVaccines] = useState<PoultryVaccination[]>(
-        animal.vaccinations || []
-    );
-    const [feed, setFeed] = useState<PoultryFeedManagement[]>(
-        animal.feedManagement || []
-    );
-    const [water, setWater] = useState<WaterManagement[]>(
-        animal.waterManagement || []
-    );
-    const [startDate, setStartDate] = useState<string>("");
+    const [vaccinations, setVaccinations] = useState<BroilerVaccination[]>(animal.vaccinations || []);
+    const [feed, setFeed] = useState<BroilerFeedManagement[]>(animal.feedManagement || []);
+    const [water, setWater] = useState<WaterManagement[]>(animal.waterManagement || []);
 
     // Save handlers
-    const saveCustomVaccines = () => onUpdate({ ...animal, vaccinations: customVaccines });
+    const saveVaccinations = () => onUpdate({ ...animal, vaccinations });
     const saveFeed = () => onUpdate({ ...animal, feedManagement: feed });
     const saveWater = () => onUpdate({ ...animal, waterManagement: water });
 
-    // Predefined vaccination schedule from PDF
-    const standardSchedule = [
-        { age: "Day 1", vaccine: "IB and ND (Cevac B1L or Ma5+Clone 30)", route: "ED" },
-        { age: "Day 16", vaccine: "IB and ND (Avinew+H120)", route: "DW" },
-        { age: "Day 19", vaccine: "IBD (D78)", route: "DW" },
-        { age: "Day 23", vaccine: "IB (IB 1/96 or IB 88 or IB 4/91)", route: "DW" },
-        { age: "Week 5", vaccine: "Fowl pox", route: "WW" },
-        { age: "Week 6", vaccine: "Chicken anemia (CA Killed or Circomune L or CAV P4)", route: "WW/IM/SC" },
-        { age: "Week 7", vaccine: "IB and ND (Ma5+Clone 30 or H120 HB1)", route: "DW" },
-        { age: "Week 9", vaccine: "Fowl cholera (Optional)", route: "Killed SC" },
-        { age: "Week 10", vaccine: "ND (Lasota)", route: "DW" },
-        { age: "Week 11", vaccine: "IB (IB 1/96 or IB 88 or IB 4/91)", route: "DW" },
-        { age: "Week 12", vaccine: "Fowl pox and AE (AE-Pox)", route: "WW" },
-        { age: "Week 16", vaccine: "ND and IB Killed", route: "SC/IM" },
-    ];
-
-    // Calculate actual date based on age and startDate
-    const calculateDate = (age: string, start: Date) => {
-        if (age.startsWith("Day")) {
-            const dayNum = parseInt(age.replace("Day", "").trim());
-            return format(addDays(start, dayNum - 1), "yyyy-MM-dd");
-        } else if (age.startsWith("Week")) {
-            const weekNum = parseInt(age.replace("Week", "").trim());
-            return format(addWeeks(start, weekNum), "yyyy-MM-dd");
-        }
-        return "";
-    };
-
-    const getStandardScheduleWithDates = () => {
-        if (!startDate) return [];
-        const start = new Date(startDate);
-        return standardSchedule.map((s) => ({
-            age: s.age,
-            vaccine: s.vaccine,
-            route: s.route,
-            date: calculateDate(s.age, start),
-        }));
-    };
-
     return (
         <div className="space-y-6 mt-6">
-            {/* Start Date Input */}
-            <div className="flex items-center gap-4">
-                <label className="font-medium">Start Date:</label>
-                <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="border rounded px-2 py-1"
-                />
-            </div>
-
-            {/* Standard Vaccination Schedule */}
+            {/* Vaccination Schedule */}
             <div>
-                <h2 className="text-lg font-semibold border-b mb-2">
-                    Standard Vaccination Schedule
-                </h2>
-                <table className="w-full border-collapse border border-gray-300">
-                    <thead className="bg-gray-100">
-                    <tr>
-                        <th className="border p-2">Age</th>
-                        <th className="border p-2">Vaccine</th>
-                        <th className="border p-2">Route</th>
-                        <th className="border p-2">Date</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {getStandardScheduleWithDates().map((v, i) => (
-                        <tr key={i} className="even:bg-gray-50">
-                            <td className="border p-2">{v.age}</td>
-                            <td className="border p-2">{v.vaccine}</td>
-                            <td className="border p-2">{v.route}</td>
-                            <td className="border p-2">{v.date}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Custom Vaccination Table */}
-            <div>
-                <h2 className="text-lg font-semibold border-b mb-2">Custom Vaccinations</h2>
+                <h2 className="text-lg font-semibold border-b mb-2">Vaccination Schedule</h2>
                 <table className="w-full border-collapse border border-gray-300">
                     <thead className="bg-gray-100">
                     <tr>
                         <th className="border p-2">Vaccine</th>
                         <th className="border p-2">Date</th>
-                        <th className="border p-2">Next Date</th>
                         <th className="border p-2">Route</th>
                         <th className="border p-2">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {customVaccines.map((v, i) => (
+                    {vaccinations.map((v, i) => (
                         <tr key={i} className="even:bg-gray-50">
-                            {/* Vaccine Name */}
                             <td className="border p-2">
                                 <input
                                     type="text"
                                     value={v.vaccine || ""}
                                     onChange={(e) => {
-                                        const copy = [...customVaccines];
+                                        const copy = [...vaccinations];
                                         copy[i].vaccine = e.target.value;
-                                        setCustomVaccines(copy);
+                                        setVaccinations(copy);
                                     }}
                                     className="w-full border rounded px-1 py-0.5"
                                 />
                             </td>
-
-                            {/* Date */}
                             <td className="border p-2">
                                 <input
                                     type="date"
                                     value={v.date || ""}
                                     onChange={(e) => {
-                                        const copy = [...customVaccines];
+                                        const copy = [...vaccinations];
                                         copy[i].date = e.target.value;
-                                        setCustomVaccines(copy);
+                                        setVaccinations(copy);
                                     }}
                                     className="w-full border rounded px-1 py-0.5"
                                 />
                             </td>
-
-                            {/* Next Date */}
-                            <td className="border p-2">
-                                <input
-                                    type="date"
-                                    value={v.nextDate || ""}
-                                    onChange={(e) => {
-                                        const copy = [...customVaccines];
-                                        copy[i].nextDate = e.target.value;
-                                        setCustomVaccines(copy);
-                                    }}
-                                    className="w-full border rounded px-1 py-0.5"
-                                />
-                            </td>
-
-                            {/* Route */}
                             <td className="border p-2">
                                 <input
                                     type="text"
                                     value={v.route || ""}
                                     onChange={(e) => {
-                                        const copy = [...customVaccines];
+                                        const copy = [...vaccinations];
                                         copy[i].route = e.target.value;
-                                        setCustomVaccines(copy);
+                                        setVaccinations(copy);
                                     }}
                                     className="w-full border rounded px-1 py-0.5"
                                 />
                             </td>
-
-                            {/* Actions */}
                             <td className="border p-2 text-center">
                                 <Trash2
                                     className="w-4 h-4 text-red-600 cursor-pointer mx-auto"
-                                    onClick={() =>
-                                        setCustomVaccines(customVaccines.filter((_, idx) => idx !== i))
-                                    }
+                                    onClick={() => setVaccinations(vaccinations.filter((_, idx) => idx !== i))}
                                 />
                             </td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
-
                 <div className="flex gap-2 mt-2">
                     <button
-                        onClick={() =>
-                            setCustomVaccines([
-                                ...customVaccines,
-                                { vaccine: "", date: "", nextDate: "", route: "" },
-                            ])
-                        }
+                        onClick={() => setVaccinations([...vaccinations, { vaccine: "", date: "", route: "" }])}
                         className="flex items-center gap-1 text-blue-600"
                     >
-                        <Plus className="w-4 h-4" /> Add Vaccine
+                        <Plus className="w-4 h-4" /> Add Row
                     </button>
-                    <button
-                        onClick={saveCustomVaccines}
-                        className="px-3 py-1 bg-green-500 text-white rounded"
-                    >
-                        Save Vaccines
+                    <button onClick={saveVaccinations} className="px-3 py-1 bg-green-500 text-white rounded">
+                        Save Vaccinations
                     </button>
                 </div>
             </div>
 
-
-            {/* Feed and Water Sections (unchanged) */}
+            {/* Feed Management */}
             <div>
                 <h2 className="text-lg font-semibold border-b mb-2">Feed Management</h2>
                 <table className="w-full border-collapse border border-gray-300">
@@ -239,10 +115,7 @@ export default function PoultryHealthTables({
                                     value={f.type}
                                     onChange={(e) => {
                                         const copy = [...feed];
-                                        copy[i].type = e.target.value as
-                                            | "Starter"
-                                            | "Grower"
-                                            | "Layer Feed";
+                                        copy[i].type = e.target.value as "Starter" | "Grower" | "Layer Feed";
                                         setFeed(copy);
                                     }}
                                     className="w-full border rounded px-1 py-0.5"
@@ -295,15 +168,13 @@ export default function PoultryHealthTables({
                     >
                         <Plus className="w-4 h-4" /> Add Row
                     </button>
-                    <button
-                        onClick={saveFeed}
-                        className="px-3 py-1 bg-green-500 text-white rounded"
-                    >
+                    <button onClick={saveFeed} className="px-3 py-1 bg-green-500 text-white rounded">
                         Save Feed
                     </button>
                 </div>
             </div>
 
+            {/* Water Management */}
             <div>
                 <h2 className="text-lg font-semibold border-b mb-2">Water Management</h2>
                 <table className="w-full border-collapse border border-gray-300">
@@ -373,10 +244,7 @@ export default function PoultryHealthTables({
                     >
                         <Plus className="w-4 h-4" /> Add Row
                     </button>
-                    <button
-                        onClick={saveWater}
-                        className="px-3 py-1 bg-green-500 text-white rounded"
-                    >
+                    <button onClick={saveWater} className="px-3 py-1 bg-green-500 text-white rounded">
                         Save Water
                     </button>
                 </div>
