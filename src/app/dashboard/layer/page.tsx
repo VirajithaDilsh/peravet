@@ -116,7 +116,7 @@ export default function Home() {
             </div>
 
 
-            <div className="flex  p-4 sm:p-6">
+            <div  id="table" className="flex  p-4 sm:p-6">
                 <LayerTable />
             </div>
         </div>
