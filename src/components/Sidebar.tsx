@@ -1,11 +1,12 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronRight, LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 import Image from "next/image";
-import { useAuth } from "@/context/AuthContext";
+import { useUserContext } from "@/context/UserContext";
 import DashboardIcon from "@/icons/dashboard.svg";
 import DairyIcon from "@/icons/dairy.svg";
 import TaskIcon from "@/icons/task.svg";
@@ -21,6 +22,9 @@ type MenuKey = "dairy" | "swine" | "poultry" | "ruminants";
 
 const Sidebar = () => {
     const pathname = usePathname();
+    const router = useRouter();
+    const { currentUser, logout } = useUserContext();
+    const role = currentUser?.role ?? "admin";
 
     const getInitialOpenMenus = (path: string) => ({
         dairy: path.includes("/cattle") || path.includes("/buffalo"),
@@ -45,9 +49,6 @@ const Sidebar = () => {
         if (window.innerWidth < 768) setIsMobileOpen(false);
     };
 
-    const { user } = useAuth();
-    const role = user?.role ?? "admin";
-
     // Prevent body scroll when sidebar is open
     useEffect(() => {
         document.body.style.overflow = isMobileOpen ? "hidden" : "";
@@ -58,7 +59,7 @@ const Sidebar = () => {
 
     return (
         <>
-            {/* ✅ Floating menu button (ONLY mobile, hide when sidebar is open) */}
+            {/* Mobile menu button */}
             {!isMobileOpen && (
                 <button
                     onClick={() => setIsMobileOpen(true)}
@@ -68,8 +69,7 @@ const Sidebar = () => {
                 </button>
             )}
 
-
-            {/* ✅ Dark overlay on mobile */}
+            {/* Mobile overlay */}
             {isMobileOpen && (
                 <div
                     className="fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity duration-300"
@@ -77,17 +77,14 @@ const Sidebar = () => {
                 />
             )}
 
-            {/* ✅ Sidebar */}
+            {/* Sidebar */}
             <div
                 className={clsx(
-                    // ✅ On mobile → full width, transparent + blurred
                     "fixed md:static top-0 left-0 min-h-screen md:bg-white bg-white/80 backdrop-blur-md border-r shadow-sm flex flex-col transition-transform duration-300 z-50 w-64 md:w-64",
-                    isMobileOpen
-                        ? "translate-x-0"
-                        : "-translate-x-full md:translate-x-0"
+                    isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
                 )}
             >
-                {/* Close button (mobile only) */}
+                {/* Close button mobile */}
                 <div className="flex justify-end md:hidden p-4">
                     <button
                         onClick={() => setIsMobileOpen(false)}
@@ -96,15 +93,15 @@ const Sidebar = () => {
                         <X size={24} />
                     </button>
                 </div>
-                {/*union icon on mobile*/}
+
+                {/* Union icon on mobile */}
                 <div className="flex justify-start md:hidden p-4 absolute top-2 left-2 z-50">
                     <Link href="/profile">
                         <UnionIcon className="w-8 h-8 cursor-pointer hover:scale-105 transition-transform" />
                     </Link>
                 </div>
 
-
-                {/* Logo (desktop only) */}
+                {/* Logo desktop */}
                 <div className="hidden md:flex justify-center items-center p-4 border-b">
                     <Image
                         src="/logo.png"
@@ -115,7 +112,7 @@ const Sidebar = () => {
                     />
                 </div>
 
-                {/* Sidebar menu area - scrollable if long */}
+                {/* Scrollable menu */}
                 <div className="p-4 flex-grow overflow-y-auto">
                     {/* Dashboard */}
                     <Link
@@ -151,7 +148,7 @@ const Sidebar = () => {
                         </div>
                     </Link>
 
-                    {/* Dairy Animals */}
+                    {/* Dairy menu */}
                     <div className="mt-2">
                         <button
                             onClick={() => toggleMenu("dairy")}
@@ -161,7 +158,11 @@ const Sidebar = () => {
                                 <DairyIcon className="w-5 h-5 fill-current" />
                                 <span>Dairy Animal</span>
                             </div>
-                            {openMenus.dairy ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                            {openMenus.dairy ? (
+                                <ChevronDown size={16} />
+                            ) : (
+                                <ChevronRight size={16} />
+                            )}
                         </button>
                         {openMenus.dairy && (
                             <div className="ml-6 mt-1">
@@ -307,7 +308,7 @@ const Sidebar = () => {
                         )}
                     </div>
 
-                    {/* Students (only admin or doctor) */}
+                    {/* Students - only admin or doctor */}
                     {(role === "admin" || role === "doctor") && (
                         <Link
                             href="/dashboard/students"
@@ -365,14 +366,16 @@ const Sidebar = () => {
 
                 {/* Sticky logout at bottom */}
                 <div className="sticky bottom-0 bg-white/80 backdrop-blur-sm border-t p-4">
-                    <Link
-                        href="/login"
-                        onClick={handleLinkClick}
-                        className="flex items-center text-red-600 hover:underline"
+                    <button
+                        onClick={() => {
+                            logout(); // clear current user
+                            router.push("/login"); // redirect
+                        }}
+                        className="flex items-center text-red-600 hover:underline w-full"
                     >
                         <LogOut size={18} className="mr-2" />
                         <span>Log Out</span>
-                    </Link>
+                    </button>
                 </div>
             </div>
         </>
