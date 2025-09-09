@@ -37,7 +37,7 @@ export default function Home() {
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-black">Sheep</h1>
 
                     {/* Right side: Button */}
-                    <AddAnimalButton animalType="Sheep" className="ml-2 sm:ml-4 md:ml-0" />
+                    <AddAnimalButton species="Sheep" text={"Add Sheep"} className="ml-2 sm:ml-4 md:ml-0" />
 
                 </div>
             </main>
