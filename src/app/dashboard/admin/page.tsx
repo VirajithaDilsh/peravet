@@ -10,26 +10,33 @@ import AddAnimalButton from "@/components/AddAnimalButton";
 export default function AdminPage() {
     return (
         <ProtectedRoute allowedRoles={["admin"]}>
-            <div className="flex">
+            <div>
                 <main className="flex-1 p-4 text-black">
-                    <h1 className="text-2xl font-semibold mb-4">Admin Panel</h1>
-                    <div className="flex flex-col md:flex-row items-start gap-10">
-                        <div className="w-full max-w-md">
-                            <AnimalPieChart />
-                        </div>
-                        <div className="w-full max-w-md">
-                            <UserPieChart />
-                        </div>
-                    </div>
-                    <div className="w-full max-w-md">
-                        <AddUserButton />
-                        <AddAnimalButton />
-                    </div>
-
-
-                    <UsersTable />
+                    <h1 className="text-2xl font-semibold mb-4 text-start">Admin Panel</h1>
                 </main>
+                {/* ✅ Full-width container for right-aligned buttons */}
+                <div className="w-full mb-10 flex justify-end space-x-4">
+                    <AddUserButton />
+                    <AddAnimalButton />
+                </div>
+
+                {/* ✅ Center pie charts and make them bigger */}
+                <div className="flex flex-col mt-4 mb-4 md:flex-row justify-center items-center gap-10">
+                    <div className="w-full max-w-lg">
+                        <AnimalPieChart />
+                    </div>
+                    <div className="w-full max-w-lg">
+                        <UserPieChart />
+                    </div>
+                </div>
+                <div id={"userTable"}>
+                    <UsersTable />
+                </div>
+
+
             </div>
+
+
         </ProtectedRoute>
     );
 }

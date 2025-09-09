@@ -141,7 +141,7 @@ export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }:
         if (isEdit) onSubmit?.(user);
         else addUser(user);
 
-        router.push("/users");
+        router.push("/dashboard/admin#userTable");
     };
 
     return (

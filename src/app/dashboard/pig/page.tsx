@@ -47,7 +47,7 @@ export default function Home() {
             </div>
 
             {/* Animals table section */}
-            <div className="flexp-4 p-4 sm:p-6">
+            <div  id="table" className="flexp-4 p-4 sm:p-6">
                 {/* Table itself */}
                 <PigTable />
             </div>
