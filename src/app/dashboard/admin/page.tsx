@@ -6,6 +6,7 @@ import UsersTable from "@/components/tables/UsersTable";
 import AnimalPieChart from "@/components/AnimalPieChart";
 import UserPieChart from "@/components/UserPieChart";
 import AddAnimalButton from "@/components/AddAnimalButton";
+import AnimalTable from "@/components/tables/AnimalTable";
 
 export default function AdminPage() {
     return (
@@ -31,6 +32,10 @@ export default function AdminPage() {
                 </div>
                 <div id={"userTable"}>
                     <UsersTable />
+                </div>
+                <div id={"animalTable"}>
+                    <AnimalTable />
+
                 </div>
 
 
