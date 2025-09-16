@@ -49,10 +49,6 @@ const AnimalEntryForm: React.FC<AnimalEntryFormProps> = ({
             title: "Reproductive Info",
             fields: ["lastCalvingDate","lactationStage","weight", "lastAiDate", "nextAiDate", "pregnancyStatus","lastHeatDate","reproductiveComment"],
         },
-        {
-            title: "Health Info",
-            fields: ["treatments", "diseaseComment", "treatmentComment"],
-        },
     ];
 
     // ✅ Only show reproductive info for female
@@ -95,6 +91,7 @@ const AnimalEntryForm: React.FC<AnimalEntryFormProps> = ({
 
         const animal: Animal = {
             ...data,
+            status: data.status || "Alive",
             treatments: data.treatments as Treatment[],
         } as Animal;
 

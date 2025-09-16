@@ -5,19 +5,19 @@ import { Plus, Trash2 } from "lucide-react";
 
 export default function BroilerHealthTables({
                                                 animal,
-                                                onUpdate,
+                                                onUpdateAction,
                                             }: {
     animal: Broiler;
-    onUpdate: (updated: Broiler) => void;
+    onUpdateAction: (updated: Broiler) => void;
 }) {
     const [vaccinations, setVaccinations] = useState<BroilerVaccination[]>(animal.vaccinations || []);
     const [feed, setFeed] = useState<BroilerFeedManagement[]>(animal.feedManagement || []);
     const [water, setWater] = useState<WaterManagement[]>(animal.waterManagement || []);
 
     // Save handlers
-    const saveVaccinations = () => onUpdate({ ...animal, vaccinations });
-    const saveFeed = () => onUpdate({ ...animal, feedManagement: feed });
-    const saveWater = () => onUpdate({ ...animal, waterManagement: water });
+    const saveVaccinations = () => onUpdateAction({ ...animal, vaccinations });
+    const saveFeed = () => onUpdateAction({ ...animal, feedManagement: feed });
+    const saveWater = () => onUpdateAction({ ...animal, waterManagement: water });
 
     return (
         <div className="space-y-6 mt-6">

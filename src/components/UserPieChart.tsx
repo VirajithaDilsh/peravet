@@ -23,8 +23,9 @@ export default function UserPieChart() {
         return acc;
     }, {} as Record<string, number>);
 
+    // Capitalize role names
     const data = Object.entries(roleCounts).map(([role, count]) => ({
-        name: role,
+        name: role.charAt(0).toUpperCase() + role.slice(1).toLowerCase(),
         value: count,
     }));
 
@@ -32,7 +33,9 @@ export default function UserPieChart() {
 
     return (
         <div className="bg-white rounded-xl shadow p-4 w-full max-w-2xl mx-auto">
-            <h2 className="text-black text-xl font-bold mb-2">User Distribution by Role</h2>
+            <h2 className="text-black text-xl font-bold mb-2">
+                User Distribution by Role
+            </h2>
             <p className="text-sm text-gray-600 mb-4">
                 Total Users: <span className="font-semibold">{totalUsers}</span>
             </p>
@@ -49,7 +52,10 @@ export default function UserPieChart() {
                         label
                     >
                         {data.map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                            />
                         ))}
                     </Pie>
                     <Tooltip />
