@@ -10,25 +10,23 @@ export default function ProfilePage() {
   const { currentUser, editUser } = useUserContext();
   const router = useRouter();
 
-  const [name, setName] = useState(currentUser?.name || "");
-  const [email, setEmail] = useState(currentUser?.email || "");
-  const [department, setDepartment] = useState(
-    currentUser?.role === "student" ? currentUser.department : ""
-  );
-  const [year, setYear] = useState(
-    currentUser?.role === "student" ? currentUser.year : 1
-  );
+  // Editable states (used only in edit mode)
+  const [tempName, setTempName] = useState("");
+  const [tempEmail, setTempEmail] = useState("");
+  const [tempDepartment, setTempDepartment] = useState("");
+  const [tempYear, setTempYear] = useState(1);
+
   const [message, setMessage] = useState("");
   const [editMode, setEditMode] = useState(false);
 
-  // Keep fields in sync with currentUser
+  // Sync with currentUser when it changes
   useEffect(() => {
     if (currentUser) {
-      setName(currentUser.name);
-      setEmail(currentUser.email);
+      setTempName(currentUser.name);
+      setTempEmail(currentUser.email);
       if (currentUser.role === "student") {
-        setDepartment(currentUser.department);
-        setYear(currentUser.year);
+        setTempDepartment(currentUser.department);
+        setTempYear(currentUser.year);
       }
     }
   }, [currentUser]);
@@ -52,21 +50,24 @@ export default function ProfilePage() {
   const handleSave = () => {
     const updatedUser = {
       ...currentUser,
-      name,
-      email,
-      ...(currentUser.role === "student" && { department, year }),
+      name: tempName,
+      email: tempEmail,
+      ...(currentUser.role === "student" && {
+        department: tempDepartment,
+        year: tempYear,
+      }),
     };
-    editUser(updatedUser);
+    editUser(updatedUser); // persist
     setMessage("Profile updated successfully!");
     setEditMode(false);
   };
 
   const handleCancel = () => {
-    setName(currentUser.name);
-    setEmail(currentUser.email);
+    setTempName(currentUser.name);
+    setTempEmail(currentUser.email);
     if (currentUser.role === "student") {
-      setDepartment(currentUser.department);
-      setYear(currentUser.year);
+      setTempDepartment(currentUser.department);
+      setTempYear(currentUser.year);
     }
     setEditMode(false);
     setMessage("");
@@ -90,7 +91,8 @@ export default function ProfilePage() {
               <User className="w-12 h-12 text-blue-500" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-700">{name}</h1>
+          {/* Show live currentUser name (updates after Save only) */}
+          <h1 className="text-2xl font-bold text-gray-700">{currentUser.name}</h1>
         </div>
 
         {/* Body */}
@@ -105,21 +107,21 @@ export default function ProfilePage() {
             </motion.p>
           )}
 
-          <div className="space-y-4">
-            <Field label="Name" value={name} setValue={setName} editable={editMode} />
-            <Field label="Email" value={email} setValue={setEmail} editable={editMode} />
+          <div className="space-y-4b text-black ">
+            <Field label="Name" value={tempName} setValue={setTempName} editable={editMode} />
+            <Field label="Email" value={tempEmail} setValue={setTempEmail} editable={editMode} />
             {currentUser.role === "student" && (
               <>
                 <Field
                   label="Department"
-                  value={department}
-                  setValue={setDepartment}
+                  value={tempDepartment}
+                  setValue={setTempDepartment}
                   editable={editMode}
                 />
                 <Field
                   label="Year"
-                  value={year}
-                  setValue={setYear}
+                  value={tempYear}
+                  setValue={setTempYear}
                   editable={editMode}
                   type="number"
                 />
@@ -173,13 +175,15 @@ const Field = ({
         type={type}
         value={value}
         readOnly={!editable}
-        onChange={e =>
+        onChange={(e) =>
           type === "number" ? setValue(Number(e.target.value)) : setValue(e.target.value)
         }
         className={`w-full p-3 rounded-xl border shadow-sm text-sm focus:outline-none transition
-          ${editable
-            ? "bg-white border-blue-400 focus:ring-2 focus:ring-blue-500"
-            : "bg-gray-100 border-gray-200 text-gray-600 cursor-not-allowed"}`}
+          ${
+            editable
+              ? "bg-white border-blue-400 focus:ring-2 focus:ring-blue-500"
+              : "bg-gray-100 border-gray-200 text-gray-600 cursor-not-allowed"
+          }`}
       />
     </div>
   );
