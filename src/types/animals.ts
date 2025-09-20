@@ -11,7 +11,7 @@ export type Animal =
 
 // ------------------- Treatment -------------------
 export interface Treatment {
-    type: "Vaccination" | "Deworming" | "Other" | "";
+    type?:string;
     treatment?: string;
     dueDate?: string;
     nextDate?: string;
@@ -23,6 +23,27 @@ export interface Treatment {
     route?: string;
     prescribe?: string;
 }
+export interface Vaccine {
+    type?:string;
+    dueDate?: string;
+    nextDate?: string;
+    comment?: string;
+}
+export interface Deworming {
+    type?:string;
+    dueDate?: string;
+    nextDate?: string;
+    comment?: string;
+}
+export interface Disease{
+    type?:string;
+    treatment?:string;
+    dueDate?: string;
+    nextDate?: string;
+    comment?: string;
+
+}
+
 
 // ------------------- Layer -------------------
 export interface PoultryVaccination {
@@ -38,21 +59,7 @@ export interface PoultryFeedManagement {
     feedRequirement?: string;
     feedIntake: string;
 }
-//-----------------------Broiler-------------------
-export interface BroilerVaccination {
-    date?: string;
-    vaccine?: string;
-    route?: string;
-
-}
-
-export interface BroilerFeedManagement {
-    type: "Starter" | "Grower" | "Layer Feed";
-    feedRequirement?: string;
-    feedIntake: string;
-}
-
-    //for layers and broilers
+//for layers and broilers
 export interface WaterManagement {
     waterRequirement?: string;
     waterIntake: string;
@@ -89,6 +96,9 @@ export interface Cattle extends BaseAnimal {
     expectedCalvingDate?: string;
     lastHeatDate?: string;
     reproductiveComment?: string;
+    vaccinations?: Vaccine[];
+    deworming?: Deworming[];
+    diseases?:Disease[];
 }
 
 // ------------------- Buffalo -------------------
@@ -107,6 +117,9 @@ export interface Buffalo extends BaseAnimal {
     lastHeatDate?: string;
     reproductiveComment?: string;
     treatmentComment?: string;
+    vaccinations?: Vaccine[];
+    deworming?: Deworming[];
+    diseases?:Disease[];
 }
 
 // ------------------- Pig -------------------
@@ -116,6 +129,8 @@ export interface Pig extends BaseAnimal {
     birthWeight: number;
     birthDate: string;
     dateOfEntry:string;
+    vaccinations?: Vaccine[];
+    deworming?: Deworming[];
 }
 
 // ------------------- Goat -------------------
@@ -134,6 +149,8 @@ export interface Goat extends BaseAnimal {
     lastHeatDate?: string;
     reproductiveComment?: string;
     treatmentComment?: string;
+    vaccinations?: Vaccine[];
+    deworming?: Deworming[];
 }
 
 // ------------------- Sheep -------------------
@@ -152,6 +169,8 @@ export interface Sheep extends BaseAnimal {
     lastHeatDate?: string;
     reproductiveComment?: string;
     treatmentComment?: string;
+    vaccinations?: Vaccine[];
+    deworming?: Deworming[];
 }
 
 // ------------------- Layer -------------------
