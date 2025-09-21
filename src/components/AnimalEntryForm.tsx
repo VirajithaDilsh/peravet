@@ -47,7 +47,7 @@ const AnimalEntryForm: React.FC<AnimalEntryFormProps> = ({
         },
         {
             title: "Reproductive Info",
-            fields: ["lastCalvingDate","lactationStage","weight", "lastAiDate", "nextAiDate", "pregnancyStatus","lastHeatDate","reproductiveComment"],
+            fields: ["lastCalvingDate","lactationStage","weight", "lastAiDate", "nextAiDate", "pregnancyStatus","expectedCalvingDate","lastHeatDate","reproductiveComment"],
         },
     ];
 

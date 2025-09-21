@@ -99,6 +99,7 @@ export interface Cattle extends BaseAnimal {
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
     diseases?:Disease[];
+
 }
 
 // ------------------- Buffalo -------------------
