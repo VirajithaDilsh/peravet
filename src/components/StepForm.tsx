@@ -18,11 +18,11 @@ const speciesFieldsMap: Record<string, (keyof AnimalForm)[]> = {
     Cattle: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
         "lastCalvingDate","lactationStage","lastAiDate","nextAiDate",
-        "pregnancyStatus","treatments","diseaseComment","weight","lastHeatDate","reproductiveComment"
+        "pregnancyStatus","expectedCalvingDate","treatments","diseaseComment","weight","lastHeatDate","reproductiveComment"
     ],
     Buffalo: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
-        "lastCalvingDate","lastAiDate","nextAiDate","pregnancyStatus","treatments","diseaseComment","treatmentComment"
+        "lastCalvingDate","expectedCalvingDate","lastAiDate","nextAiDate","pregnancyStatus","treatments","diseaseComment","treatmentComment"
     ],
     Pig: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",

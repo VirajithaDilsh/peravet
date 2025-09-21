@@ -9,7 +9,7 @@ interface UserContextProps {
     loading: boolean; // ✅ expose loading state
 
     login: (email: string, password: string) => boolean;
-    
+
     logout: () => void;
     addUser: (user: User) => void;
     editUser: (user: User) => void;

@@ -18,6 +18,8 @@ import PoultryHealthTables from "@/components/tables/PoultryHealthTables";
 import BroilerHealthTables from "@/components/tables/BroilerHealthTables";
 import CattleHealthTables from "@/components/tables/CattleHealthTable";
 
+
+
 type AnimalKeys = keyof (Cattle & Buffalo & Pig & Goat & Sheep & Layer & Broiler);
 
 // Type guards
