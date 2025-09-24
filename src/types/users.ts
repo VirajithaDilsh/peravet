@@ -21,7 +21,7 @@ export type User = AdminUser | DoctorUser | StudentUser | EmployeeUser;
 
 // Form type (for React Hook Form)
 export interface FormValues {
-    id?: string;
+    id: string;
     name: string;
     email: string;
     password: string;

@@ -1,9 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { useUserContext } from "@/context/UserContext";
-import { useForm, FormProvider, UseFormReturn  } from "react-hook-form";
+import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from "uuid";
 import { FormValues, Role, User } from "@/types/users";
 
 interface UserStepFormProps {
@@ -14,18 +13,26 @@ interface UserStepFormProps {
     onBack: () => void;
 }
 
-// Simple StepForm UI (like your AnimalEntryForm)
-const UserStepForm: React.FC<UserStepFormProps> = ({ step, steps, methods, onNext, onBack }) => {
+// Step form UI
+const UserStepForm: React.FC<UserStepFormProps> = ({
+                                                       step,
+                                                       steps,
+                                                       methods,
+                                                       onNext,
+                                                       onBack,
+                                                   }) => {
     const currentStep = steps[step];
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4">{currentStep.title}</h2>
-            <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4 text-black">{currentStep.title}</h2>
+            <div className="space-y-4 text-black">
                 {currentStep.fields.map((field) => {
                     const isNumber = field === "year";
                     return (
                         <div key={field} className="flex flex-col">
-                            <label className="mb-1 capitalize">{field.replace(/([A-Z])/g, " $1")}</label>
+                            <label className="mb-1 capitalize">
+                                {field === "id" ? "User ID" : field.replace(/([A-Z])/g, " $1")}
+                            </label>
                             {field === "role" ? (
                                 <select
                                     {...methods.register(field)}
@@ -80,7 +87,11 @@ interface NewUserFormProps {
     onSubmit?: (user: User) => void;
 }
 
-export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }: NewUserFormProps) {
+export default function NewUserForm({
+                                        defaultValues,
+                                        isEdit = false,
+                                        onSubmit,
+                                    }: NewUserFormProps) {
     const { addUser } = useUserContext();
     const router = useRouter();
     const [step, setStep] = useState(0);
@@ -95,16 +106,18 @@ export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }:
     let steps: { title: string; fields: (keyof FormValues)[] }[] = [
         {
             title: "Basic Information",
-            fields: ["name", "email", "password", "role"] as (keyof FormValues)[],
+            fields: ["id", "name", "email", "password", "role"], // added id
         },
         {
             title: "Student Information",
-            fields: ["department", "year"] as (keyof FormValues)[],
+            fields: ["department", "year"],
         },
     ];
 
     // Only show student info step for student role
-    steps = steps.filter((s) => !(s.title === "Student Information" && role !== "student"));
+    steps = steps.filter(
+        (s) => !(s.title === "Student Information" && role !== "student")
+    );
 
     const handleNext = () => {
         const requiredFields = steps[step].fields;
@@ -122,7 +135,7 @@ export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }:
         const user: User =
             data.role === "student"
                 ? {
-                    id: isEdit && defaultValues?.id ? defaultValues.id : uuidv4(),
+                    id: data.id, // manual id
                     name: data.name,
                     email: data.email,
                     password: data.password,
@@ -131,7 +144,7 @@ export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }:
                     year: data.year!,
                 }
                 : {
-                    id: isEdit && defaultValues?.id ? defaultValues.id : uuidv4(),
+                    id: data.id, // manual id
                     name: data.name,
                     email: data.email,
                     password: data.password,
@@ -145,25 +158,34 @@ export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }:
     };
 
     return (
-        <FormProvider {...methods}>
-            <form
-                onSubmit={methods.handleSubmit(submitHandler)}
-                className="bg-white shadow-md rounded-2xl p-6 max-w-xl mx-auto mt-6"
-            >
-                <UserStepForm step={step} steps={steps} methods={methods} onNext={handleNext} onBack={handleBack} />
+        // Page wrapper with green background
+        <div className="min-h-screen bg-green-500 flex justify-center items-start py-10">
+            <FormProvider {...methods}>
+                <form
+                    onSubmit={methods.handleSubmit(submitHandler)}
+                    className="bg-white shadow-md rounded-2xl p-6 max-w-xl w-full"
+                >
+                    <UserStepForm
+                        step={step}
+                        steps={steps}
+                        methods={methods}
+                        onNext={handleNext}
+                        onBack={handleBack}
+                    />
 
-                {/* Submit button only on last step */}
-                {step === steps.length - 1 && (
-                    <div className="mt-6 text-right">
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition"
-                        >
-                            {isEdit ? "Update User" : "Submit"}
-                        </button>
-                    </div>
-                )}
-            </form>
-        </FormProvider>
+                    {/* Submit button only on last step */}
+                    {step === steps.length - 1 && (
+                        <div className="mt-6 text-right">
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition"
+                            >
+                                {isEdit ? "Update User" : "Submit"}
+                            </button>
+                        </div>
+                    )}
+                </form>
+            </FormProvider>
+        </div>
     );
 }
