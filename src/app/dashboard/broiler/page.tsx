@@ -1,6 +1,6 @@
 "use client";
 //import { useState } from "react";
-import AddAnimalButton from "@/components/AddAnimalButton";
+{/*import AddAnimalButton from "@/components/AddAnimalButton";*/}
 import BroilerTable from "@/components/tables/BroilerTable";
 import { getBroiler } from "@/utils/animalStatus";
 import { useAnimalContext } from "@/context/AnimalContext";
@@ -22,7 +22,7 @@ export default function Home() {
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-black">Broiler</h1>
 
                     {/* Right side: Button */}
-                    <AddAnimalButton species="Broiler" text={"Add Broiler"} className="ml-2 sm:ml-4 md:ml-0" />
+                    {/*<AddAnimalButton species="Broiler" text={"Add Broiler"} className="ml-2 sm:ml-4 md:ml-0" />*/}
 
                 </div>
             </main>

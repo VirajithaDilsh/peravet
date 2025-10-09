@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams, useRouter } from "next/navigation";
 import { useAnimalContext } from "@/context/AnimalContext";
 import keyDisplayNames from "@/constants/animalFieldLabels";
@@ -13,31 +14,27 @@ import {
     Broiler
 } from "@/types/animals";
 import { useState, useEffect } from "react";
-import { Pencil } from "lucide-react";
 import PoultryHealthTables from "@/components/tables/PoultryHealthTables";
 import BroilerHealthTables from "@/components/tables/BroilerHealthTables";
 import CattleHealthTables from "@/components/tables/CattleHealthTable";
-
-
-
-type AnimalKeys = keyof (Cattle & Buffalo & Pig & Goat & Sheep & Layer & Broiler);
+import ReproductionPage from "@/components/tables/ReproductiveInfo";
+import BuffaloHealthTables from "@/components/tables/BuffaloHealthTable";
 
 // Type guards
 function isCattle(animal: Animal): animal is Cattle {
-    return animal.species === "Cattle";
+    return animal.species.toLowerCase() === "cattle";
 }
 function isBuffalo(animal: Animal): animal is Buffalo {
-    return animal.species === "Buffalo";
+    return animal.species.toLowerCase() === "buffalo";
 }
 function isLayer(animal: Animal): animal is Layer {
-    return animal.species === "Layer";
+    return animal.species.toLowerCase() === "layer";
 }
 function isBroiler(animal: Animal): animal is Broiler {
-    return animal.species === "Broiler";
+    return animal.species.toLowerCase() === "broiler";
 }
 
-const pregnancyOptions = ["Pregnant", "Not Pregnant", "To be Check", "Infertile"];
-const lactationOptions = ["Early", "Mid", "Late", "Dry"];
+type AnimalKeys = keyof (Cattle & Buffalo & Pig & Goat & Sheep & Layer & Broiler);
 
 export default function AnimalDetailPage() {
     const { tag } = useParams();
@@ -45,9 +42,6 @@ export default function AnimalDetailPage() {
     const router = useRouter();
 
     const animal = animals.find((a) => a.tag === tag);
-
-    const [reproValues, setReproValues] = useState<Partial<Cattle>>({});
-    const [editingRepro, setEditingRepro] = useState<Partial<Record<keyof Cattle, boolean>>>({});
 
     // Flock state for Layer & Broiler
     const [initialFlockSize, setInitialFlockSize] = useState<number>(0);
@@ -58,19 +52,6 @@ export default function AnimalDetailPage() {
     useEffect(() => {
         if (!animal) return;
 
-        if (isCattle(animal) || isBuffalo(animal)) {
-            setReproValues({
-                lastCalvingDate: animal.lastCalvingDate,
-                lactationStage: animal.lactationStage,
-                lastAiDate: animal.lastAiDate,
-                nextAiDate: animal.nextAiDate,
-                pregnancyStatus: animal.pregnancyStatus,
-                ageOfPregnancy: animal.ageOfPregnancy,
-                expectedCalvingDate: animal.expectedCalvingDate,
-                lastHeatDate: animal.lastHeatDate,
-                reproductiveComment: animal.reproductiveComment,
-            });
-        }
         if (isLayer(animal) || isBroiler(animal)) {
             setInitialFlockSize(animal.initialFlockSize || 0);
             setCurrentFlockSize(animal.currentFlockSize || 0);
@@ -104,16 +85,6 @@ export default function AnimalDetailPage() {
         }
     };
 
-    const handleReproChange = <K extends keyof Cattle>(key: K, value: Cattle[K]) => {
-        setReproValues({ ...reproValues, [key]: value });
-    };
-
-    const saveReproField = <K extends keyof Cattle>(key: K) => {
-        if (isCattle(animal) || isBuffalo(animal)) {
-            editAnimal({ ...animal, [key]: reproValues[key] });
-            setEditingRepro({ ...editingRepro, [key]: false });
-        }
-    };
     const isValuePresent = (value: unknown) =>
         value != null && value !== "" && value !== "undefined";
 
@@ -121,17 +92,7 @@ export default function AnimalDetailPage() {
         "Basic Information": ["species", "tag", "breed", "gender", "weight", "age", "status"],
         "Birth Information": ["dam", "sire", "birthDate", "birthWeight"],
         "Flock Information": ["initialFlockSize", "currentFlockSize", "mortalityRate"],
-        "Reproductive Information": [
-            "lastCalvingDate",
-            "lactationStage",
-            "lastAiDate",
-            "nextAiDate",
-            "pregnancyStatus",
-            "ageOfPregnancy",
-            "expectedCalvingDate",
-            "lastHeatDate",
-            "reproductiveComment",
-        ],
+        // Reproductive Information handled separately
     };
 
     const getLabel = (key: string) => {
@@ -150,10 +111,7 @@ export default function AnimalDetailPage() {
                 {Object.entries(fieldGroups).map(([groupName, keys]) => {
                     let visibleFields: string[] = [];
 
-                    if (groupName === "Reproductive Information") {
-                        if (!isCattle(animal) && !isBuffalo(animal)) return null;
-                        visibleFields = keys.filter((key) => isValuePresent(animal[key as keyof Cattle]));
-                    } else if (groupName === "Flock Information") {
+                    if (groupName === "Flock Information") {
                         if (!isLayer(animal) && !isBroiler(animal)) return null;
                         visibleFields = keys;
                     } else {
@@ -161,63 +119,6 @@ export default function AnimalDetailPage() {
                     }
 
                     if (visibleFields.length === 0) return null;
-
-                    // Reproductive group
-                    if (groupName === "Reproductive Information") {
-                        return (
-                            <div key={groupName} className="mb-4 md:mb-6">
-                                <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">
-                                    {groupName}
-                                </h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                                    {visibleFields.map((key) => {
-                                        const isEditing = editingRepro[key as keyof Cattle];
-                                        const value = reproValues[key as keyof Cattle] ?? "";
-                                        const isDateField = key.toLowerCase().includes("date");
-                                        const isSelectField = key === "pregnancyStatus" || key === "lactationStage";
-
-                                        return (
-                                            <div key={key} className="bg-gray-100 p-3 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center justify-between">
-                                                <div className="flex-1">
-                                                    <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel(key)}</p>
-                                                    {isEditing ? (
-                                                        isDateField ? (
-                                                            <input type="date" value={value as string} onChange={(e) => handleReproChange(key as keyof Cattle, e.target.value)} className="border rounded px-2 py-1 mt-1 w-full" />
-                                                        ) : isSelectField ? (
-                                                            <select value={value as string} onChange={(e) => handleReproChange(key as keyof Cattle, e.target.value)} className="border rounded px-2 py-1 mt-1 w-full">
-                                                                {(key === "pregnancyStatus" ? pregnancyOptions : lactationOptions).map((opt) => (
-                                                                    <option key={opt} value={opt}>{opt}</option>
-                                                                ))}
-                                                            </select>
-                                                        ) : (
-                                                            <textarea
-                                                                value={reproValues.reproductiveComment || ""}
-                                                                onChange={(e) =>
-                                                                    setReproValues({ ...reproValues, reproductiveComment: e.target.value })
-                                                                }
-                                                                className="w-full border rounded px-2 py-1 mt-1 text-sm md:text-base h-24 overflow-auto break-words"
-                                                            />
-                                                        )
-                                                    ) : (
-                                                        <div className="h-24 overflow-y-auto break-words mt-1">
-                                                            <p className="text-base md:text-lg text-gray-800">{String(value) || "No comment"}</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="mt-2 sm:mt-0 sm:ml-2 flex-shrink-0">
-                                                    {isEditing ? (
-                                                        <button onClick={() => saveReproField(key as keyof Cattle)} className="text-green-600 font-bold text-sm md:text-base">Save</button>
-                                                    ) : (
-                                                        <Pencil className="w-5 h-5 text-blue-600 cursor-pointer" onClick={() => setEditingRepro({...editingRepro, [key as keyof Cattle]: true})} />
-                                                    )}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        );
-                    }
 
                     // Flock group
                     if (groupName === "Flock Information") {
@@ -227,11 +128,29 @@ export default function AnimalDetailPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                                     <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
                                         <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("initialFlockSize")}</p>
-                                        <input type="number" value={initialFlockSize} onChange={(e) => setInitialFlockSize(Number(e.target.value))} className="border rounded px-2 py-1 mt-1 w-full" />
+                                        <input
+                                            type="number"
+                                            value={initialFlockSize}
+                                            onChange={(e) => {
+                                                const newVal = Number(e.target.value);
+                                                setInitialFlockSize(newVal);
+                                                editAnimal({ ...animal, initialFlockSize: newVal });
+                                            }}
+                                            className="border rounded px-2 py-1 mt-1 w-full"
+                                        />
                                     </div>
                                     <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
                                         <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("currentFlockSize")}</p>
-                                        <input type="number" value={currentFlockSize} onChange={(e) => setCurrentFlockSize(Number(e.target.value))} className="border rounded px-2 py-1 mt-1 w-full" />
+                                        <input
+                                            type="number"
+                                            value={currentFlockSize}
+                                            onChange={(e) => {
+                                                const newVal = Number(e.target.value);
+                                                setCurrentFlockSize(newVal);
+                                                editAnimal({ ...animal, currentFlockSize: newVal });
+                                            }}
+                                            className="border rounded px-2 py-1 mt-1 w-full"
+                                        />
                                     </div>
                                     <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
                                         <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("mortalityRate")}</p>
@@ -249,8 +168,32 @@ export default function AnimalDetailPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                                 {visibleFields.map((key) => (
                                     <div key={key} className="bg-gray-100 p-3 rounded-lg shadow-sm">
-                                        <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel(key)}</p>
-                                        <p className="text-base md:text-lg font-medium text-gray-800">{String(animal[key as keyof Animal] ?? "")}</p>
+                                        <p className="text-sm md:text-base font-semibold text-gray-500 mb-1">{getLabel(key)}</p>
+
+                                        {key === "status" ? (
+                                            <div className="relative">
+                                                <select
+                                                    value={animal.status}
+                                                    onChange={(e) =>
+                                                        editAnimal({ ...animal, status: e.target.value as "Alive" | "Dead" | "Sick" })
+                                                    }
+                                                    className="appearance-none w-full bg-white border border-gray-300 rounded-md px-3 py-2 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium"
+                                                >
+                                                    <option value="Alive">Alive</option>
+                                                    <option value="Dead">Dead</option>
+                                                    <option value="Sick">Sick</option>
+                                                </select>
+                                                <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <p className="text-base md:text-lg font-medium text-gray-800">
+                                                {String(animal[key as keyof Animal] ?? "")}
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -258,26 +201,49 @@ export default function AnimalDetailPage() {
                     );
                 })}
 
+                {/* Reproductive Info */}
+                {(isCattle(animal) || isBuffalo(animal)) &&
+                    animal.gender?.trim().toLowerCase() === "female" && (
+                        <div className="mb-6">
+                            <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+                                Reproduction Information
+                            </h2>
+                            <ReproductionPage animal={animal} />
+                        </div>
+                    )}
+
                 {/* Health Management Tables */}
-                {isLayer(animal) && (
-                    <div className="mb-6">
-                        <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Poultry Health Management</h2>
-                        <PoultryHealthTables animal={animal} onUpdateAction={(updatedLayer) => editAnimal(updatedLayer)} />
-                    </div>
-                )}
-                {isBroiler(animal) && (
-                    <div className="mb-6">
-                        <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Broiler Health Management</h2>
-                        <BroilerHealthTables animal={animal} onUpdateAction={(updatedLayer) => editAnimal(updatedLayer)} />
-                    </div>
-                )}
-                {isCattle(animal) && (
-                    <div className="mb-6">
-                        <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
-                            Cattle Health Management
-                        </h2>
-                        <CattleHealthTables animal={animal} onUpdateAction={(updated) => editAnimal(updated)} />
-                    </div>
+                {(isLayer(animal) || isBroiler(animal) || isCattle(animal) ||isBuffalo(animal)) && (
+                    <>
+                        {isLayer(animal) && (
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Poultry Health Management</h2>
+                                <PoultryHealthTables animal={animal} onUpdateAction={editAnimal} />
+                            </div>
+                        )}
+                        {isBroiler(animal) && (
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Broiler Health Management</h2>
+                                <BroilerHealthTables animal={animal} onUpdateAction={editAnimal} />
+                            </div>
+                        )}
+                        {isCattle(animal) && (
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+                                    Cattle Health Management
+                                </h2>
+                                <CattleHealthTables animal={animal} onUpdateAction={editAnimal} />
+                            </div>
+                        )}
+                        {isBuffalo(animal) && (
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+                                    Cattle Health Management
+                                </h2>
+                                <BuffaloHealthTables animal={animal} onUpdateAction={editAnimal} />
+                            </div>
+                        )}
+                    </>
                 )}
 
                 {/* Action Buttons */}

@@ -8,6 +8,7 @@ interface AnimalContextProps {
     deleteAnimal: (tag: string) => void;
     editAnimal: (animal: Animal) => void;
     getAnimalByTag: (tag: string) => Animal | undefined;
+    updateAnimal: (tag: string, updater: (animal: Animal) => Animal) => void;
 }
 
 const AnimalContext = createContext<AnimalContextProps | undefined>(undefined);
@@ -45,6 +46,15 @@ export const AnimalProvider = ({ children }: { children: React.ReactNode }) => {
     const getAnimalByTag = (tag: string): Animal | undefined => {
         return animals.find((a) => a.tag === tag);
     };
+    const updateAnimal = (tag: string, updater: (animal: Animal) => Animal) => {
+        setAnimals(prev =>
+            prev.map(animal =>
+                animal.tag === tag ? updater(animal) : animal
+            )
+        );
+    };
+
+
 
     return (
         <AnimalContext.Provider
@@ -54,6 +64,7 @@ export const AnimalProvider = ({ children }: { children: React.ReactNode }) => {
                 deleteAnimal,
                 editAnimal,
                 getAnimalByTag,
+                updateAnimal,
             }}
         >
             {children}
