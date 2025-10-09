@@ -14,23 +14,23 @@ export default function Home() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [submitted, setSubmitted] = useState(false); // track form submission
+    const [submitted, setSubmitted] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
-        const success = login(email, password);
+        // ✅ await login since it's async
+        const success = await login(email, password);
 
         if (!success) {
             setError("Invalid email or password");
             return;
         }
 
-        setSubmitted(true); // trigger useEffect redirect
+        setSubmitted(true); // trigger redirect
     };
 
-    // Redirect when login is successful and currentUser is updated
     useEffect(() => {
         if (submitted && currentUser) {
             if (currentUser.role === "admin") {

@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { useUserContext } from "@/context/UserContext";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
@@ -8,18 +9,19 @@ import { FormValues, Role, User } from "@/types/users";
 interface UserStepFormProps {
     step: number;
     steps: { title: string; fields: (keyof FormValues)[] }[];
-    methods: UseFormReturn<FormValues>; // react-hook-form methods
+    methods: UseFormReturn<FormValues>;
     onNext: () => void;
     onBack: () => void;
+    errors: { [key: string]: string };
 }
 
-// Step form UI
 const UserStepForm: React.FC<UserStepFormProps> = ({
                                                        step,
                                                        steps,
                                                        methods,
                                                        onNext,
                                                        onBack,
+                                                       errors,
                                                    }) => {
     const currentStep = steps[step];
     return (
@@ -51,12 +53,14 @@ const UserStepForm: React.FC<UserStepFormProps> = ({
                                     className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 />
                             )}
+                            {errors[field] && (
+                                <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
+                            )}
                         </div>
                     );
                 })}
             </div>
 
-            {/* Navigation buttons */}
             <div className="mt-6 flex justify-between">
                 {step > 0 && (
                     <button
@@ -87,14 +91,11 @@ interface NewUserFormProps {
     onSubmit?: (user: User) => void;
 }
 
-export default function NewUserForm({
-                                        defaultValues,
-                                        isEdit = false,
-                                        onSubmit,
-                                    }: NewUserFormProps) {
-    const { addUser } = useUserContext();
+export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }: NewUserFormProps) {
+    const { addUser, users } = useUserContext();
     const router = useRouter();
     const [step, setStep] = useState(0);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const methods = useForm<FormValues>({
         defaultValues: defaultValues || { role: "" as Role },
@@ -103,39 +104,61 @@ export default function NewUserForm({
     const role = methods.watch("role") || defaultValues?.role;
 
     // Steps configuration
-    let steps: { title: string; fields: (keyof FormValues)[] }[] = [
-        {
-            title: "Basic Information",
-            fields: ["id", "name", "email", "password", "role"], // added id
-        },
-        {
-            title: "Student Information",
-            fields: ["department", "year"],
-        },
+    let stepsConfig: { title: string; fields: (keyof FormValues)[] }[] = [
+        { title: "Basic Information", fields: ["id", "name", "email", "password", "role"] },
+        { title: "Student Information", fields: ["department", "year"] },
     ];
 
-    // Only show student info step for student role
-    steps = steps.filter(
+    // Only show student step for student role
+    stepsConfig = stepsConfig.filter(
         (s) => !(s.title === "Student Information" && role !== "student")
     );
 
-    const handleNext = () => {
-        const requiredFields = steps[step].fields;
-        const valid = requiredFields.every((f) => !!methods.getValues(f));
-        if (!valid) {
-            alert("Please fill all required fields in this step.");
-            return;
+    const validateStep = (): boolean => {
+        const currentFields = stepsConfig[step].fields;
+        let valid = true;
+        const newErrors: { [key: string]: string } = {};
+
+        currentFields.forEach((f) => {
+            const value = methods.getValues(f);
+            if (!value) {
+                newErrors[f] = "This field is required";
+                valid = false;
+            } else {
+                newErrors[f] = "";
+            }
+        });
+
+        // Check duplicate ID and email
+        const idValue = methods.getValues("id");
+        const emailValue = methods.getValues("email");
+        if (users.some((u) => u.id === idValue && u.id !== defaultValues?.id)) {
+            newErrors["id"] = "This ID is already taken";
+            valid = false;
         }
+        if (users.some((u) => u.email === emailValue && u.id !== defaultValues?.id)) {
+            newErrors["email"] = "This email is already registered";
+            valid = false;
+        }
+
+        setErrors(newErrors);
+        return valid;
+    };
+
+    const handleNext = () => {
+        if (!validateStep()) return;
         setStep((s) => s + 1);
     };
 
     const handleBack = () => setStep((s) => s - 1);
 
     const submitHandler = (data: FormValues) => {
+        if (!validateStep()) return;
+
         const user: User =
             data.role === "student"
                 ? {
-                    id: data.id, // manual id
+                    id: data.id,
                     name: data.name,
                     email: data.email,
                     password: data.password,
@@ -144,7 +167,7 @@ export default function NewUserForm({
                     year: data.year!,
                 }
                 : {
-                    id: data.id, // manual id
+                    id: data.id,
                     name: data.name,
                     email: data.email,
                     password: data.password,
@@ -158,7 +181,6 @@ export default function NewUserForm({
     };
 
     return (
-        // Page wrapper with green background
         <div className="min-h-screen bg-green-500 flex justify-center items-start py-10">
             <FormProvider {...methods}>
                 <form
@@ -167,14 +189,14 @@ export default function NewUserForm({
                 >
                     <UserStepForm
                         step={step}
-                        steps={steps}
+                        steps={stepsConfig}
                         methods={methods}
                         onNext={handleNext}
                         onBack={handleBack}
+                        errors={errors}
                     />
 
-                    {/* Submit button only on last step */}
-                    {step === steps.length - 1 && (
+                    {step === stepsConfig.length - 1 && (
                         <div className="mt-6 text-right">
                             <button
                                 type="submit"

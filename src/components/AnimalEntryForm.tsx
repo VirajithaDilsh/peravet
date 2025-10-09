@@ -39,16 +39,13 @@ const AnimalEntryForm: React.FC<AnimalEntryFormProps> = ({
     let steps: { title: string; fields: (keyof AnimalForm)[] }[] = [
         {
             title: "Basic Information",
-            fields: ["species", "tag", "breed", "gender","initialFlockSize","currentFlockSize","mortilityRate"],
+            fields: ["species", "tag", "breed", "gender","initialFlockSize","currentFlockSize","mortilityRate","weight"],
         },
         {
             title: "Birth Info",
             fields: ["dam", "sire", "birthDate", "birthWeight"],
         },
-        {
-            title: "Reproductive Info",
-            fields: ["lastCalvingDate","lactationStage","weight", "lastAiDate", "nextAiDate", "pregnancyStatus","expectedCalvingDate","lastHeatDate","reproductiveComment"],
-        },
+
     ];
 
     // ✅ Only show reproductive info for female

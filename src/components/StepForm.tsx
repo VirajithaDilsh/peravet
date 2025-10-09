@@ -22,7 +22,8 @@ const speciesFieldsMap: Record<string, (keyof AnimalForm)[]> = {
     ],
     Buffalo: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
-        "lastCalvingDate","expectedCalvingDate","lastAiDate","nextAiDate","pregnancyStatus","treatments","diseaseComment","treatmentComment"
+        "lastCalvingDate","lactationStage","lastAiDate","nextAiDate",
+        "pregnancyStatus","expectedCalvingDate","treatments","diseaseComment","weight","lastHeatDate","reproductiveComment"
     ],
     Pig: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",

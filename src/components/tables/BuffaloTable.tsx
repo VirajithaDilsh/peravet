@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, MouseEvent, KeyboardEvent } from "react";
 import { useAnimalContext } from "@/context/AnimalContext";
 import { Buffalo } from "@/types/animals";
@@ -10,9 +11,11 @@ export default function BuffaloTable() {
     const [search, setSearch] = useState("");
     const router = useRouter();
 
-    const BuffaloOnly = animals.filter((a): a is Buffalo => a.species === "Buffalo");
+    // ✅ Filter only cattle
+    const buffaloOnly = animals.filter((a): a is Buffalo => a.species === "Buffalo");
 
-    const filteredBuffalo = BuffaloOnly.filter((animal) =>
+    // ✅ Search filter
+    const filteredCattle = buffaloOnly.filter((animal) =>
         [animal.tag, animal.breed, animal.gender].some((field) =>
             field.toLowerCase().includes(search.toLowerCase())
         )
@@ -28,17 +31,18 @@ export default function BuffaloTable() {
         <div className="p-4 text-black w-full">
             <h2 className="text-2xl font-semibold mb-4">Buffalo Records</h2>
 
+            {/* Search bar */}
             <div className="flex justify-end mb-4">
                 <input
                     type="text"
                     placeholder="Search by tag, breed, gender..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="p-2 w-full max-w-sm rounded-2xl bg-white  border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-2 w-full max-w-sm rounded-2xl bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
             </div>
 
-            {/* Desktop & Tablet - Table View */}
+            {/* ---------- Desktop / Tablet Table ---------- */}
             <div className="hidden md:block">
                 <div className="border rounded-lg shadow overflow-x-auto max-h-[500px] w-full">
                     <table className="w-full table-auto border-collapse text-xs md:text-sm min-w-[700px]">
@@ -63,9 +67,10 @@ export default function BuffaloTable() {
                             ))}
                         </tr>
                         </thead>
+
                         <tbody>
-                        {filteredBuffalo.length > 0 ? (
-                            filteredBuffalo.map((animal, idx) => (
+                        {filteredCattle.length > 0 ? (
+                            filteredCattle.map((animal, idx) => (
                                 <tr
                                     key={animal.tag}
                                     className={`cursor-pointer hover:bg-blue-50 transition-colors ${
@@ -85,15 +90,19 @@ export default function BuffaloTable() {
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
                                         {animal.weight}
                                     </td>
+
+                                    {/* ✅ Updated to use nested reproduction data */}
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.lastAiDate || "-"}
+                                        {animal.reproduction?.[0]?.lastAiDate || "-"}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.pregnancyStatus || "-"}
+                                        {animal.reproduction?.[0]?.pregnancyStatus || "-"}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.expectedCalvingDate || "-"}
+                                        {animal.reproduction?.[0]?.expectedCalvingDate || "-"}
                                     </td>
+
+                                    {/* Actions */}
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
                                         <div className="flex gap-1 md:gap-2 justify-center">
                                             <button
@@ -109,7 +118,8 @@ export default function BuffaloTable() {
                                             <button
                                                 onClick={(e) => {
                                                     stop(e);
-                                                    if (confirm(`Delete ${animal.tag}?`)) deleteAnimal(animal.tag);
+                                                    if (confirm(`Delete ${animal.tag}?`))
+                                                        deleteAnimal(animal.tag);
                                                 }}
                                                 className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
                                                 title="Delete"
@@ -122,8 +132,11 @@ export default function BuffaloTable() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={8} className="text-center py-4 text-gray-500 border border-gray-300">
-                                    No buffalo records found.
+                                <td
+                                    colSpan={8}
+                                    className="text-center py-4 text-gray-500 border border-gray-300"
+                                >
+                                    No cattle records found.
                                 </td>
                             </tr>
                         )}
@@ -132,19 +145,20 @@ export default function BuffaloTable() {
                 </div>
             </div>
 
-
-            {/* Mobile - Card View with Y-axis scroll */}
+            {/* ---------- Mobile Card View ---------- */}
             <div className="md:hidden border rounded-lg shadow overflow-y-auto min-h-[300px] max-h-[500px]">
                 <div className="flex flex-col">
-                    {filteredBuffalo.length > 0 ? (
-                        filteredBuffalo.map((animal) => (
+                    {filteredCattle.length > 0 ? (
+                        filteredCattle.map((animal) => (
                             <div
                                 key={animal.tag}
                                 onClick={() => goToDetails(animal.tag)}
                                 className="border-b last:border-b-0 p-3 bg-white hover:bg-blue-50 transition cursor-pointer"
                             >
                                 <div className="flex justify-between items-center mb-2">
-                                    <h3 className="font-semibold text-blue-800 text-sm">Tag No:{animal.tag}</h3>
+                                    <h3 className="font-semibold text-blue-800 text-sm">
+                                        Tag No: {animal.tag}
+                                    </h3>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={(e) => {
@@ -158,7 +172,8 @@ export default function BuffaloTable() {
                                         <button
                                             onClick={(e) => {
                                                 stop(e);
-                                                if (confirm(`Delete ${animal.tag}?`)) deleteAnimal(animal.tag);
+                                                if (confirm(`Delete ${animal.tag}?`))
+                                                    deleteAnimal(animal.tag);
                                             }}
                                             className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
                                         >
@@ -166,21 +181,30 @@ export default function BuffaloTable() {
                                         </button>
                                     </div>
                                 </div>
+
                                 <p className="text-xs text-gray-600">Breed: {animal.breed}</p>
                                 <p className="text-xs text-gray-600">Gender: {animal.gender}</p>
                                 <p className="text-xs text-gray-600">Weight: {animal.weight}</p>
-                                <p className="text-xs text-gray-600">Last AI Date: {animal.lastAiDate || "-"}</p>
-                                <p className="text-xs text-gray-600">Pregnancy: {animal.pregnancyStatus || "-"}</p>
-                                <p className="text-xs text-gray-600">Calving Date: {animal.expectedCalvingDate || "-"}</p>
+
+                                {/* ✅ Updated to show nested values */}
+                                <p className="text-xs text-gray-600">
+                                    Last AI Date: {animal.reproduction?.[0]?.lastAiDate || "-"}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                    Pregnancy: {animal.reproduction?.[0]?.pregnancyStatus || "-"}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                    Calving Date: {animal.reproduction?.[0]?.expectedCalvingDate || "-"}
+                                </p>
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-gray-500 p-4">No buffalo records found.</p>
+                        <p className="text-center text-gray-500 p-4">
+                            No Buffalo records found.
+                        </p>
                     )}
                 </div>
             </div>
-
-
         </div>
     );
 }

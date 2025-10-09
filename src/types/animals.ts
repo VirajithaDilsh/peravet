@@ -65,6 +65,17 @@ export interface WaterManagement {
     waterIntake: string;
     chlorinating?: string;
 }
+export  interface ReproductionInfo{
+    lastCalvingDate?: string;
+    lactationStage?: string;
+    lastAiDate?: string;
+    nextAiDate?: string;
+    pregnancyStatus?: string;
+    ageOfPregnancy?: number;
+    expectedCalvingDate?: string;
+    lastHeatDate?: string;
+    reproductiveComment?: string;
+}
 
 
 
@@ -87,18 +98,10 @@ export interface Cattle extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-    lastCalvingDate?: string;
-    lactationStage?: string;
-    lastAiDate?: string;
-    nextAiDate?: string;
-    pregnancyStatus?: string;
-    ageOfPregnancy?: number;
-    expectedCalvingDate?: string;
-    lastHeatDate?: string;
-    reproductiveComment?: string;
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
     diseases?:Disease[];
+    reproduction?: ReproductionInfo[];
 
 }
 
@@ -108,16 +111,7 @@ export interface Buffalo extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-    lastCalvingDate?: string;
-    lactationStage?: string;
-    lastAiDate?: string;
-    nextAiDate?: string;
-    pregnancyStatus?: string;
-    ageOfPregnancy?: number;
-    expectedCalvingDate?: string;
-    lastHeatDate?: string;
-    reproductiveComment?: string;
-    treatmentComment?: string;
+    reproduction?: ReproductionInfo[];
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
     diseases?:Disease[];
