@@ -21,7 +21,7 @@ export default function TasksPage() {
     const filtered = tasks.filter((t) => showCompleted || !completed[t.key]);
 
     return (
-        <div className="p-4 md:p-6 lg:p-8 bg-gray-50 min-h-screen">
+        <div className="p-4 md:p-6 lg:p-8  min-h-screen">
             {/* Toggle completed tasks */}
             <label className="flex items-center gap-3 mb-6 text-gray-800 font-medium">
                 <input
