@@ -10,7 +10,6 @@ export default function TasksPage() {
         completed,
         markCompleted,
         undoCompleted,
-        snooze,
         showCompleted,
         setShowCompleted,
     } = useTasks();
@@ -21,7 +20,7 @@ export default function TasksPage() {
     const filtered = tasks.filter((t) => showCompleted || !completed[t.key]);
 
     return (
-        <div className="p-4 md:p-6 lg:p-8 bg-gray-50 min-h-screen">
+        <div className="p-4 md:p-6 lg:p-8  min-h-screen">
             {/* Toggle completed tasks */}
             <label className="flex items-center gap-3 mb-6 text-gray-800 font-medium">
                 <input
@@ -103,12 +102,7 @@ export default function TasksPage() {
                                             Undo
                                         </button>
                                     )}
-                                    <button
-                                        onClick={() => snooze(task.key, 7)}
-                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium transition"
-                                    >
-                                        Snooze 7d
-                                    </button>
+
                                 </td>
                             </tr>
                         );
@@ -186,12 +180,7 @@ export default function TasksPage() {
                                             Undo
                                         </button>
                                     )}
-                                    <button
-                                        onClick={() => snooze(task.key, 7)}
-                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium transition"
-                                    >
-                                        Snooze 7d
-                                    </button>
+
                                 </div>
                             </div>
                         );

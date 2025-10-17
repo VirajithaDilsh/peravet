@@ -50,6 +50,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
             >
                 <div className="flex flex-col items-center justify-center">
+                    <Link href="/">
                     <Image
                         src="/logo.png"
                         alt="logo"
@@ -57,6 +58,7 @@ export default function Home() {
                         height={85}
                         className="rounded-lg"
                     />
+                    </Link>
                 </div>
 
                 <form onSubmit={handleSubmit}>

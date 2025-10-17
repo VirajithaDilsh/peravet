@@ -1,5 +1,6 @@
 // RegistrationNotice.jsx
 import React from "react";
+import BackButton from "@/components/Button/BackButton";
 
 export default function RegistrationNotice() {
     return (
@@ -21,6 +22,11 @@ export default function RegistrationNotice() {
                     The Farm Manager will assist you with the registration process and provide
                     the necessary credentials.
                 </p>
+                <div className="flex items-center justify-center mt-10" >
+                    <BackButton/>
+                </div>
+
+
             </div>
         </div>
     );

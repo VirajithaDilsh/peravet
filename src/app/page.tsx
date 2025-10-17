@@ -366,64 +366,35 @@ export default function Home(): JSX.Element {
             </section>
 
             {/* FOOTER */}
-            <footer className="bg-green-500 text-black py-8 md:py-10 px-6 md:px-8">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16 text-center md:text-left">
-                    {/* Socials */}
-                    <div>
-                        <div className="flex justify-center md:justify-start space-x-4 mb-4">
-                            {[
-                                { href: "https://facebook.com", img: "/social/fb.svg" },
-                                { href: "https://twitter.com", img: "/social/twitter.svg" },
-                                { href: "https://linkedin.com", img: "/social/linkin.svg" },
-                                { href: "https://instagram.com", img: "/social/insta.svg" },
-                            ].map((social, idx) => (
-                                <motion.a
-                                    key={idx}
-                                    href={social.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    whileHover={{ scale: 1.2, rotate: 5 }}
-                                    className="transition-transform"
-                                >
-                                    <Image src={social.img} alt="social" width={35} height={35} />
-                                </motion.a>
-                            ))}
-                        </div>
-                        <p className="mt-4">Copyright Team codeX 2025</p>
+            <footer className="bg-green-500 text-black py-8 px-6">
+                <div className="max-w-7xl mx-auto flex flex-col items-center space-y-4">
+                    {/* Social icons */}
+                    <div className="flex space-x-4">
+                        {[
+                            { href: "https://facebook.com", img: "/social/fb.svg" },
+                            { href: "https://twitter.com", img: "/social/twitter.svg" },
+                            { href: "https://linkedin.com", img: "/social/linkin.svg" },
+                            { href: "https://instagram.com", img: "/social/insta.svg" },
+                        ].map((social, idx) => (
+                            <motion.a
+                                key={idx}
+                                href={social.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                whileHover={{ scale: 1.2, rotate: 5 }}
+                                className="transition-transform"
+                            >
+                                <Image src={social.img} alt="social" width={35} height={35} />
+                            </motion.a>
+                        ))}
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h3 className="font-bold mb-4">Quick Links</h3>
-                        <ul className="space-y-2">
-                            {["Home", "Features", "About Us", "Contact Us"].map((link) => (
-                                <li key={link}>
-                                    <Link
-                                        href={`#${link.toLowerCase().replace(" ", "")}`}
-                                        className="hover:underline hover:text-green-800 transition"
-                                    >
-                                        {link}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Address */}
-                    <div>
-                        <h3 className="font-bold mb-4">Address</h3>
-                        <p>
-                            Veterinary Teaching Farm
-                            <br />
-                            Udaperadeniya
-                            <br />
-                            Peradeniya, Sri Lanka
-                            <br />
-                            20400
-                        </p>
-                    </div>
+                    {/* Copyright */}
+                    <p className="text-sm text-center">&copy; 2025 Team CodeX. All Rights Reserved.</p>
                 </div>
             </footer>
+
+
         </main>
         </>
     );

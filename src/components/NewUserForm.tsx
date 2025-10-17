@@ -23,18 +23,26 @@ const UserStepForm: React.FC<UserStepFormProps> = ({
                                                        onBack,
                                                        errors,
                                                    }) => {
+    const router = useRouter(); // ✅ for cancel button
     const currentStep = steps[step];
+
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4 text-black">{currentStep.title}</h2>
+            <h2 className="text-xl font-semibold mb-4 text-black">
+                {currentStep.title}
+            </h2>
+
             <div className="space-y-4 text-black">
                 {currentStep.fields.map((field) => {
                     const isNumber = field === "year";
                     return (
                         <div key={field} className="flex flex-col">
                             <label className="mb-1 capitalize">
-                                {field === "id" ? "User ID" : field.replace(/([A-Z])/g, " $1")}
+                                {field === "id"
+                                    ? "User ID"
+                                    : field.replace(/([A-Z])/g, " $1")}
                             </label>
+
                             {field === "role" ? (
                                 <select
                                     {...methods.register(field)}
@@ -53,24 +61,33 @@ const UserStepForm: React.FC<UserStepFormProps> = ({
                                     className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 />
                             )}
+
                             {errors[field] && (
-                                <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors[field]}
+                                </p>
                             )}
                         </div>
                     );
                 })}
             </div>
 
+            {/* ✅ Navigation Buttons */}
             <div className="mt-6 flex justify-between">
-                {step > 0 && (
-                    <button
-                        type="button"
-                        onClick={onBack}
-                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-2xl hover:bg-gray-400 transition"
-                    >
-                        Back
-                    </button>
-                )}
+                <button
+                    type="button"
+                    onClick={() =>
+                        step === 0 ? router.push("/dashboard/admin") : onBack()
+                    }
+                    className={`px-4 py-2 rounded-2xl transition ${
+                        step === 0
+                            ? "bg-gray-300 text-white hover:bg-gray-400"
+                            : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+                    }`}
+                >
+                    {step === 0 ? "Cancel" : "Back"}
+                </button>
+
                 {step < steps.length - 1 && (
                     <button
                         type="button"
@@ -91,7 +108,11 @@ interface NewUserFormProps {
     onSubmit?: (user: User) => void;
 }
 
-export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }: NewUserFormProps) {
+export default function NewUserForm({
+                                        defaultValues,
+                                        isEdit = false,
+                                        onSubmit,
+                                    }: NewUserFormProps) {
     const { addUser, users } = useUserContext();
     const router = useRouter();
     const [step, setStep] = useState(0);
@@ -105,7 +126,10 @@ export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }:
 
     // Steps configuration
     let stepsConfig: { title: string; fields: (keyof FormValues)[] }[] = [
-        { title: "Basic Information", fields: ["id", "name", "email", "password", "role"] },
+        {
+            title: "Basic Information",
+            fields: ["id", "name", "email", "password", "role"],
+        },
         { title: "Student Information", fields: ["department", "year"] },
     ];
 
@@ -181,7 +205,7 @@ export default function NewUserForm({ defaultValues, isEdit = false, onSubmit }:
     };
 
     return (
-        <div className="min-h-screen bg-green-500 flex justify-center items-start py-10">
+        <div className="min-h-screen bg-[#D7F5DC] flex justify-center items-start py-10">
             <FormProvider {...methods}>
                 <form
                     onSubmit={methods.handleSubmit(submitHandler)}

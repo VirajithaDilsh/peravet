@@ -13,10 +13,11 @@ import TaskIcon from "@/icons/task.svg";
 import PigIcon from "@/icons/pig.svg";
 import AdminIcon from "@/icons/admin.svg";
 import StudentIcon from "@/icons/students.svg";
-import SettingsIcon from "@/icons/settings.svg";
+{/*import SettingsIcon from "@/icons/settings.svg";*/}
 import GoatIcon from "@/icons/goat.svg";
 import RoosterIcon from "@/icons/rooster.svg";
 import UnionIcon from "@/icons/union.svg";
+
 
 type MenuKey = "dairy" | "swine" | "poultry" | "ruminants";
 
@@ -103,6 +104,7 @@ const Sidebar = () => {
 
                 {/* Logo desktop */}
                 <div className="hidden md:flex justify-center items-center p-4 border-b">
+                    <Link href={"/"}>
                     <Image
                         src="/logo.png"
                         alt="Logo"
@@ -110,6 +112,7 @@ const Sidebar = () => {
                         height={90}
                         className="rounded"
                     />
+                    </Link>
                 </div>
 
                 {/* Scrollable menu */}
@@ -147,6 +150,26 @@ const Sidebar = () => {
                             <span>Task</span>
                         </div>
                     </Link>
+                    {/*production*/}
+                    {( role === "employee" || role === "admin" ) && (
+                        <Link
+                            href="/dashboard/production"
+                            onClick={handleLinkClick}
+                            className={clsx(
+                                "block px-4 py-2 mt-2 rounded",
+                                pathname === "/dashboard/production"
+                                    ? "bg-green-600 text-white"
+                                    : "text-gray-700 hover:bg-green-100"
+                            )}
+                        >
+                            <div className="flex items-center space-x-2">
+
+
+                                <span>Production</span>
+                            </div>
+                        </Link>
+                    )}
+
 
                     {/* Dairy menu */}
                     <div className="mt-2">
@@ -309,7 +332,7 @@ const Sidebar = () => {
                     </div>
 
                     {/* Students - only admin or doctor */}
-                    {(role === "admin" || role === "doctor") && (
+                    {( role === "doctor") && (
                         <Link
                             href="/dashboard/students"
                             onClick={handleLinkClick}
@@ -327,8 +350,8 @@ const Sidebar = () => {
                         </Link>
                     )}
 
-                    {/* Settings */}
-                    <Link
+                    {/* Settings
+                      <Link
                         href="/dashboard/settings"
                         onClick={handleLinkClick}
                         className={clsx(
@@ -343,6 +366,8 @@ const Sidebar = () => {
                             <span>Settings</span>
                         </div>
                     </Link>
+                     */}
+
 
                     {/* Admin Panel */}
                     {role === "admin" && (
