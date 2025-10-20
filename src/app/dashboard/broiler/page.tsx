@@ -39,9 +39,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="flex justify-start p-4 sm:p-6">
-                <h2 className="text-black text-lg sm:text-xl">Egg Production</h2>
-            </div>
+
 
 
             <div  id="table" className="flex  p-4 sm:p-6">

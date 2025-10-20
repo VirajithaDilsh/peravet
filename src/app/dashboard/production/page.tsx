@@ -1,5 +1,6 @@
 "use client";
 
+import ProtectedRoute from "@/components/ProtectedRoute";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -7,10 +8,10 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 import { ProductionRecord } from "@/types/Production";
-import { useAnimalContext } from "@/context/AnimalContext"; // adjust path
+import { useAnimalContext } from "@/context/AnimalContext";
 
 export default function ProductionPage() {
-    const { animals } = useAnimalContext(); // get animals from context
+    const { animals } = useAnimalContext();
     const { register, handleSubmit, reset, watch, setValue } = useForm<ProductionRecord>();
     const [records, setRecords] = useState<ProductionRecord[]>(() => {
         const saved = localStorage.getItem("productionRecords");
@@ -21,18 +22,18 @@ export default function ProductionPage() {
     const animalId = watch("animalId");
     const species = watch("species");
 
-    // Auto-fill species & unit when animal selected
     useEffect(() => {
         const selectedAnimal = animals.find((a) => a.tag === animalId);
         if (selectedAnimal) {
             setValue("species", selectedAnimal.species);
-
             const unit =
                 ["Cattle", "Buffalo", "Goat", "Sheep"].includes(selectedAnimal.species)
                     ? "L"
-                    : ["Layer", "Broiler"].includes(selectedAnimal.species)
+                    : ["Layer"].includes(selectedAnimal.species)
                         ? "count"
-                        : "kg";
+                        : ["Broiler", "Pig"].includes(selectedAnimal.species)
+                            ? "kg"
+                            : "";
             setValue("unit", unit);
         } else {
             setValue("species", "");
@@ -40,7 +41,6 @@ export default function ProductionPage() {
         }
     }, [animalId, animals, setValue]);
 
-    // Persist records
     useEffect(() => {
         localStorage.setItem("productionRecords", JSON.stringify(records));
     }, [records]);
@@ -80,18 +80,29 @@ export default function ProductionPage() {
         toast.success("Excel exported successfully");
     };
 
+    const getQuantityLabel = (sp: string) => {
+        if (["Cattle", "Buffalo", "Goat", "Sheep"].includes(sp)) return "Milk Yield (L)";
+        if (["Layer"].includes(sp)) return "Eggs Produced (count)";
+        if (["Broiler", "Pig"].includes(sp)) return "Meat Production (kg)";
+        return "Quantity";
+    };
+
     return (
-        <div className="p-6 space-y-8 text-black">
-            <h1 className="text-3xl font-bold mb-4">Daily Production Management</h1>
+        <ProtectedRoute allowedRoles={["admin","employee"]}>
+        <div className="p-4 sm:p-6 space-y-6 text-black">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4">Daily Production</h1>
 
             {/* Add/Edit Form */}
-            <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-                <h2 className="text-xl font-semibold">{editingId ? "Edit Production Record" : "Add New Production"}</h2>
-                <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-
-                    {/* Date */}
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 space-y-4">
+                <h2 className="text-lg sm:text-xl font-semibold">
+                    {editingId ? "Edit Production Record" : "Add New Production"}
+                </h2>
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+                >
                     <div>
-                        <label className="block text-sm font-medium">Date</label>
+                        <label className="block text-sm font-medium mb-1">Date</label>
                         <input
                             type="date"
                             {...register("date", { required: true })}
@@ -100,9 +111,8 @@ export default function ProductionPage() {
                         />
                     </div>
 
-                    {/* Animal Select */}
                     <div>
-                        <label className="block text-sm font-medium">Animal / Flock ID</label>
+                        <label className="block text-sm font-medium mb-1">Animal / Flock ID</label>
                         <input
                             list="animal-list"
                             value={animalId || ""}
@@ -119,10 +129,8 @@ export default function ProductionPage() {
                         </datalist>
                     </div>
 
-
-                    {/* Species */}
                     <div>
-                        <label className="block text-sm font-medium">Species</label>
+                        <label className="block text-sm font-medium mb-1">Species</label>
                         <input
                             {...register("species")}
                             readOnly
@@ -130,26 +138,22 @@ export default function ProductionPage() {
                         />
                     </div>
 
-                    {/* Quantity */}
                     <div>
-                        <label className="block text-sm font-medium">
-                            {["Cattle", "Buffalo", "Goat", "Sheep"].includes(species)
-                                ? "Milk Yield (L)"
-                                : ["Layer", "Broiler"].includes(species)
-                                    ? "Eggs Produced (count)"
-                                    : "Quantity"}
-                        </label>
+                        <label className="block text-sm font-medium mb-1">{getQuantityLabel(species)}</label>
                         <input
                             type="number"
                             step="0.01"
-                            {...register("quantity", { required: true, valueAsNumber: true })}
+                            {...register("quantity", {
+                                required: true,
+                                valueAsNumber: true,
+                                validate: (v) => v === undefined || !isNaN(v) || "Please enter a valid number",
+                            })}
                             className="border rounded px-3 py-2 w-full text-black"
                         />
                     </div>
 
-                    {/* Unit */}
                     <div>
-                        <label className="block text-sm font-medium">Unit</label>
+                        <label className="block text-sm font-medium mb-1">Unit</label>
                         <input
                             {...register("unit")}
                             readOnly
@@ -157,9 +161,8 @@ export default function ProductionPage() {
                         />
                     </div>
 
-                    {/* Notes */}
                     <div>
-                        <label className="block text-sm font-medium">Notes</label>
+                        <label className="block text-sm font-medium mb-1">Notes</label>
                         <input
                             placeholder="Optional notes"
                             {...register("notes")}
@@ -167,14 +170,14 @@ export default function ProductionPage() {
                         />
                     </div>
 
-                    {/* Form Actions */}
-                    <div className="sm:col-span-2 md:col-span-3 flex justify-end gap-3 mt-4">
-                        <Button type="submit" className="bg-green-600 hover:bg-green-700 text-white">
+                    <div className="sm:col-span-2 md:col-span-3 flex flex-col sm:flex-row justify-end gap-2 mt-2 sm:mt-4">
+                        <Button type="submit" className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
                             {editingId ? "Update Record" : "Add Record"}
                         </Button>
                         <Button
                             type="button"
                             variant="outline"
+                            className="w-full sm:w-auto"
                             onClick={() => {
                                 reset();
                                 setEditingId(null);
@@ -187,12 +190,12 @@ export default function ProductionPage() {
             </div>
 
             {/* Production Table */}
-            <div className="bg-white rounded-lg shadow-md p-4 space-y-4">
-                <div className="flex justify-between items-center mb-2">
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-2 sm:gap-0">
                     <h2 className="text-lg font-semibold">Production Records</h2>
                     <button
                         onClick={exportToExcel}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded w-full sm:w-auto"
                     >
                         Export Excel
                     </button>
@@ -222,11 +225,15 @@ export default function ProductionPage() {
                                     <td className="border p-2">{record.quantity}</td>
                                     <td className="border p-2">{record.unit}</td>
                                     <td className="border p-2">{record.notes || "-"}</td>
-                                    <td className="border p-2 flex justify-center gap-2">
-                                        <Button variant="outline" onClick={() => onEdit(record)}>
+                                    <td className="border p-2 flex flex-col sm:flex-row justify-center gap-1 sm:gap-2">
+                                        <Button variant="outline" className="w-full sm:w-auto" onClick={() => onEdit(record)}>
                                             Edit
                                         </Button>
-                                        <Button variant="destructive" onClick={() => onDelete(record.id)}>
+                                        <Button
+                                            variant="destructive"
+                                            className="w-full sm:w-auto"
+                                            onClick={() => onDelete(record.id)}
+                                        >
                                             Delete
                                         </Button>
                                     </td>
@@ -238,5 +245,6 @@ export default function ProductionPage() {
                 )}
             </div>
         </div>
+        </ProtectedRoute>
     );
 }

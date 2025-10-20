@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect } from "react";
-import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
 import { AnimalForm } from "@/types/AnimalForm";
 import keyDisplayNames from "@/constants/animalFieldLabels";
+import BackButton from "@/components/Button/BackButton";
 
 interface StepFormProps {
     step: number;
@@ -18,31 +19,30 @@ const speciesFieldsMap: Record<string, (keyof AnimalForm)[]> = {
     Cattle: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
         "lastCalvingDate","lactationStage","lastAiDate","nextAiDate",
-        "pregnancyStatus","expectedCalvingDate","treatments","diseaseComment","weight","lastHeatDate","reproductiveComment"
+        "pregnancyStatus","expectedCalvingDate","diseaseComment","weight","lastHeatDate","reproductiveComment"
     ],
     Buffalo: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
         "lastCalvingDate","lactationStage","lastAiDate","nextAiDate",
-        "pregnancyStatus","expectedCalvingDate","treatments","diseaseComment","weight","lastHeatDate","reproductiveComment"
+        "pregnancyStatus","expectedCalvingDate","diseaseComment","weight","lastHeatDate","reproductiveComment"
     ],
     Pig: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
         "litterSize","lastFarrowingDate","nextExpectedFarrowingDate","pregnancyStatus",
         "parity","weaningDate","currentWeight","weaningWeight","vaccinationType",
         "vaccinationDate","nextVaccinationDate","dewormingType","lastDewormingDate",
-        "nextDewormingDate","treatments","diseaseComment","treatmentComment","generalComment"
+        "nextDewormingDate","diseaseComment","treatmentComment","generalComment"
     ],
     Goat: ["species","tag","status","breed","gender","dam","sire","diseaseComment","treatmentComment"],
     Sheep: ["species","tag","breed","gender","dam","sire","diseaseComment","treatmentComment"],
     Layer: [
-        "species","tag","status","breed","gender","initialFlockSize","currentFlockSize","treatments","diseaseComment","treatmentComment"
+        "species","tag","status","breed","gender","initialFlockSize","currentFlockSize","diseaseComment","treatmentComment"
     ],
     Broiler: [
-        "species","tag","status","breed","gender","initialFlockSize","currentFlockSize"
-       ,"treatments","diseaseComment","treatmentComment"
+        "species","tag","status","breed","gender","initialFlockSize","currentFlockSize",
+        "diseaseComment","treatmentComment"
     ],
 };
-
 
 const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBack, disableSpecies = false }) => {
     const searchParams = useSearchParams();
@@ -58,11 +58,6 @@ const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBac
     const currentStep = steps[step];
     const filteredFields = currentStep.fields.filter(f => speciesFieldsMap[species]?.includes(f));
 
-    const { fields: treatmentFields, append, remove } = useFieldArray({
-        control: methods.control,
-        name: "treatments" as const,
-    });
-
     const progressPercentage = ((step + 1) / steps.length) * 100;
 
     return (
@@ -75,7 +70,10 @@ const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBac
                     ))}
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full">
-                    <div className="h-2 bg-blue-500 rounded-full transition-all" style={{ width: `${progressPercentage}%` }} />
+                    <div
+                        className="h-2 bg-blue-500 rounded-full transition-all"
+                        style={{ width: `${progressPercentage}%` }}
+                    />
                 </div>
             </div>
 
@@ -88,9 +86,7 @@ const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBac
                     // ---------- Select Fields ----------
                     if (["species", "gender", "lactationStage", "pregnancyStatus"].includes(field)) {
                         // Hide gender for Layer or Broiler
-                        if (field === "gender" && (species === "Layer" || species === "Broiler")) {
-                            return null;
-                        }
+                        if (field === "gender" && (species === "Layer" || species === "Broiler")) return null;
 
                         let options: { value: string; label: string }[] = [];
 
@@ -101,28 +97,7 @@ const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBac
                                 { value: "Male", label: "Male" },
                                 { value: "Female", label: "Female" },
                             ];
-                        } else if (field === "lactationStage") {
-                            options = [
-                                { value: "Early", label: "Early" },
-                                { value: "Mid", label: "Mid" },
-                                { value: "Late", label: "Late" },
-                                { value: "Dry", label: "Dry" },
-                            ];
-                        } else if (field === "pregnancyStatus") {
-                            options = [
-                                { value: "Pregnant", label: "Pregnant" },
-                                { value: "Not Pregnant", label: "Not Pregnant" },
-                                { value: "To be Check", label: "To be Check" },
-                                { value: "Infertile", label: "Infertile" },
-                            ];
-                        }else if (species === "Layer" || species === "Broiler") {
-                            steps.push(
-                                { title: "Poultry Vaccination", fields: ["vaccinationSchedule"] },
-                                { title: "Feed Management", fields: ["feedManagement"] },
-                                { title: "Water Management", fields: ["waterManagement"] }
-                            );
                         }
-
 
                         return (
                             <div key={field} className="w-full">
@@ -135,49 +110,51 @@ const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBac
                                     <option value="">Select {label}</option>
                                     {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                                 </select>
-                                {methods.formState.errors[field] && <p className="text-red-500 text-sm mt-1">{label} is required</p>}
+                                {methods.formState.errors[field] && (
+                                    <p className="text-red-500 text-sm mt-1">{label} is required</p>
+                                )}
                             </div>
                         );
                     }
 
-                    // ---------- Treatments ----------
-                    if (field === "treatments") {
-                        return (
-                            <div key={field} className="col-span-full">
-                                <label className="block mb-4 text-gray-700 font-medium">{label}</label>
-                                <div className="flex flex-col gap-4">
-                                    {treatmentFields.map((item, index) => (
-                                        <div key={item.id} className="flex flex-col sm:flex-row gap-4 p-4 bg-white text-black rounded-2xl shadow-sm items-center flex-wrap">
-                                            <select {...methods.register(`treatments.${index}.type` as const)} className="border rounded-xl p-2 flex-1 min-w-[120px]">
-                                                <option value="">Type</option>
-                                                <option value="Vaccination">Vaccination</option>
-                                                <option value="Deworming">Deworming</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-                                            <input {...methods.register(`treatments.${index}.treatment` as const)} placeholder="Treatment" className="border rounded-xl p-2 flex-1 min-w-[120px]" />
-                                            <input type="date" {...methods.register(`treatments.${index}.dueDate` as const)} className="border rounded-xl p-2 flex-1 min-w-[120px]" />
-                                            <input type="date" {...methods.register(`treatments.${index}.nextDate` as const)} className="border rounded-xl p-2 flex-1 min-w-[120px]" />
-                                            <input {...methods.register(`treatments.${index}.comment` as const)} placeholder="Comment" className="border rounded-xl p-2 flex-1 min-w-[120px]" />
-                                            <button type="button" onClick={() => remove(index)} className="text-red-500 font-bold hover:underline mt-2 sm:mt-0">Delete</button>
-                                        </div>
-                                    ))}
-                                    <button type="button" onClick={() => append({ type: "", treatment: "", dueDate: "", nextDate: "", comment: "" })} className="px-6 py-2 bg-blue-500 text-white rounded-2xl hover:bg-blue-600 transition self-start">Add Treatment</button>
-                                </div>
-                            </div>
-                        );
-                    }
+                    // ---------- ✅ Text/Date/Number Inputs ----------
+                    const isNumberField = field === "weight" || field === "birthWeight";
 
-                    // ---------- Text/Date Inputs ----------
                     return (
                         <div key={field} className="w-full">
                             <label className="block mb-2 text-gray-700 font-medium">{label}</label>
                             <input
-                                type={field.toLowerCase().includes("date") ? "date" : "text"}
-                                {...methods.register(field as keyof AnimalForm)}
-                                placeholder=""
+                                type={
+                                    field.toLowerCase().includes("date")
+                                        ? "date"
+                                        : isNumberField
+                                            ? "number"
+                                            : "text"
+                                }
+                                step={isNumberField ? "any" : undefined}
+                                {...methods.register(field as keyof AnimalForm, {
+                                    ...(isNumberField && {
+                                        valueAsNumber: true,
+                                        setValueAs: (v) =>
+                                            v === "" || v === undefined ? undefined : parseFloat(v),
+                                        validate: (v) => {
+                                            if (v === undefined || v === null || v === "") return true;
+                                            return !isNaN(v as number) || "Please enter a valid number";
+                                        },
+
+                                    }),
+                                })}
+                                onKeyDown={(e) => {
+                                    if (isNumberField && ["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+                                }}
                                 className="w-full text-black border-2 border-gray-300 rounded-2xl p-3 bg-white focus:outline-none focus:border-blue-400"
                             />
-                            {methods.formState.errors[field] && <p className="text-red-500 text-sm mt-1">{label} is required</p>}
+                            {methods.formState.errors[field] && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {methods.formState.errors[field]?.message?.toString() ||
+                                        `${label} is required`}
+                                </p>
+                            )}
                         </div>
                     );
                 })}
@@ -185,8 +162,25 @@ const StepForm: React.FC<StepFormProps> = ({ step, steps, methods, onNext, onBac
 
             {/* Navigation */}
             <div className="flex flex-col sm:flex-row justify-between mt-10 gap-4 sm:gap-0">
-                {step > 0 && <button type="button" onClick={onBack} className="px-8 py-3 bg-gray-300 rounded-full hover:bg-gray-400 transition w-full sm:w-auto">Back</button>}
-                {step < steps.length - 1 && <button type="button" onClick={onNext} className="px-8 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition w-full sm:w-auto">Next</button>}
+                {step === 0 && <BackButton />}
+                {step > 0 && (
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="px-8 py-3 bg-gray-300 rounded-full hover:bg-gray-400 transition w-full sm:w-auto"
+                    >
+                        Back
+                    </button>
+                )}
+                {step < steps.length - 1 && (
+                    <button
+                        type="button"
+                        onClick={onNext}
+                        className="px-8 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition w-full sm:w-auto"
+                    >
+                        Next
+                    </button>
+                )}
             </div>
         </div>
     );
