@@ -28,6 +28,7 @@ export interface FormValues {
     role: Role;
     department?: string; // only for students
     year?: number;       // only for students
+    confirmPassword?: string;
 }
 
 

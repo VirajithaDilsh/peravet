@@ -1,8 +1,7 @@
 "use client";
-import { useState } from "react";
+
 {/*import AddAnimalButton from "@/components/AddAnimalButton";*/}
 import BuffaloTable from "@/components/tables/BuffaloTable";
-import TagInput from "@/components/TagInput";
 import { getBuffalo } from "@/utils/animalStatus";
 import { useAnimalContext } from "@/context/AnimalContext";
 
@@ -10,19 +9,6 @@ import { useAnimalContext } from "@/context/AnimalContext";
 
 export default function Home() {
 
-    const [date, setDate] = useState("");
-    const [milker, setMilker] = useState("");
-
-    const handleSubmit = () => {
-        const formData = {
-            date,
-            milker,
-        };
-        console.log("Form Data:", formData);
-
-        // 👉 You can send this data to an API
-        // await fetch("/api/save", { method: "POST", body: JSON.stringify(formData) })
-    };
 
     const { animals } = useAnimalContext();
     const buffaloStats = getBuffalo(animals);
@@ -89,49 +75,6 @@ export default function Home() {
 
                 </div>
             </div>
-
-            {/*Milk production update*/}
-            <div className="flex justify-start p-4 sm:p-6">
-                <h2 className="text-black text-lg sm:text-xl">Milk Production</h2>
-            </div>
-
-            <div className="flex-col w-full max-w-[743px] bg-[#DDF4EF] rounded-xl text-black px-4 sm:px-6 py-3 sm:py-4 ml-2 sm:ml-4">
-                <div className="flex flex-row flex-wrap items-end gap-2 sm:gap-4 w-full">
-
-                    <div className="flex-1 min-w-[100px] sm:min-w-[140px]">
-                        <TagInput
-                            label="Date"
-                            placeholder=""
-                            value={date}
-                            onChangeAction={setDate}
-                            type="date"
-                        />
-                    </div>
-
-                    <div className="flex-1 min-w-[110px] sm:min-w-[150px]">
-                        <TagInput
-                            label="Total Milk Yeild"
-                            placeholder=""
-                            value={milker}
-                            onChangeAction={setMilker}
-                            type="number"
-                            step="0.01"
-                        />
-                    </div>
-
-                    <div className="mt-4 sm:mt-7">
-                        <button
-                            onClick={handleSubmit}
-                            className="bg-[#08A31A] text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-green-700 text-sm sm:text-base"
-                        >
-                            Submit
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-
-
             <div id="table" className="flex  p-4 sm:p-6">
                 <BuffaloTable />
             </div>

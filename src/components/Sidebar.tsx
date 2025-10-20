@@ -17,6 +17,7 @@ import StudentIcon from "@/icons/students.svg";
 import GoatIcon from "@/icons/goat.svg";
 import RoosterIcon from "@/icons/rooster.svg";
 import UnionIcon from "@/icons/union.svg";
+import ProductIcon from "@/icons/Prod.svg";
 
 
 type MenuKey = "dairy" | "swine" | "poultry" | "ruminants";
@@ -163,8 +164,7 @@ const Sidebar = () => {
                             )}
                         >
                             <div className="flex items-center space-x-2">
-
-
+                                <ProductIcon className="fill-current" />
                                 <span>Production</span>
                             </div>
                         </Link>
