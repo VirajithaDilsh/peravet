@@ -20,7 +20,7 @@ export default function Home() {
             <main className="flex flex-col">
                 <div className="flex justify-between items-center p-6">
                     {/* Left side: Title */}
-                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-black">Cattle</h1>
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-black">Buffalo</h1>
 
                     {/* Right side: Button */}
                     {/*<AddAnimalButton species="Buffalo" text={"Add Buffalo"} className="ml-2 sm:ml-4 md:ml-0" />*/}
@@ -33,7 +33,7 @@ export default function Home() {
 
                     {/* Cow */}
                     <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
-                        <span className="text-green-600 text-[10px] sm:text-lg font-bold truncate">{buffaloStats.cow}</span>
+                        <span className="text-green-600 text-[10px] sm:text-lg font-bold truncate">{buffaloStats.males}</span>
                         <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Cow</p>
                     </div>
 
