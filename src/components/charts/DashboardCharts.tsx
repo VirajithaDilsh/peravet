@@ -10,19 +10,31 @@ import {
     CartesianGrid,
     ResponsiveContainer,
 } from "recharts";
-import { useProduction } from "@/context/ProductionContext";
+import { ProductionRecord } from "@/types/Production";
 
 export default function DashboardCharts() {
-    const { records } = useProduction(); // ✅ get production records from context
+    const [records, setRecords] = useState<ProductionRecord[]>([]);
     const [milkData, setMilkData] = useState<{ day: string; milk: number }[]>([]);
-    const [eggData, setEggData] = useState<{ day: string; eggs?: number; meat?: number }[]>([]);
+    const [eggData, setEggData] = useState<
+        { day: string; eggs?: number; meat?: number }[]
+    >([]);
     const [milkSpecies, setMilkSpecies] = useState("Cattle");
     const [eggSpecies, setEggSpecies] = useState("Layer");
+
+    // 🔁 Load and auto-refresh localStorage updates
+    useEffect(() => {
+        const loadData = () => {
+            const saved = localStorage.getItem("productionRecords");
+            if (saved) setRecords(JSON.parse(saved));
+        };
+        loadData();
+        window.addEventListener("storage", loadData);
+        return () => window.removeEventListener("storage", loadData);
+    }, []);
 
     // 🥛 Milk data
     useEffect(() => {
         const milkMap: Record<string, number> = {};
-
         records
             .filter(
                 (r) =>
@@ -49,10 +61,8 @@ export default function DashboardCharts() {
             .filter((r) => ["Layer", "Broiler"].includes(r.species))
             .forEach((r) => {
                 if (!dataMap[r.date]) dataMap[r.date] = {};
-                if (r.species === "Layer")
-                    dataMap[r.date].eggs = (dataMap[r.date].eggs || 0) + r.quantity;
-                if (r.species === "Broiler")
-                    dataMap[r.date].meat = (dataMap[r.date].meat || 0) + r.quantity;
+                if (r.species === "Layer") dataMap[r.date].eggs = (dataMap[r.date].eggs || 0) + r.quantity;
+                if (r.species === "Broiler") dataMap[r.date].meat = (dataMap[r.date].meat || 0) + r.quantity;
             });
 
         setEggData(
@@ -68,7 +78,9 @@ export default function DashboardCharts() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Milk Production Chart */}
             <div className="bg-white p-6 rounded-2xl shadow-lg">
-                <h3 className="text-lg font-semibold mb-2 text-gray-800">Milk Production (Liters)</h3>
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">
+                    Milk Production (Liters)
+                </h3>
 
                 <select
                     value={milkSpecies}
@@ -103,7 +115,9 @@ export default function DashboardCharts() {
             {/* Egg / Meat Production Chart */}
             <div className="bg-white p-6 rounded-2xl shadow-lg">
                 <h3 className="text-lg font-semibold mb-2 text-gray-800">
-                    {eggSpecies === "Broiler" ? "Meat Production (Kilograms)" : "Egg Production (Eggs)"}
+                    {eggSpecies === "Broiler"
+                        ? "Meat Production (Kilograms)"
+                        : "Egg Production (Eggs)"}
                 </h3>
 
                 <select
