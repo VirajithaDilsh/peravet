@@ -21,7 +21,7 @@ export default function TasksPage() {
 
     return (
         <div className="p-4 md:p-6 lg:p-8  min-h-screen">
-            {/* Toggle completed tasks */}
+            {/* Toggle completed tasks
             <label className="flex items-center gap-3 mb-6 text-gray-800 font-medium">
                 <input
                     type="checkbox"
@@ -30,7 +30,7 @@ export default function TasksPage() {
                     className="accent-blue-500 w-5 h-5"
                 />
                 Show completed tasks
-            </label>
+            </label> */}
 
             {/* Table (desktop) + Card list (mobile) */}
             <div className="overflow-x-auto bg-white rounded-xl shadow-md">

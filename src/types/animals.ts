@@ -134,16 +134,8 @@ export interface Goat extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-    lastCalvingDate?: string;
-    lactationStage?: string;
-    lastAiDate?: string;
-    nextAiDate?: string;
-    pregnancyStatus?: string;
-    ageOfPregnancy?: number;
-    expectedCalvingDate?: string;
-    lastHeatDate?: string;
-    reproductiveComment?: string;
-    treatmentComment?: string;
+    diseases?:Disease[];
+    reproduction?: ReproductionInfo[];
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
 }
@@ -154,17 +146,10 @@ export interface Sheep extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-    lastCalvingDate?: string;
-    lactationStage?: string;
-    lastAiDate?: string;
-    nextAiDate?: string;
-    pregnancyStatus?: string;
-    ageOfPregnancy?: number;
-    expectedCalvingDate?: string;
-    lastHeatDate?: string;
-    reproductiveComment?: string;
     treatmentComment?: string;
+    diseases?:Disease[];
     vaccinations?: Vaccine[];
+    reproduction?: ReproductionInfo[];
     deworming?: Deworming[];
 }
 
@@ -173,7 +158,6 @@ export interface Layer extends BaseAnimal {
     initialFlockSize?: number;
     currentFlockSize?: number;
     mortalityRate: number;
-    treatments?: Treatment[];
     vaccinations?: PoultryVaccination[]; // multiple vaccinations
     feedManagement?: PoultryFeedManagement[]; // multiple feed entries
     waterManagement?: WaterManagement[]; // multiple water entries
@@ -184,7 +168,6 @@ export interface Broiler extends BaseAnimal {
     initialFlockSize?: number;
     currentFlockSize?: number;
     mortalityRate: number;
-    treatments?: Treatment[];
     vaccinations?: PoultryVaccination[]; // multiple vaccinations
     feedManagement?: PoultryFeedManagement[]; // multiple feed entries
     waterManagement?: WaterManagement[]; // multiple water entries
