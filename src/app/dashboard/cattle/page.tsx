@@ -15,6 +15,7 @@ export default function Home() {
 
 
 
+
     return (
         <div>
             <main className="flex flex-col">
@@ -33,7 +34,7 @@ export default function Home() {
 
                     {/* Cow */}
                     <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
-                        <span className="text-green-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.cow}</span>
+                        <span className="text-green-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.males}</span>
                         <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Cow</p>
                     </div>
 

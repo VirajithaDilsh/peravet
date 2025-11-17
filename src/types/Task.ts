@@ -1,11 +1,13 @@
 // ------------------- Task Types -------------------
 export type TaskType =
+    | "Treatment"
     | "Vaccination"
     | "Deworming"
+    | "Disease"
     | "Artificial Insemination"
     | "Expected Calving"
-    | "Treatment"
-    | "Disease";
+    | "Feed"
+    | "Water";
 
 export type TaskSourceField =
     | "nextVaccinationDate"

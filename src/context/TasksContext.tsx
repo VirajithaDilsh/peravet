@@ -4,8 +4,17 @@ import { createContext, useContext, useMemo, useState } from "react";
 import { Task } from "@/types/Task";
 import { buildTasksFromAnimals } from "@/utils/buildTasksFromAnimals";
 import { useAnimalContext } from "@/context/AnimalContext";
-import { Animal, Cattle, Buffalo, Goat, Sheep, Vaccine, Deworming, Treatment } from "@/types/animals";
+import {
+    Animal,
+    Vaccine,
+    Deworming,
+    Treatment,
+    Disease,
+} from "@/types/animals";
 
+// --------------------------------------------------------
+// Context Types
+// --------------------------------------------------------
 interface TasksContextValue {
     tasks: Task[];
     completed: Record<string, string>;
@@ -18,6 +27,9 @@ interface TasksContextValue {
 
 const TasksContext = createContext<TasksContextValue | null>(null);
 
+// --------------------------------------------------------
+// Provider
+// --------------------------------------------------------
 export function TasksProvider({ children }: { children: React.ReactNode }) {
     const { animals, editAnimal } = useAnimalContext();
 
@@ -25,6 +37,7 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     const [snoozed, setSnoozed] = useState<Record<string, string>>({});
     const [showCompleted, setShowCompleted] = useState<boolean>(false);
 
+    // Build tasks from animals
     const rawTasks = useMemo(() => buildTasksFromAnimals(animals), [animals]);
 
     const tasks = useMemo(
@@ -36,63 +49,86 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         [rawTasks, snoozed]
     );
 
+    // --------------------------------------------------------
+    // markCompleted()
+    // --------------------------------------------------------
     const markCompleted = (task: Task) => {
         setCompleted((c) => ({ ...c, [task.key]: new Date().toISOString() }));
 
         const animal = animals.find((a) => a.tag === task.animalTag);
         if (!animal) return;
 
-        // Clone animal
-        const updatedAnimal: Animal = { ...animal };
+        // Deep clone to avoid mutation
+        const updatedAnimal: Animal = JSON.parse(JSON.stringify(animal));
 
-        // Remove task safely using TS types
-        switch (task.type) {
-            case "Vaccination":
-                if ("vaccinations" in animal && Array.isArray(animal.vaccinations)) {
-                    updatedAnimal.vaccinations = animal.vaccinations.filter(
-                        (v: Vaccine) => v.nextDate !== task.dueDate
-                    );
-                }
-                break;
+        const targetDate = task.nextDate || task.dueDate;
 
-            case "Deworming":
-                if ("deworming" in animal && Array.isArray(animal.deworming)) {
-                    (updatedAnimal as Cattle | Buffalo | Goat | Sheep).deworming =
-                        animal.deworming.filter((d: Deworming) => d.nextDate !== task.dueDate);
-                }
-                break;
+        // ------------------- Vaccination -------------------
+        if (task.type === "Vaccination") {
+            if ("vaccinations" in updatedAnimal && Array.isArray(updatedAnimal.vaccinations)) {
+                updatedAnimal.vaccinations = updatedAnimal.vaccinations.filter(
+                    (v: Vaccine | undefined) => v?.nextDate !== targetDate
+                );
+            }
+        }
 
-            case "Treatment":
-                if ("treatments" in animal && Array.isArray(animal.treatments)) {
-                    updatedAnimal.treatments = animal.treatments.filter(
-                        (t: Treatment) => t.nextDate !== task.dueDate
-                    );
-                }
-                break;
+        // ------------------- Deworming -------------------
+        if (task.type === "Deworming") {
+            if ("deworming" in updatedAnimal && Array.isArray(updatedAnimal.deworming)) {
+                updatedAnimal.deworming = updatedAnimal.deworming.filter(
+                    (d: Deworming | undefined) => d?.nextDate !== targetDate
+                );
+            }
+        }
 
-            case "Disease":
-                if ("diseases" in animal) {
-                    (updatedAnimal as Cattle ).diseases = undefined;
-                }
-                break;
+        // ------------------- Treatment -------------------
+        if (task.type === "Treatment") {
+            if ("treatments" in updatedAnimal && Array.isArray(updatedAnimal.treatments)) {
+                updatedAnimal.treatments = updatedAnimal.treatments.filter(
+                    (t: Treatment | undefined) => t?.nextDate !== targetDate
+                );
+            }
+        }
 
+        // ------------------- Disease -------------------
+        if (task.type === "Disease") {
+            if ("diseases" in updatedAnimal && Array.isArray(updatedAnimal.diseases)) {
+                updatedAnimal.diseases = updatedAnimal.diseases.filter(
+                    (d: Disease | undefined) => d?.nextDate !== targetDate
+                );
+            }
+        }
 
-            case "Artificial Insemination":
-                if ("nextAiDate" in animal) {
-                    (updatedAnimal as Cattle | Buffalo | Goat | Sheep).nextAiDate = undefined;
-                }
-                break;
+        // ------------------- Artificial Insemination -------------------
+        if (task.type === "Artificial Insemination") {
+            if ("reproduction" in updatedAnimal && Array.isArray(updatedAnimal.reproduction)) {
+                updatedAnimal.reproduction = updatedAnimal.reproduction.map((r) => {
+                    if (r.nextAiDate === targetDate) {
+                        return { ...r, nextAiDate: undefined };
+                    }
+                    return r;
+                });
+            }
+        }
 
-            case "Expected Calving":
-                if ("expectedCalvingDate" in animal) {
-                    (updatedAnimal as Cattle | Buffalo | Goat | Sheep).expectedCalvingDate = undefined;
-                }
-                break;
+        // ------------------- Expected Calving -------------------
+        if (task.type === "Expected Calving") {
+            if ("reproduction" in updatedAnimal && Array.isArray(updatedAnimal.reproduction)) {
+                updatedAnimal.reproduction = updatedAnimal.reproduction.map((r) => {
+                    if (r.expectedCalvingDate === targetDate) {
+                        return { ...r, expectedCalvingDate: undefined };
+                    }
+                    return r;
+                });
+            }
         }
 
         editAnimal(updatedAnimal);
     };
 
+    // --------------------------------------------------------
+    // undoCompleted()
+    // --------------------------------------------------------
     const undoCompleted = (task: Task) => {
         setCompleted((c) => {
             const rest = { ...c };
@@ -101,6 +137,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    // --------------------------------------------------------
+    // snooze()
+    // --------------------------------------------------------
     const snooze = (key: string, days: number) => {
         setSnoozed((s) => {
             const task = rawTasks.find((t) => t.key === key);
@@ -111,6 +150,7 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    // --------------------------------------------------------
     return (
         <TasksContext.Provider
             value={{
@@ -128,6 +168,7 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     );
 }
 
+// --------------------------------------------------------
 export function useTasks() {
     const ctx = useContext(TasksContext);
     if (!ctx) throw new Error("useTasks must be used within TasksProvider");
