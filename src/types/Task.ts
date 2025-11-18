@@ -1,12 +1,15 @@
 // ------------------- Task Types -------------------
 export type TaskType =
+    | "Treatment"
     | "Vaccination"
     | "Deworming"
+    | "Disease"
     | "Artificial Insemination"
     | "Expected Calving"
-    | "Treatment"
-    | "Disease";
+    | "Feed"
+    | "Water";
 
+// ------------------- Task Source Field Mapping -------------------
 export type TaskSourceField =
     | "nextVaccinationDate"
     | "nextDewormingDate"
@@ -15,15 +18,16 @@ export type TaskSourceField =
     | "nextTreatmentDate"
     | "nextDiseaseDate";
 
+// ------------------- Status -------------------
 export type TaskStatus = "overdue" | "due-soon" | "upcoming" | "completed";
 
 // ------------------- Task Interface -------------------
 export interface Task {
-    key: string;          // unique key for task (animalTag + type + date)
-    type: TaskType;       // type of task
-    species: string;      // species of animal
-    animalTag: string;    // tag/ID of the animal
-    dueDate: string;      // date task is due
-    nextDate?: string;    // optional next occurrence date
-    comment?: string;     // optional comment
+    key: string;            // unique key for task (animalTag + type + date)
+    type: TaskType;         // Type of task
+    species: string;        // Animal species
+    animalTag: string;      // Animal's ear tag
+    dueDate: string;        // Date the task must be done
+    nextDate?: string;      // Next scheduled date (optional)
+    comment?: string;       // Free text / notes
 }
