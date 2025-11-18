@@ -11,20 +11,18 @@ export default function Home() {
         <div className="flex flex-col">
             <main className="flex-1 p-4">
                 <h1 className="text-3xl text-black font-bold mb-4">Tasks</h1>
-
-                {/* Task Table */}
-                <TaskTable />
-
-                {/* Add Task Button */}
-                <div className="flex justify-end mb-4 mr-8">
-                    <Button
-                        className="rounded-xl px-8 bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => router.push("/dashboard/task/addtask")}
-                    >
-                        Add Task
-                    </Button>
-                </div>
             </main>
+
+            <div className="flex justify-end mb-4 mr-8">
+                <Button
+                    className="rounded-xl px-8 bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => router.push("/dashboard/task/addtask")}
+                >
+                    Add Task
+                </Button>
+            </div>
+
+            <TaskTable />
         </div>
     );
 }

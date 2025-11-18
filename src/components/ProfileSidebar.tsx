@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useUserContext } from "@/context/UserContext";
 import { User } from "@/types/users";

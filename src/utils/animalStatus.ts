@@ -25,6 +25,9 @@ export function countBySpeciesAndGender(
     return animals.filter(a => a.species === species && a.gender === gender).length;
 }
 
+// ======================================================
+//  TOTAL ANIMALS
+// ======================================================
 export function getTotalAnimals(animals: Animal[]): number {
     return animals.length;
 }
@@ -37,13 +40,15 @@ export function getTotalPregnantAnimals(animals: Animal[]): number {
         // Species with reproduction array
         if (["Cattle", "Buffalo", "Goat", "Sheep"].includes(a.species)) {
             const repro = (a as Cattle | Buffalo | Goat | Sheep).reproduction;
-            return Array.isArray(repro) && repro.some(r => r.pregnancyStatus === "Pregnant");
+            return Array.isArray(repro) && repro.some((r: ReproductionInfo) => r.pregnancyStatus === "Pregnant");
         }
+
         // Pig pregnancy handled via status
         if (a.species === "Pig") {
             return (a as Pig).status?.toLowerCase() === "pregnant";
         }
-        // Layer & Broiler cannot be pregnant
+
+        // Layer & Broiler have no pregnancy
         return false;
     }).length;
 }
@@ -51,73 +56,84 @@ export function getTotalPregnantAnimals(animals: Animal[]): number {
 // ======================================================
 //  SPECIES-SPECIFIC COUNTS
 // ======================================================
-
-function getReproductionCounts<T extends Cattle | Buffalo | Goat | Sheep>(animals: T[]) {
-    return {
-        total: animals.length,
-        males: animals.filter(a => a.gender === "Male").length,
-        females: animals.filter(a => a.gender === "Female").length,
-        pregnant: animals.filter(a => a.reproduction?.some(r => r.pregnancyStatus === "Pregnant")).length,
-        milking: animals.filter(a => a.reproduction?.some(r => ["Early", "Mid", "Late"].includes(r.lactationStage ?? ""))).length,
-        dry: animals.filter(a => a.reproduction?.some(r => r.lactationStage === "Dry")).length,
-        heifers: animals.filter(a => a.gender === "Female" && a.reproduction?.every(r => !r.ageOfPregnancy || r.ageOfPregnancy === 0)).length,
-        cows: animals.filter(a => a.reproduction?.some(r => (r.ageOfPregnancy ?? 0) > 0)).length,
-    };
-}
-
 export function getCattle(animals: Animal[]) {
     const cattle = animals.filter((a): a is Cattle => a.species === "Cattle");
-    return getReproductionCounts(cattle);
+
+    return {
+        total: cattle.length,
+        males: cattle.filter(c => c.gender === "Male").length,
+        females: cattle.filter(c => c.gender === "Female").length,
+        pregnant: cattle.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.pregnancyStatus === "Pregnant")).length,
+        milking: cattle.filter(c => c.reproduction?.some((r: ReproductionInfo) => ["Early", "Mid", "Late"].includes(r.lactationStage ?? ""))).length,
+        dry: cattle.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.lactationStage === "Dry")).length,
+        heifers: cattle.filter(c => c.gender === "Female" && c.reproduction?.every((r: ReproductionInfo) => !r.ageOfPregnancy || r.ageOfPregnancy === 0)).length,
+        cows: cattle.filter(c => c.reproduction?.some((r: ReproductionInfo) => (r.ageOfPregnancy ?? 0) > 0)).length
+    };
 }
 
 export function getBuffalo(animals: Animal[]) {
     const buffalo = animals.filter((a): a is Buffalo => a.species === "Buffalo");
-    return getReproductionCounts(buffalo);
+
+    return {
+        total: buffalo.length,
+        males: buffalo.filter(c => c.gender === "Male").length,
+        females: buffalo.filter(c => c.gender === "Female").length,
+        pregnant: buffalo.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.pregnancyStatus === "Pregnant")).length,
+        milking: buffalo.filter(c => c.reproduction?.some((r: ReproductionInfo) => ["Early", "Mid", "Late"].includes(r.lactationStage ?? ""))).length,
+        dry: buffalo.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.lactationStage === "Dry")).length,
+        heifers: buffalo.filter(c => c.gender === "Female" && c.reproduction?.every((r: ReproductionInfo) => !r.ageOfPregnancy || r.ageOfPregnancy === 0)).length,
+        cows: buffalo.filter(c => c.reproduction?.some((r: ReproductionInfo) => (r.ageOfPregnancy ?? 0) > 0)).length
+    };
 }
 
 export function getPig(animals: Animal[]) {
     const pigs = animals.filter((a): a is Pig => a.species === "Pig");
+
     return {
         total: pigs.length,
-        males: pigs.filter(p => p.gender === "Male").length,
-        females: pigs.filter(p => p.gender === "Female").length,
-        pregnant: pigs.filter(p => p.status?.toLowerCase() === "pregnant").length
+        males: pigs.filter(c => c.gender === "Male").length,
+        females: pigs.filter(c => c.gender === "Female").length,
+        pregnant: pigs.filter(c => c.status?.toLowerCase() === "pregnant").length
     };
 }
 
 export function getGoat(animals: Animal[]) {
     const goats = animals.filter((a): a is Goat => a.species === "Goat");
+
     return {
         total: goats.length,
-        males: goats.filter(g => g.gender === "Male").length,
-        females: goats.filter(g => g.gender === "Female").length,
-        pregnant: goats.filter(g => g.reproduction?.some(r => r.pregnancyStatus === "Pregnant")).length
+        males: goats.filter(c => c.gender === "Male").length,
+        females: goats.filter(c => c.gender === "Female").length,
+        pregnant: goats.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.pregnancyStatus === "Pregnant")).length
     };
 }
 
 export function getSheep(animals: Animal[]) {
     const sheep = animals.filter((a): a is Sheep => a.species === "Sheep");
+
     return {
         total: sheep.length,
-        males: sheep.filter(s => s.gender === "Male").length,
-        females: sheep.filter(s => s.gender === "Female").length,
-        pregnant: sheep.filter(s => s.reproduction?.some(r => r.pregnancyStatus === "Pregnant")).length
+        males: sheep.filter(c => c.gender === "Male").length,
+        females: sheep.filter(c => c.gender === "Female").length,
+        pregnant: sheep.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.pregnancyStatus === "Pregnant")).length
     };
 }
 
 export function getLayer(animals: Animal[]) {
-    const layers = animals.filter((a): a is Layer => a.species === "Layer");
+    const layer = animals.filter((a): a is Layer => a.species === "Layer");
+
     return {
-        total: layers.length,
-        flockSize: layers.reduce((sum, l) => sum + (l.currentFlockSize ?? 0), 0)
+        total: layer.length,
+        flockSize: layer.reduce((sum, b) => sum + (b.currentFlockSize ?? 0), 0)
     };
 }
 
 export function getBroiler(animals: Animal[]) {
-    const broilers = animals.filter((a): a is Broiler => a.species === "Broiler");
+    const broiler = animals.filter((a): a is Broiler => a.species === "Broiler");
+
     return {
-        total: broilers.length,
-        flockSize: broilers.reduce((sum, b) => sum + (b.currentFlockSize ?? 0), 0)
+        total: broiler.length,
+        flockSize: broiler.reduce((sum, b) => sum + (b.currentFlockSize ?? 0), 0)
     };
 }
 
@@ -134,6 +150,6 @@ export function getAnimalSummary(animals: Animal[]) {
         goats: getGoat(animals),
         sheep: getSheep(animals),
         layer: getLayer(animals),
-        broiler: getBroiler(animals),
+        broiler: getBroiler(animals)
     };
 }

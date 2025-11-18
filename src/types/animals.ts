@@ -1,4 +1,3 @@
-// ------------------- Union Type -------------------
 export type Animal =
     | Cattle
     | Buffalo
@@ -8,9 +7,11 @@ export type Animal =
     | Layer
     | Broiler;
 
+
+
 // ------------------- Treatment -------------------
 export interface Treatment {
-    type?: string;
+    type?:string;
     treatment?: string;
     dueDate?: string;
     nextDate?: string;
@@ -22,35 +23,35 @@ export interface Treatment {
     route?: string;
     prescribe?: string;
 }
-
 export interface Vaccine {
-    type?: string;
+    type?:string;
     dueDate?: string;
     nextDate?: string;
     comment?: string;
 }
-
 export interface Deworming {
-    type?: string;
+    type?:string;
     dueDate?: string;
     nextDate?: string;
     comment?: string;
 }
-
-export interface Disease {
-    type?: string;
-    treatment?: string;
+export interface Disease{
+    type?:string;
+    treatment?:string;
     dueDate?: string;
     nextDate?: string;
     comment?: string;
+
 }
 
-// ------------------- Poultry -------------------
+
+// ------------------- Layer -------------------
 export interface PoultryVaccination {
     date?: string;
     nextDate?: string;
     vaccine?: string;
     route?: string;
+
 }
 
 export interface PoultryFeedManagement {
@@ -58,15 +59,13 @@ export interface PoultryFeedManagement {
     feedRequirement?: string;
     feedIntake: string;
 }
-
+//for layers and broilers
 export interface WaterManagement {
     waterRequirement?: string;
     waterIntake: string;
     chlorinating?: string;
 }
-
-// ------------------- Reproduction -------------------
-export interface ReproductionInfo {
+export  interface ReproductionInfo{
     lastCalvingDate?: string;
     lactationStage?: string;
     lastAiDate?: string;
@@ -78,17 +77,17 @@ export interface ReproductionInfo {
     reproductiveComment?: string;
 }
 
-// ------------------- Base Animal -------------------
+
+
+// ------------------- Base -------------------
 export interface BaseAnimal {
     species: string;
-    tag: string;       // Ear tag OR flock ID
-    breed: string;     // Breed / strain
+    tag: string; // flock ID (birds)
+    breed: string; // strains (birds)
     gender: string;
     weight?: number;
-    age?: number;      // Age OR flock age
+    age?: number; // age of flock (birds)
     status: string;
-
-    // Common fields
     treatments?: Treatment[];
     diseaseComment?: string;
 }
@@ -99,11 +98,11 @@ export interface Cattle extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
-    diseases?: Disease[];
-    reproduction?: ReproductionInfo |null;
+    diseases?:Disease[];
+    reproduction?: ReproductionInfo[];
+
 }
 
 // ------------------- Buffalo -------------------
@@ -112,11 +111,10 @@ export interface Buffalo extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-
-    reproduction?: ReproductionInfo |null;
+    reproduction?: ReproductionInfo[];
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
-    diseases?: Disease[];
+    diseases?:Disease[];
 }
 
 // ------------------- Pig -------------------
@@ -125,8 +123,7 @@ export interface Pig extends BaseAnimal {
     sire: string;
     birthWeight: number;
     birthDate: string;
-    dateOfEntry: string;
-
+    dateOfEntry:string;
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
 }
@@ -137,12 +134,8 @@ export interface Goat extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-
-    // Inline reproduction fields (legacy)
-    reproduction?: ReproductionInfo |null;
-    treatmentComment?: string;
-
-    diseases?: Disease[];
+    diseases?:Disease[];
+    reproduction?: ReproductionInfo[];
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
 }
@@ -153,32 +146,29 @@ export interface Sheep extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-    diseases?: Disease[];
+    treatmentComment?: string;
+    diseases?:Disease[];
     vaccinations?: Vaccine[];
-    reproduction?: ReproductionInfo |null;
+    reproduction?: ReproductionInfo[];
     deworming?: Deworming[];
 }
 
-// ------------------- Poultry: Layer -------------------
+// ------------------- Layer -------------------
 export interface Layer extends BaseAnimal {
     initialFlockSize?: number;
     currentFlockSize?: number;
     mortalityRate: number;
-
-    treatments?: Treatment[];
-    vaccinations?: PoultryVaccination[];
-    feedManagement?: PoultryFeedManagement[];
-    waterManagement?: WaterManagement[];
+    vaccinations?: PoultryVaccination[]; // multiple vaccinations
+    feedManagement?: PoultryFeedManagement[]; // multiple feed entries
+    waterManagement?: WaterManagement[]; // multiple water entries
 }
 
-// ------------------- Poultry: Broiler -------------------
+// ------------------- Broiler -------------------
 export interface Broiler extends BaseAnimal {
     initialFlockSize?: number;
     currentFlockSize?: number;
     mortalityRate: number;
-
-    treatments?: Treatment[];
-    vaccinations?: PoultryVaccination[];
-    feedManagement?: PoultryFeedManagement[];
-    waterManagement?: WaterManagement[];
+    vaccinations?: PoultryVaccination[]; // multiple vaccinations
+    feedManagement?: PoultryFeedManagement[]; // multiple feed entries
+    waterManagement?: WaterManagement[]; // multiple water entries
 }

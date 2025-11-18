@@ -1,18 +1,13 @@
 "use client";
-
-import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
+import React, { useState } from "react";
 import ProfileSidebar from "@/components/ProfileSidebar";
 import UnionIcon from "@/icons/union.svg";
 import Image from "next/image";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function DashboardLayout({
-                                            children,
-                                        }: {
-    children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     return (
@@ -20,51 +15,43 @@ export default function DashboardLayout({
             <div className="relative flex">
                 <Sidebar />
 
-                {/* Main Content */}
+                {/* Main content */}
                 <main className="flex-1 min-h-screen bg-[#D7F5DC] p-6 relative z-10">
-                    <header className="p-0 bg-[#D7F5DC] border-b relative z-10">
-                        {/* Desktop */}
-                        <div className="hidden sm:flex items-center justify-between h-16">
-                            <GlobalSearchBar />
-
-                            {/* Desktop Profile Icon */}
-                            <div
-                                className="hidden md:block lg:block cursor-pointer"
-                                onClick={() => setIsProfileOpen(true)}
-                            >
-                                <UnionIcon className="w-8 h-8 hover:scale-105 transition-transform" />
-                            </div>
-
-                        </div>
-
-                        {/* Mobile */}
-                        <div className="sm:hidden flex items-center h-16 px-4 gap-4">
-                            <div className="flex-shrink-0">
-                                <Image
-                                    src="/logo-mobile.png"
-                                    alt="Mobile Logo"
-                                    width={45}
-                                    height={45}
-                                    className="rounded-2xl"
-                                />
-                            </div>
-
-                            <div className="flex-grow">
+                    <div className="flex-1">
+                        <header className="p-0 bg-[#D7F5DC] border-b relative z-10">
+                            {/* Desktop layout */}
+                            <div className="hidden sm:flex items-center justify-between h-16">
                                 <GlobalSearchBar />
+                                <div
+                                    className="hidden md:block lg:block cursor-pointer"
+                                    onClick={() => setIsProfileOpen(true)}
+                                >
+                                    <UnionIcon className="w-8 h-8 hover:scale-105 transition-transform" />
+                                </div>
                             </div>
 
-                            <button
-                                onClick={() => console.log("Open sidebar")}
-                                className="flex-shrink-0 p-2 rounded-md hover:bg-green-200"
-                            />
-                        </div>
-                    </header>
+                            {/* Mobile layout */}
+                            <div className="sm:hidden flex items-center h-16 px-4 gap-4">
+                                <div className="flex-shrink-0">
+                                    <Image
+                                        src="/logo-mobile.png"
+                                        alt="mobile logo"
+                                        width={48}
+                                        height={48}
+                                        className="rounded-2xl"
+                                    />
+                                </div>
+                                <div className="flex-grow">
+                                    <GlobalSearchBar />
+                                </div>
+                            </div>
+                        </header>
+                    </div>
 
-                    {/* Children pages */}
                     {children}
                 </main>
 
-                {/* Overlay */}
+                {/* Blur overlay */}
                 {isProfileOpen && (
                     <div
                         className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30"
@@ -72,10 +59,9 @@ export default function DashboardLayout({
                     />
                 )}
 
-                {/* Profile Sidebar */}
+                {/* Profile Sidebar (right side slide-in) */}
                 <div
-                    className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-40 
-                    transform transition-transform duration-300
+                    className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-40 transform transition-transform duration-300
                     ${isProfileOpen ? "translate-x-0" : "translate-x-full"}`}
                 >
                     <ProfileSidebar
