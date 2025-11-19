@@ -91,7 +91,7 @@ export default function Home() {
                     {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
                     <div className="flex justify-end text-sm mb-8">
-                        <Link href="/register" className="text-green-600 hover:underline">
+                        <Link href="/forgotpassword" className="text-green-600 hover:underline">
                             Forgot password?
                         </Link>
                     </div>

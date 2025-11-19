@@ -145,7 +145,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
+                                className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner text-black focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
                             />
                         </div>
                         <div>
@@ -155,7 +155,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
+                                className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner text-black focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
                             />
                         </div>
                         {currentUser.role === "student" && (
@@ -167,7 +167,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                                         name="department"
                                         value={formData.department}
                                         onChange={handleChange}
-                                        className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
+                                        className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner text-black focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
                                     />
                                 </div>
                                 <div>
@@ -177,7 +177,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                                         name="year"
                                         value={formData.year}
                                         onChange={handleChange}
-                                        className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
+                                        className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner text-black focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
                                     />
                                 </div>
                             </>
@@ -201,7 +201,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
+                                className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner text-black focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
                             />
                         </div>
                         <div>
@@ -211,7 +211,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                                 name="confirmPassword"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
-                                className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
+                                className="mt-2 w-full px-4 py-3 border rounded-xl shadow-inner text-black focus:ring-2 focus:ring-purple-300 focus:outline-none transition"
                             />
                         </div>
                         <button

@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Combobox } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 
 // ---------------- TYPE GUARDS ----------------
 const isCattle = (animal: Animal): animal is Cattle => animal.species === "Cattle";
@@ -39,15 +40,17 @@ const isLayerOrBroiler = (animal: Animal): animal is Layer | Broiler =>
 // ---------------- COMPONENT ----------------
 export default function AddTaskPage() {
     const { animals, updateAnimal } = useAnimalContext();
+    const router = useRouter();
 
-    const [selectedTag, setSelectedTag] = useState(""); // cannot be null
-    const [animalInput, setAnimalInput] = useState(""); // typed input
+    // ---------------- STATE ----------------
+    const [selectedTag, setSelectedTag] = useState("");
+    const [animalInput, setAnimalInput] = useState("");
     const [taskType, setTaskType] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [nextDate, setNextDate] = useState("");
     const [comment, setComment] = useState("");
 
-    // Treatment-specific fields
+    // Treatment fields
     const [drug, setDrug] = useState("");
     const [dosage, setDosage] = useState<number | "">("");
     const [route, setRoute] = useState("");
@@ -180,6 +183,7 @@ export default function AddTaskPage() {
         resetForm();
     };
 
+    // ------------------ RESET FORM ------------------
     const resetForm = () => {
         setSelectedTag("");
         setAnimalInput("");
@@ -197,6 +201,11 @@ export default function AddTaskPage() {
         setWaterIntake("");
         setWaterRequirement("");
         setChlorinating("");
+    };
+
+    const handleCancel = () => {
+        resetForm();
+        router.back(); // navigate back
     };
 
     // ------------------ RENDER TASK FIELDS ------------------
@@ -351,7 +360,7 @@ export default function AddTaskPage() {
                     </div>
 
                     <div className="flex justify-end gap-3 mt-10 border-t pt-5">
-                        <Button variant="outline" className="rounded-xl px-6" onClick={resetForm}>
+                        <Button variant="outline" className="rounded-xl px-6" onClick={handleCancel}>
                             Cancel
                         </Button>
                         <Button className="rounded-xl px-8 bg-green-600 hover:bg-green-700 text-white" onClick={handleAddTask}>
