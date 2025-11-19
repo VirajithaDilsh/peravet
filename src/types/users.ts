@@ -42,4 +42,5 @@ export const sampleUsers: User[] = [
     { id: "2", name: "Dr. Smith", email: "doctor@example.com", password: "doctor123", role: "doctor" },
     { id: "3", name: "John Student", email: "student@example.com", password: "student123", role: "student", department: "Veterinary Science", year: 3 },
     { id: "4", name: "Jane Employee", email: "employee@example.com", password: "employee123", role: "employee" },
+    { id: "5", name: "Peravtf Admin User", email: "peravtfadm@example.com", password: "2328687Al", role: "admin" },
 ];
