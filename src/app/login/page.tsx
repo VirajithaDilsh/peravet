@@ -115,18 +115,7 @@ export default function Home() {
                         </p>
                     </div>
                 </form>
-
-                <p className="text-xs text-gray-500 text-center mt-4">
-                    Emails & Passwords:
-                    <br />
-                    admin@example.com / admin123
-                    <br />
-                    doctor@example.com / doctor123
-                    <br />
-                    employee@example.com / employee123
-                    <br />
-                    student@example.com / student123
-                </p>
+                
             </motion.div>
         </div>
     );
