@@ -90,15 +90,15 @@ export default function Home() {
 
                     {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-                    <div className="flex justify-end text-sm mb-8">
+                    {/*<div className="flex justify-end text-sm mb-8">
                         <Link href="/forgotpassword" className="text-green-600 hover:underline">
                             Forgot password?
                         </Link>
-                    </div>
+                    </div>*/}
 
                     <motion.button
                         type="submit"
-                        className="w-full bg-[#20B15A] text-white py-3 rounded-lg font-semibold"
+                        className="w-full bg-[#20B15A] text-white py-3 rounded-lg mt-5 font-semibold"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 300 }}
