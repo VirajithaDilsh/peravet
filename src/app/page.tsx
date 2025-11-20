@@ -84,7 +84,7 @@ export default function Home(): JSX.Element {
                     <div className="absolute top-10 right-10 flex items-center space-x-6">
                         {/* Desktop Nav */}
                         <nav className="hidden md:flex space-x-6">
-                            {["Home", "Features", "About", "Contact"].map((link) => (
+                            {[ "Features", "About", "Contact"].map((link) => (
                                 <Link
                                     key={link}
                                     href={`#${link.toLowerCase()}`}
