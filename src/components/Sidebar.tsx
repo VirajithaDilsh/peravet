@@ -12,7 +12,7 @@ import DairyIcon from "@/icons/dairy.svg";
 import TaskIcon from "@/icons/task.svg";
 import PigIcon from "@/icons/pig.svg";
 import AdminIcon from "@/icons/admin.svg";
-import StudentIcon from "@/icons/students.svg";
+{/*import StudentIcon from "@/icons/students.svg";*/}
 {/*import SettingsIcon from "@/icons/settings.svg";*/}
 import GoatIcon from "@/icons/goat.svg";
 import RoosterIcon from "@/icons/rooster.svg";
@@ -331,7 +331,7 @@ const Sidebar = () => {
                         )}
                     </div>
 
-                    {/* Students - only admin or doctor */}
+                    {/* Students - only admin or doctor
                     {( role === "doctor") && (
                         <Link
                             href="/dashboard/students"
@@ -348,7 +348,7 @@ const Sidebar = () => {
                                 <span>Students</span>
                             </div>
                         </Link>
-                    )}
+                    )} */}
 
                     {/* Settings
                       <Link
