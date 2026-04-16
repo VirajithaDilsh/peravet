@@ -71,7 +71,6 @@ export default function AllAnimalsTable() {
             {/* Desktop Table */}
             <div className="hidden md:block">
                 <div className="border rounded-lg shadow overflow-x-auto max-h-[500px] w-full">
-                    <h1>Hiiii</h1>
                     <table className="w-full table-auto border-collapse text-xs md:text-sm min-w-[700px]">
                         <thead className="bg-blue-100 text-left sticky top-0 z-10">
                         <tr>
