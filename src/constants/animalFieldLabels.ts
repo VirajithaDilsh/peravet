@@ -31,7 +31,6 @@ const keyDisplayNames: Record<string, Record<string, string>> = {
         initialFlockSize: "Initial Flock Size",
         currentFlockSize: "Current Flock Size",
         mortilityRate: "Mortility Rate",
-        dateOfEntry: "Date of Entry",
     },
     Layer: {
         tag: "Flock ID",
@@ -46,7 +45,6 @@ const keyDisplayNames: Record<string, Record<string, string>> = {
     Pig: {
         tag: "Pig ID",
         litterSize: "Number of Piglets",
-
     },
 
 };
