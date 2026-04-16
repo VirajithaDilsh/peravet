@@ -11,7 +11,7 @@ import {
     Goat,
     Sheep,
     Layer,
-    Broiler
+    Broiler,
 } from "@/types/animals";
 import { useState, useEffect } from "react";
 import PoultryHealthTables from "@/components/tables/PoultryHealthTables";
@@ -19,19 +19,47 @@ import BroilerHealthTables from "@/components/tables/BroilerHealthTables";
 import CattleHealthTables from "@/components/tables/CattleHealthTable";
 import ReproductionPage from "@/components/tables/ReproductiveInfo";
 import BuffaloHealthTables from "@/components/tables/BuffaloHealthTable";
+import PigHealthTables from "@/components/tables/PigHealthTable";
 
 // Type guards
 function isCattle(animal: Animal): animal is Cattle {
     return animal.species.toLowerCase() === "cattle";
 }
+
 function isBuffalo(animal: Animal): animal is Buffalo {
     return animal.species.toLowerCase() === "buffalo";
 }
+
 function isLayer(animal: Animal): animal is Layer {
     return animal.species.toLowerCase() === "layer";
 }
+
 function isBroiler(animal: Animal): animal is Broiler {
     return animal.species.toLowerCase() === "broiler";
+}
+
+function isPig(animal: Animal): animal is Pig {
+    return animal.species.toLowerCase() === "pig";
+}
+
+function isGoat(animal: Animal): animal is Goat {
+    return animal.species.toLowerCase() === "goat";
+}
+
+function isSheep(animal: Animal): animal is Sheep {
+    return animal.species.toLowerCase() === "sheep";
+}
+
+function isReproductiveAnimal(
+    animal: Animal
+): animal is Cattle | Buffalo | Pig | Goat | Sheep {
+    return (
+        isCattle(animal) ||
+        isBuffalo(animal) ||
+        isPig(animal) ||
+        isGoat(animal) ||
+        isSheep(animal)
+    );
 }
 
 type AnimalKeys = keyof (Cattle & Buffalo & Pig & Goat & Sheep & Layer & Broiler);
@@ -43,12 +71,10 @@ export default function AnimalDetailPage() {
 
     const animal = animals.find((a) => a.tag === tag);
 
-    // Flock state for Layer & Broiler
     const [initialFlockSize, setInitialFlockSize] = useState<number>(0);
     const [currentFlockSize, setCurrentFlockSize] = useState<number>(0);
     const [mortalityRate, setMortalityRate] = useState<number>(0);
 
-    // Initialize state
     useEffect(() => {
         if (!animal) return;
 
@@ -57,16 +83,19 @@ export default function AnimalDetailPage() {
             setCurrentFlockSize(animal.currentFlockSize || 0);
             setMortalityRate(
                 animal.initialFlockSize && animal.currentFlockSize
-                    ? ((animal.initialFlockSize - animal.currentFlockSize) / animal.initialFlockSize) * 100
+                    ? ((animal.initialFlockSize - animal.currentFlockSize) /
+                        animal.initialFlockSize) *
+                    100
                     : 0
             );
         }
     }, [animal]);
 
-    // Update mortalityRate whenever flock size changes
     useEffect(() => {
         if (initialFlockSize > 0) {
-            setMortalityRate(((initialFlockSize - currentFlockSize) / initialFlockSize) * 100);
+            setMortalityRate(
+                ((initialFlockSize - currentFlockSize) / initialFlockSize) * 100
+            );
         }
     }, [initialFlockSize, currentFlockSize]);
 
@@ -92,7 +121,6 @@ export default function AnimalDetailPage() {
         "Basic Information": ["species", "tag", "breed", "gender", "weight", "age", "status"],
         "Birth Information": ["dam", "sire", "birthDate", "birthWeight"],
         "Flock Information": ["initialFlockSize", "currentFlockSize", "mortalityRate"],
-        // Reproductive Information handled separately
     };
 
     const getLabel = (key: string) => {
@@ -107,7 +135,6 @@ export default function AnimalDetailPage() {
                     ID: {animal.tag}
                 </h1>
 
-                {/* Field Groups */}
                 {Object.entries(fieldGroups).map(([groupName, keys]) => {
                     let visibleFields: string[] = [];
 
@@ -115,19 +142,24 @@ export default function AnimalDetailPage() {
                         if (!isLayer(animal) && !isBroiler(animal)) return null;
                         visibleFields = keys;
                     } else {
-                        visibleFields = keys.filter((key) => isValuePresent(animal[key as keyof Animal]));
+                        visibleFields = keys.filter((key) =>
+                            isValuePresent(animal[key as keyof Animal])
+                        );
                     }
 
                     if (visibleFields.length === 0) return null;
 
-                    // Flock group
                     if (groupName === "Flock Information") {
                         return (
                             <div key={groupName} className="mb-4 md:mb-6">
-                                <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">{groupName}</h2>
+                                <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">
+                                    {groupName}
+                                </h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                                     <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
-                                        <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("initialFlockSize")}</p>
+                                        <p className="text-sm md:text-base font-semibold text-gray-500">
+                                            {getLabel("initialFlockSize")}
+                                        </p>
                                         <input
                                             type="number"
                                             value={initialFlockSize}
@@ -139,8 +171,11 @@ export default function AnimalDetailPage() {
                                             className="border rounded px-2 py-1 mt-1 w-full"
                                         />
                                     </div>
+
                                     <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
-                                        <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("currentFlockSize")}</p>
+                                        <p className="text-sm md:text-base font-semibold text-gray-500">
+                                            {getLabel("currentFlockSize")}
+                                        </p>
                                         <input
                                             type="number"
                                             value={currentFlockSize}
@@ -152,30 +187,44 @@ export default function AnimalDetailPage() {
                                             className="border rounded px-2 py-1 mt-1 w-full"
                                         />
                                     </div>
+
                                     <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
-                                        <p className="text-sm md:text-base font-semibold text-gray-500">{getLabel("mortalityRate")}</p>
-                                        <p className="text-base md:text-lg font-medium text-gray-800">{mortalityRate.toFixed(2)}%</p>
+                                        <p className="text-sm md:text-base font-semibold text-gray-500">
+                                            {getLabel("mortalityRate")}
+                                        </p>
+                                        <p className="text-base md:text-lg font-medium text-gray-800">
+                                            {mortalityRate.toFixed(2)}%
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         );
                     }
 
-                    // Default group
                     return (
                         <div key={groupName} className="mb-4 md:mb-6">
-                            <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">{groupName}</h2>
+                            <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-3 border-b">
+                                {groupName}
+                            </h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                                 {visibleFields.map((key) => (
                                     <div key={key} className="bg-gray-100 p-3 rounded-lg shadow-sm">
-                                        <p className="text-sm md:text-base font-semibold text-gray-500 mb-1">{getLabel(key)}</p>
+                                        <p className="text-sm md:text-base font-semibold text-gray-500 mb-1">
+                                            {getLabel(key)}
+                                        </p>
 
                                         {key === "status" ? (
                                             <div className="relative">
                                                 <select
                                                     value={animal.status}
                                                     onChange={(e) =>
-                                                        editAnimal({ ...animal, status: e.target.value as "Alive" | "Dead" | "Sick" })
+                                                        editAnimal({
+                                                            ...animal,
+                                                            status: e.target.value as
+                                                                | "Alive"
+                                                                | "Dead"
+                                                                | "Sick",
+                                                        })
                                                     }
                                                     className="appearance-none w-full bg-white border border-gray-300 rounded-md px-3 py-2 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium"
                                                 >
@@ -184,8 +233,19 @@ export default function AnimalDetailPage() {
                                                     <option value="Sick">Sick</option>
                                                 </select>
                                                 <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    <svg
+                                                        className="h-5 w-5 text-gray-400"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M19 9l-7 7-7-7"
+                                                        />
                                                     </svg>
                                                 </span>
                                             </div>
@@ -201,8 +261,7 @@ export default function AnimalDetailPage() {
                     );
                 })}
 
-                {/* Reproductive Info */}
-                {(isCattle(animal) || isBuffalo(animal)) &&
+                {isReproductiveAnimal(animal) &&
                     animal.gender?.trim().toLowerCase() === "female" && (
                         <div className="mb-6">
                             <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
@@ -212,21 +271,30 @@ export default function AnimalDetailPage() {
                         </div>
                     )}
 
-                {/* Health Management Tables */}
-                {(isLayer(animal) || isBroiler(animal) || isCattle(animal) ||isBuffalo(animal)) && (
+                {(isLayer(animal) ||
+                    isBroiler(animal) ||
+                    isPig(animal) ||
+                    isCattle(animal) ||
+                    isBuffalo(animal)) && (
                     <>
                         {isLayer(animal) && (
                             <div className="mb-6">
-                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Poultry Health Management</h2>
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+                                    Poultry Health Management
+                                </h2>
                                 <PoultryHealthTables animal={animal} onUpdateAction={editAnimal} />
                             </div>
                         )}
+
                         {isBroiler(animal) && (
                             <div className="mb-6">
-                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">Broiler Health Management</h2>
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+                                    Broiler Health Management
+                                </h2>
                                 <BroilerHealthTables animal={animal} onUpdateAction={editAnimal} />
                             </div>
                         )}
+
                         {isCattle(animal) && (
                             <div className="mb-6">
                                 <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
@@ -235,21 +303,40 @@ export default function AnimalDetailPage() {
                                 <CattleHealthTables animal={animal} onUpdateAction={editAnimal} />
                             </div>
                         )}
+
                         {isBuffalo(animal) && (
                             <div className="mb-6">
                                 <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
-                                    Cattle Health Management
+                                    Buffalo Health Management
                                 </h2>
                                 <BuffaloHealthTables animal={animal} onUpdateAction={editAnimal} />
+                            </div>
+                        )}
+
+                        {isPig(animal) && (
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+                                    Pig Health Management
+                                </h2>
+                                <PigHealthTables animal={animal} onUpdateAction={editAnimal} />
                             </div>
                         )}
                     </>
                 )}
 
-                {/* Action Buttons */}
                 <div className="mt-4 md:mt-6 flex flex-wrap gap-2 md:gap-3">
-                    <button onClick={() => router.push(`/animals/edit/${animal.tag}`)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 md:px-5 md:py-2 rounded-lg shadow-md transition text-sm md:text-base">✏️ Edit Full</button>
-                    <button onClick={() => handleDelete(animal)} className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 md:px-5 md:py-2 rounded-lg shadow-md transition text-sm md:text-base">🗑 Delete</button>
+                    <button
+                        onClick={() => router.push(`/animals/edit/${animal.tag}`)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 md:px-5 md:py-2 rounded-lg shadow-md transition text-sm md:text-base"
+                    >
+                        ✏️ Edit Full
+                    </button>
+                    <button
+                        onClick={() => handleDelete(animal)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 md:px-5 md:py-2 rounded-lg shadow-md transition text-sm md:text-base"
+                    >
+                        🗑 Delete
+                    </button>
                 </div>
             </div>
         </div>
