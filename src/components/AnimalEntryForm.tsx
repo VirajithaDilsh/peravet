@@ -39,7 +39,7 @@ const AnimalEntryForm: React.FC<AnimalEntryFormProps> = ({
     let steps: { title: string; fields: (keyof AnimalForm)[] }[] = [
         {
             title: "Basic Information",
-            fields: ["species", "tag", "breed", "gender","initialFlockSize","currentFlockSize","mortilityRate","weight"],
+            fields: ["species", "tag", "breed", "gender","initialFlockSize","currentFlockSize","mortilityRate","weight","dateOfEntry"],
         },
         {
             title: "Birth Info",

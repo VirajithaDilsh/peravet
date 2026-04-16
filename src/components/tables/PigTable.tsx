@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, MouseEvent, KeyboardEvent } from "react";
 import { useAnimalContext } from "@/context/AnimalContext";
 import { Pig } from "@/types/animals";
@@ -14,7 +15,7 @@ export default function PigTable() {
 
     const filteredPig = PigOnly.filter((animal) =>
         [animal.tag, animal.breed, animal.gender].some((field) =>
-            field.toLowerCase().includes(search.toLowerCase())
+            (field ?? "").toLowerCase().includes(search.toLowerCase())
         )
     );
 
@@ -23,6 +24,29 @@ export default function PigTable() {
     };
 
     const stop = (e: MouseEvent | KeyboardEvent) => e.stopPropagation();
+
+    const safeText = (value: unknown) => {
+        if (value === null || value === undefined || value === "") return "-";
+
+        const num = Number(value);
+
+        if (typeof value === "number") {
+            return Number.isFinite(value) ? value : "-";
+        }
+
+        if (!Number.isNaN(num) && String(value).trim() !== "") {
+            return String(value);
+        }
+
+        return String(value).trim() !== "" ? String(value) : "-";
+    };
+
+    const safeWeight = (value: unknown) => {
+        if (value === null || value === undefined || value === "") return "-";
+
+        const num = Number(value);
+        return Number.isFinite(num) ? num : "-";
+    };
 
     return (
         <div className="p-4 text-black w-full">
@@ -34,7 +58,7 @@ export default function PigTable() {
                     placeholder="Search by tag, breed, gender..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="p-2 w-full max-w-sm rounded-2xl bg-white  border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-2 w-full max-w-sm rounded-2xl bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
             </div>
 
@@ -44,13 +68,7 @@ export default function PigTable() {
                     <table className="w-full table-auto border-collapse text-xs md:text-sm min-w-[700px]">
                         <thead className="bg-blue-100 text-left sticky top-0 z-10">
                         <tr>
-                            {[
-                                "Tag No",
-                                "Breed",
-                                "Gender",
-                                "Weight",
-                                "Actions",
-                            ].map((head) => (
+                            {["Tag No", "Breed", "Gender", "Weight", "Actions"].map((head) => (
                                 <th
                                     key={head}
                                     className="py-2 px-2 md:py-3 md:px-4 border border-gray-300 font-medium whitespace-nowrap"
@@ -71,16 +89,16 @@ export default function PigTable() {
                                     onClick={() => goToDetails(animal.tag)}
                                 >
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.tag}
+                                        {safeText(animal.tag)}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.breed}
+                                        {safeText(animal.breed)}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.gender}
+                                        {safeText(animal.gender)}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.weight}
+                                        {safeWeight(animal.weight)}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
                                         <div className="flex gap-1 md:gap-2 justify-center">
@@ -97,7 +115,9 @@ export default function PigTable() {
                                             <button
                                                 onClick={(e) => {
                                                     stop(e);
-                                                    if (confirm(`Delete ${animal.tag}?`)) deleteAnimal(animal.tag);
+                                                    if (confirm(`Delete ${animal.tag}?`)) {
+                                                        deleteAnimal(animal.tag);
+                                                    }
                                                 }}
                                                 className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
                                                 title="Delete"
@@ -110,7 +130,10 @@ export default function PigTable() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={8} className="text-center py-4 text-gray-500 border border-gray-300">
+                                <td
+                                    colSpan={5}
+                                    className="text-center py-4 text-gray-500 border border-gray-300"
+                                >
                                     No pig records found.
                                 </td>
                             </tr>
@@ -119,7 +142,6 @@ export default function PigTable() {
                     </table>
                 </div>
             </div>
-
 
             {/* Mobile - Card View with Y-axis scroll */}
             <div className="md:hidden border rounded-lg shadow overflow-y-auto min-h-[300px] max-h-[500px]">
@@ -132,7 +154,9 @@ export default function PigTable() {
                                 className="border-b last:border-b-0 p-3 bg-white hover:bg-blue-50 transition cursor-pointer"
                             >
                                 <div className="flex justify-between items-center mb-2">
-                                    <h3 className="font-semibold text-blue-800 text-sm">Tag No:{animal.tag}</h3>
+                                    <h3 className="font-semibold text-blue-800 text-sm">
+                                        Tag No: {safeText(animal.tag)}
+                                    </h3>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={(e) => {
@@ -146,7 +170,9 @@ export default function PigTable() {
                                         <button
                                             onClick={(e) => {
                                                 stop(e);
-                                                if (confirm(`Delete ${animal.tag}?`)) deleteAnimal(animal.tag);
+                                                if (confirm(`Delete ${animal.tag}?`)) {
+                                                    deleteAnimal(animal.tag);
+                                                }
                                             }}
                                             className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
                                         >
@@ -154,18 +180,17 @@ export default function PigTable() {
                                         </button>
                                     </div>
                                 </div>
-                                <p className="text-xs text-gray-600">Breed: {animal.breed}</p>
-                                <p className="text-xs text-gray-600">Gender: {animal.gender}</p>
-                                <p className="text-xs text-gray-600">Weight: {animal.weight}</p>
+
+                                <p className="text-xs text-gray-600">Breed: {safeText(animal.breed)}</p>
+                                <p className="text-xs text-gray-600">Gender: {safeText(animal.gender)}</p>
+                                <p className="text-xs text-gray-600">Weight: {safeWeight(animal.weight)}</p>
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-gray-500 p-4">No buffalo records found.</p>
+                        <p className="text-center text-gray-500 p-4">No pig records found.</p>
                     )}
                 </div>
             </div>
-
-
         </div>
     );
 }
