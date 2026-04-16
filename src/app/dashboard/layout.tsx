@@ -7,16 +7,20 @@ import UnionIcon from "@/icons/union.svg";
 import Image from "next/image";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+                                            children,
+                                        }: {
+    children: React.ReactNode;
+}) {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     return (
         <ProtectedRoute>
-            <div className="relative flex">
+            <div className="min-h-screen bg-[#D7F5DC]">
                 <Sidebar />
 
                 {/* Main content */}
-                <main className="flex-1 min-h-screen bg-[#D7F5DC] p-6 relative z-10">
+                <main className="min-h-screen bg-[#D7F5DC] p-6 relative z-10 md:ml-72">
                     <div className="flex-1">
                         <header className="p-0 bg-[#D7F5DC] border-b relative z-10">
                             {/* Desktop layout */}
@@ -59,10 +63,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     />
                 )}
 
-                {/* Profile Sidebar (right side slide-in) */}
+                {/* Profile Sidebar */}
                 <div
-                    className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-40 transform transition-transform duration-300
-                    ${isProfileOpen ? "translate-x-0" : "translate-x-full"}`}
+                    className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-40 transform transition-transform duration-300 ${
+                        isProfileOpen ? "translate-x-0" : "translate-x-full"
+                    }`}
                 >
                     <ProfileSidebar
                         isOpen={isProfileOpen}

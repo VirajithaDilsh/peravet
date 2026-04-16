@@ -30,13 +30,7 @@ export default function Home() {
             </main>
             {/* Total Cattle Stats */}
             <div className="w-full max-w-5xl mx-auto p-2 sm:p-4">
-                <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center">
-
-                    {/* Cow */}
-                    <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">
-                        <span className="text-green-600 text-[10px] sm:text-lg font-bold truncate">{cattleStats.males}</span>
-                        <p className="text-[8px] sm:text-xs md:text-sm text-gray-600 mt-1 truncate">Cow</p>
-                    </div>
+                <div className="grid grid-cols-6 gap-1 sm:gap-2 text-center">
 
                     {/* Heifers */}
                     <div className="flex flex-col items-center bg-white rounded-lg p-1 sm:p-2 shadow hover:shadow-lg transition-shadow overflow-hidden">

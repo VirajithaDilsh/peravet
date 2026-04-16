@@ -66,7 +66,7 @@ export function getCattle(animals: Animal[]) {
         pregnant: cattle.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.pregnancyStatus === "Pregnant")).length,
         milking: cattle.filter(c => c.reproduction?.some((r: ReproductionInfo) => ["Early", "Mid", "Late"].includes(r.lactationStage ?? ""))).length,
         dry: cattle.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.lactationStage === "Dry")).length,
-        heifers: cattle.filter(c => c.gender === "Female" && c.reproduction?.every((r: ReproductionInfo) => !r.ageOfPregnancy || r.ageOfPregnancy === 0)).length,
+        heifers: cattle.filter(c => c.gender === "Female" &&  c.reproduction?.some(r => r.pregnancyStatus === "Heifer")).length,
         cows: cattle.filter(c => c.reproduction?.some((r: ReproductionInfo) => (r.ageOfPregnancy ?? 0) > 0)).length
     };
 }
@@ -81,7 +81,7 @@ export function getBuffalo(animals: Animal[]) {
         pregnant: buffalo.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.pregnancyStatus === "Pregnant")).length,
         milking: buffalo.filter(c => c.reproduction?.some((r: ReproductionInfo) => ["Early", "Mid", "Late"].includes(r.lactationStage ?? ""))).length,
         dry: buffalo.filter(c => c.reproduction?.some((r: ReproductionInfo) => r.lactationStage === "Dry")).length,
-        heifers: buffalo.filter(c => c.gender === "Female" && c.reproduction?.every((r: ReproductionInfo) => !r.ageOfPregnancy || r.ageOfPregnancy === 0)).length,
+        heifers: buffalo.filter(c => c.gender === "Female" &&  c.reproduction?.some(r => r.pregnancyStatus === "Heifer")).length,
         cows: buffalo.filter(c => c.reproduction?.some((r: ReproductionInfo) => (r.ageOfPregnancy ?? 0) > 0)).length
     };
 }
