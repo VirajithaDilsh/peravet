@@ -23,6 +23,7 @@ const pregnancyOptions = [
     { value: "Not Pregnant", label: "Not Pregnant" },
     { value: "To be Check", label: "To be Check" },
     { value: "Infertile", label: "Infertile" },
+    { value: "Heifer", label: "Heifer" },
 ];
 
 const breedingMethodOptions = [
