@@ -27,11 +27,11 @@ const speciesFieldsMap: Record<string, (keyof AnimalForm)[]> = {
         "pregnancyStatus","expectedCalvingDate","diseaseComment","weight","lastHeatDate","reproductiveComment"
     ],
     Pig: [
-        "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
+        "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight","weight",
         "litterSize","lastFarrowingDate","nextExpectedFarrowingDate","pregnancyStatus",
         "parity","weaningDate","currentWeight","weaningWeight","vaccinationType",
         "vaccinationDate","nextVaccinationDate","dewormingType","lastDewormingDate",
-        "nextDewormingDate","diseaseComment","treatmentComment","generalComment"
+        "nextDewormingDate","diseaseComment","treatmentComment","generalComment","dateOfEntry",
     ],
     Goat: ["species","tag","status","breed","gender","dam","sire","diseaseComment","treatmentComment"],
     Sheep: ["species","tag","breed","gender","dam","sire","diseaseComment","treatmentComment"],

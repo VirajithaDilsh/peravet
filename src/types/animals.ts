@@ -126,6 +126,7 @@ export interface Pig extends BaseAnimal {
     dateOfEntry:string;
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
+    datOfEntry:string;
 }
 
 // ------------------- Goat -------------------

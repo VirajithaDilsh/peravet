@@ -11,6 +11,8 @@ export type AnimalForm = Partial<{
     status: string;
     treatments: Treatment[];
     diseaseComment: string;
+    dateOfEntry: string;
+
 
     // Cattle & Buffalo
     dam: string;
