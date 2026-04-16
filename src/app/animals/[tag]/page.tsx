@@ -20,6 +20,8 @@ import CattleHealthTables from "@/components/tables/CattleHealthTable";
 import ReproductionPage from "@/components/tables/ReproductiveInfo";
 import BuffaloHealthTables from "@/components/tables/BuffaloHealthTable";
 import PigHealthTables from "@/components/tables/PigHealthTable";
+import GoatHealthTables from "@/components/tables/GoatHealthTable";
+import SheepHealthTables from "@/components/tables/SheepHealthTable";
 
 // Type guards
 function isCattle(animal: Animal): animal is Cattle {
@@ -275,7 +277,9 @@ export default function AnimalDetailPage() {
                     isBroiler(animal) ||
                     isPig(animal) ||
                     isCattle(animal) ||
-                    isBuffalo(animal)) && (
+                    isBuffalo(animal)) ||
+                    isGoat(animal) ||
+                    isSheep(animal)  && (
                     <>
                         {isLayer(animal) && (
                             <div className="mb-6">
@@ -319,6 +323,22 @@ export default function AnimalDetailPage() {
                                     Pig Health Management
                                 </h2>
                                 <PigHealthTables animal={animal} onUpdateAction={editAnimal} />
+                            </div>
+                        )}
+                        {isGoat(animal) && (
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+                                    Goat Health Management
+                                </h2>
+                                <GoatHealthTables animal={animal} onUpdateAction={editAnimal} />
+                            </div>
+                        )}
+                        {isSheep(animal) && (
+                            <div className="mb-6">
+                                <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+                                    Sheep Health Management
+                                </h2>
+                                <SheepHealthTables animal={animal} onUpdateAction={editAnimal} />
                             </div>
                         )}
                     </>

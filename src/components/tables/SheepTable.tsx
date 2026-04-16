@@ -51,7 +51,7 @@ export default function SheepTable() {
                                 "Weight",
                                 "Last AI Date",
                                 "Pregnancy Status",
-                                "Expected Calving Date",
+                                "Expected Lambing Date",
                                 "Actions",
                             ].map((head) => (
                                 <th
@@ -92,7 +92,7 @@ export default function SheepTable() {
                                         {animal.pregnancyStatus || "-"}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.expectedCalvingDate || "-"}
+                                        {animal.expectedLambingDate || "-"}
                                     </td>
                                     <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
                                         <div className="flex gap-1 md:gap-2 justify-center">
@@ -171,7 +171,7 @@ export default function SheepTable() {
                                 <p className="text-xs text-gray-600">Weight: {animal.weight}</p>
                                 <p className="text-xs text-gray-600">Last AI Date: {animal.lastAiDate || "-"}</p>
                                 <p className="text-xs text-gray-600">Pregnancy: {animal.pregnancyStatus || "-"}</p>
-                                <p className="text-xs text-gray-600">Calving Date: {animal.expectedCalvingDate || "-"}</p>
+                                <p className="text-xs text-gray-600">Calving Date: {animal.expectedLambingDate || "-"}</p>
                             </div>
                         ))
                     ) : (
