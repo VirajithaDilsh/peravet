@@ -154,6 +154,9 @@ export interface Goat extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
+    expectedKiddingDate?: string;
+    lastAiDate?: string;
+    pregnancyStatus?: string;
     diseases?:Disease[];
     reproduction?: ReproductionInfo[];
     vaccinations?: Vaccine[];
@@ -166,10 +169,12 @@ export interface Sheep extends BaseAnimal {
     sire: string;
     birthDate: string;
     birthWeight: number;
-    treatmentComment?: string;
+    expectedLambingDate?: string;
+    lastAiDate?: string;
+    pregnancyStatus?: string;
     diseases?:Disease[];
-    vaccinations?: Vaccine[];
     reproduction?: ReproductionInfo[];
+    vaccinations?: Vaccine[];
     deworming?: Deworming[];
 }
 

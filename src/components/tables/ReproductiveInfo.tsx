@@ -100,7 +100,6 @@ export default function ReproductionPage({ animal }: Props) {
     ];
 
     const smallRuminantFields = [
-        { label: "Parity", name: "parity", type: "number" },
         { label: "Mating Date", name: "matingDate", type: "date" },
         {
             label: "Pregnancy Status",
@@ -110,6 +109,7 @@ export default function ReproductionPage({ animal }: Props) {
         },
         { label: "Expected Birth Date", name: "expectedCalvingDate", type: "date" },
         { label: "Last Heat Date", name: "lastHeatDate", type: "date" },
+
     ];
 
     const reproductionFields =
