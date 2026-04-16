@@ -35,13 +35,19 @@ export interface Deworming {
     nextDate?: string;
     comment?: string;
 }
-export interface Disease{
-    type?:string;
-    treatment?:string;
+export interface Disease {
+    type?: string;
+    treatment?: string;
     dueDate?: string;
     nextDate?: string;
     comment?: string;
 
+    // Pig-specific
+    date?: string;
+    condition?: string;
+    medication?: string;
+    dosage?: string;
+    withdrawalDate?: string;
 }
 
 
@@ -65,7 +71,7 @@ export interface WaterManagement {
     waterIntake: string;
     chlorinating?: string;
 }
-export  interface ReproductionInfo{
+export interface ReproductionInfo {
     lastCalvingDate?: string;
     lactationStage?: string;
     lastAiDate?: string;
@@ -74,6 +80,18 @@ export  interface ReproductionInfo{
     ageOfPregnancy?: number;
     expectedCalvingDate?: string;
     lastHeatDate?: string;
+
+    parity?: number;
+    matingDate?: string;
+    breedingMethod?: "Natural Mating" | "AI";
+    boarId?: string;
+    aiDate?: string;
+    farrowingDate?: string;
+    bornAlive?: number;
+    bornDead?: number;
+    mummified?: number;
+    weaningDate?: string;
+
     reproductiveComment?: string;
 }
 
@@ -123,10 +141,11 @@ export interface Pig extends BaseAnimal {
     sire: string;
     birthWeight: number;
     birthDate: string;
-    dateOfEntry:string;
+    dateOfEntry: string;
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
-    datOfEntry:string;
+    diseases?: Disease[];
+    reproduction?: ReproductionInfo[];
 }
 
 // ------------------- Goat -------------------
