@@ -12,7 +12,7 @@ export default function Home() {
         <ProtectedRoute allowedRoles={["admin","doctor"]}>
             <div className="flex">
                 <main className="flex-1 p-4 text-black">
-                    <h1 className="text-2xl font-semibold mb-4">Students</h1>
+                    <h1 className="text-2xl font-semibold mb-4">Students Records</h1>
                     <StudentTable users={studentUsers} />
                 </main>
             </div>

@@ -7,6 +7,7 @@ import {
     LogOut,
     Menu,
     X,
+    GraduationCap,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -30,7 +31,9 @@ const Sidebar = () => {
     const pathname = usePathname();
     const router = useRouter();
     const { currentUser, logout } = useUserContext();
-    const role = currentUser?.role ?? "admin";
+
+    // keep fallback if currentUser is not loaded yet
+    const role = currentUser?.role ?? "";
 
     const getInitialOpenMenus = (path: string) => ({
         dairy: path.includes("/cattle") || path.includes("/buffalo"),
@@ -88,7 +91,6 @@ const Sidebar = () => {
 
     return (
         <>
-            {/* Mobile menu button */}
             {!isMobileOpen && (
                 <button
                     onClick={() => setIsMobileOpen(true)}
@@ -98,7 +100,6 @@ const Sidebar = () => {
                 </button>
             )}
 
-            {/* Mobile overlay */}
             {isMobileOpen && (
                 <div
                     className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm md:hidden"
@@ -106,14 +107,12 @@ const Sidebar = () => {
                 />
             )}
 
-            {/* Sidebar */}
             <aside
                 className={clsx(
                     "fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-slate-200 bg-white shadow-xl transition-transform duration-300 md:translate-x-0",
                     isMobileOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
-                {/* Header */}
                 <div className="relative border-b border-slate-100 px-5 py-5">
                     <div className="flex items-center justify-between md:hidden">
                         <Link href="/profile" onClick={handleLinkClick}>
@@ -140,7 +139,7 @@ const Sidebar = () => {
                         </Link>
                     </div>
                 </div>
-                {/* Navigation */}
+
                 <div className="flex-1 overflow-y-auto px-3 py-4">
                     <p className={sectionLabel}>Main</p>
 
@@ -184,12 +183,27 @@ const Sidebar = () => {
                                 <span>Production</span>
                             </Link>
                         )}
+
+                        {role === "doctor" && (
+                            <Link
+                                href="/dashboard/students"
+                                onClick={handleLinkClick}
+                                className={clsx(
+                                    linkBase,
+                                    pathname === "/dashboard/students"
+                                        ? activeLink
+                                        : inactiveLink
+                                )}
+                            >
+                                <GraduationCap size={20} />
+                                <span>Student Page</span>
+                            </Link>
+                        )}
                     </nav>
 
                     <p className={sectionLabel}>Animal Categories</p>
 
                     <div className="space-y-2">
-                        {/* Dairy */}
                         <div>
                             <button
                                 onClick={() => toggleMenu("dairy")}
@@ -236,7 +250,6 @@ const Sidebar = () => {
                             )}
                         </div>
 
-                        {/* Swine */}
                         <div>
                             <button
                                 onClick={() => toggleMenu("swine")}
@@ -271,7 +284,6 @@ const Sidebar = () => {
                             )}
                         </div>
 
-                        {/* Poultry */}
                         <div>
                             <button
                                 onClick={() => toggleMenu("poultry")}
@@ -318,7 +330,6 @@ const Sidebar = () => {
                             )}
                         </div>
 
-                        {/* Small Ruminants */}
                         <div>
                             <button
                                 onClick={() => toggleMenu("ruminants")}
@@ -384,7 +395,6 @@ const Sidebar = () => {
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="border-t border-slate-200 bg-slate-50 p-4">
                     <button
                         onClick={() => {

@@ -1,4 +1,18 @@
-// ------------------- Task Types -------------------
+
+export type UserRole = "admin" | "student" | "employee" | "doctor";
+
+export type TaskAssignType =
+    | "all_students"
+    | "all_employees"
+    | "all_doctors"
+    | "specific_users";
+
+export interface AssignedUser {
+    id: string;
+    name: string;
+    role: UserRole;
+}
+
 export type TaskType =
     | "Treatment"
     | "Vaccination"
@@ -9,25 +23,14 @@ export type TaskType =
     | "Feed"
     | "Water";
 
-// ------------------- Task Source Field Mapping -------------------
-export type TaskSourceField =
-    | "nextVaccinationDate"
-    | "nextDewormingDate"
-    | "nextAiDate"
-    | "expectedCalvingDate"
-    | "nextTreatmentDate"
-    | "nextDiseaseDate";
-
-// ------------------- Status -------------------
-export type TaskStatus = "overdue" | "due-soon" | "upcoming" | "completed";
-
-// ------------------- Task Interface -------------------
 export interface Task {
-    key: string;            // unique key for task (animalTag + type + date)
-    type: TaskType;         // Type of task
-    species: string;        // Animal species
-    animalTag: string;      // Animal's ear tag
-    dueDate: string;        // Date the task must be done
-    nextDate?: string;      // Next scheduled date (optional)
-    comment?: string;       // Free text / notes
+    key: string;
+    type: TaskType;
+    species: string;
+    animalTag: string;
+    dueDate: string;
+    nextDate?: string;
+    comment?: string;
+    assignType?: TaskAssignType;
+    assignedUsers?: AssignedUser[];
 }

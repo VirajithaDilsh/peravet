@@ -28,8 +28,6 @@ export default function StudentTable({ users }: StudentTableProps) {
 
     return (
         <div className="p-4 text-black w-full">
-            <h2 className="text-2xl font-semibold mb-4">Student Records</h2>
-
             <div className="flex justify-end mb-4">
                 <input
                     type="text"
