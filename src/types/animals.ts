@@ -7,11 +7,29 @@ export type Animal =
     | Layer
     | Broiler;
 
+// ------------------- Assignment -------------------
+export type AssignRole = "student" | "employee" | "doctor";
 
+export type TaskAssignType =
+    | "all_students"
+    | "all_employees"
+    | "all_doctors"
+    | "specific_users";
+
+export interface AssignedUser {
+    id: string;
+    name: string;
+    role: AssignRole;
+}
+
+export interface AssignmentInfo {
+    assignType?: TaskAssignType;
+    assignedUsers?: AssignedUser[];
+}
 
 // ------------------- Treatment -------------------
-export interface Treatment {
-    type?:string;
+export interface Treatment extends AssignmentInfo {
+    type?: string;
     treatment?: string;
     dueDate?: string;
     nextDate?: string;
@@ -23,19 +41,22 @@ export interface Treatment {
     route?: string;
     prescribe?: string;
 }
-export interface Vaccine {
-    type?:string;
+
+export interface Vaccine extends AssignmentInfo {
+    type?: string;
     dueDate?: string;
     nextDate?: string;
     comment?: string;
 }
-export interface Deworming {
-    type?:string;
+
+export interface Deworming extends AssignmentInfo {
+    type?: string;
     dueDate?: string;
     nextDate?: string;
     comment?: string;
 }
-export interface Disease {
+
+export interface Disease extends AssignmentInfo {
     type?: string;
     treatment?: string;
     dueDate?: string;
@@ -50,28 +71,27 @@ export interface Disease {
     withdrawalDate?: string;
 }
 
-
-// ------------------- Layer -------------------
-export interface PoultryVaccination {
+// ------------------- Layer / Broiler -------------------
+export interface PoultryVaccination extends AssignmentInfo {
     date?: string;
     nextDate?: string;
     vaccine?: string;
     route?: string;
-
 }
 
-export interface PoultryFeedManagement {
+export interface PoultryFeedManagement extends AssignmentInfo {
     type: "Starter" | "Grower" | "Layer Feed";
     feedRequirement?: string;
     feedIntake: string;
 }
-//for layers and broilers
-export interface WaterManagement {
+
+export interface WaterManagement extends AssignmentInfo {
     waterRequirement?: string;
     waterIntake: string;
     chlorinating?: string;
 }
-export interface ReproductionInfo {
+
+export interface ReproductionInfo extends AssignmentInfo {
     lastCalvingDate?: string;
     lactationStage?: string;
     lastAiDate?: string;
@@ -95,8 +115,6 @@ export interface ReproductionInfo {
     reproductiveComment?: string;
 }
 
-
-
 // ------------------- Base -------------------
 export interface BaseAnimal {
     species: string;
@@ -118,9 +136,8 @@ export interface Cattle extends BaseAnimal {
     birthWeight: number;
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
-    diseases?:Disease[];
+    diseases?: Disease[];
     reproduction?: ReproductionInfo[];
-
 }
 
 // ------------------- Buffalo -------------------
@@ -132,7 +149,7 @@ export interface Buffalo extends BaseAnimal {
     reproduction?: ReproductionInfo[];
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
-    diseases?:Disease[];
+    diseases?: Disease[];
 }
 
 // ------------------- Pig -------------------
@@ -157,7 +174,7 @@ export interface Goat extends BaseAnimal {
     expectedKiddingDate?: string;
     lastAiDate?: string;
     pregnancyStatus?: string;
-    diseases?:Disease[];
+    diseases?: Disease[];
     reproduction?: ReproductionInfo[];
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
@@ -172,7 +189,7 @@ export interface Sheep extends BaseAnimal {
     expectedLambingDate?: string;
     lastAiDate?: string;
     pregnancyStatus?: string;
-    diseases?:Disease[];
+    diseases?: Disease[];
     reproduction?: ReproductionInfo[];
     vaccinations?: Vaccine[];
     deworming?: Deworming[];
@@ -183,9 +200,10 @@ export interface Layer extends BaseAnimal {
     initialFlockSize?: number;
     currentFlockSize?: number;
     mortalityRate: number;
-    vaccinations?: PoultryVaccination[]; // multiple vaccinations
-    feedManagement?: PoultryFeedManagement[]; // multiple feed entries
-    waterManagement?: WaterManagement[]; // multiple water entries
+    vaccinations?: PoultryVaccination[];
+    feedManagement?: PoultryFeedManagement[];
+    waterManagement?: WaterManagement[];
+    diseases?: Disease[];
 }
 
 // ------------------- Broiler -------------------
@@ -193,7 +211,8 @@ export interface Broiler extends BaseAnimal {
     initialFlockSize?: number;
     currentFlockSize?: number;
     mortalityRate: number;
-    vaccinations?: PoultryVaccination[]; // multiple vaccinations
-    feedManagement?: PoultryFeedManagement[]; // multiple feed entries
-    waterManagement?: WaterManagement[]; // multiple water entries
+    vaccinations?: PoultryVaccination[];
+    feedManagement?: PoultryFeedManagement[];
+    waterManagement?: WaterManagement[];
+    diseases?: Disease[];
 }

@@ -19,18 +19,27 @@ const KpiCard = ({ title, value }: KpiCardProps) => (
 export default function DashboardKpis() {
     const { animals } = useAnimalContext();
     const { records } = useProduction();
+    const today = new Date().toISOString().split("T")[0];
 
     const TotalStats = getTotalAnimals(animals);
     const totalPregnant = getTotalPregnantAnimals(animals);
 
-    // Calculate total milk (liters)
+    // Milk today
     const totalMilk = records
-        .filter((r) => ["Cattle", "Buffalo", "Goat", "Sheep"].includes(r.species))
+        .filter(
+            (r) =>
+                ["Cattle", "Buffalo", "Goat", "Sheep"].includes(r.species) &&
+                r.date === today
+        )
         .reduce((sum, r) => sum + r.quantity, 0);
 
-    // Calculate total eggs
+// Eggs today
     const totalEggs = records
-        .filter((r) => r.species === "Layer")
+        .filter(
+            (r) =>
+                r.species === "Layer" &&
+                r.date === today
+        )
         .reduce((sum, r) => sum + r.quantity, 0);
 
     return (

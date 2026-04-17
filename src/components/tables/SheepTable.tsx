@@ -1,7 +1,8 @@
 "use client";
+
 import React, { useState, MouseEvent, KeyboardEvent } from "react";
 import { useAnimalContext } from "@/context/AnimalContext";
-import { Sheep } from "@/types/animals";  //cattle
+import { Sheep } from "@/types/animals";
 import { Trash2, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -10,11 +11,13 @@ export default function SheepTable() {
     const [search, setSearch] = useState("");
     const router = useRouter();
 
-    const sheepOnly = animals.filter((a): a is Sheep => a.species === "Sheep");
+    const sheepOnly = animals.filter(
+        (a): a is Sheep => a.species?.trim().toLowerCase() === "sheep"
+    );
 
     const filteredSheep = sheepOnly.filter((animal) =>
         [animal.tag, animal.breed, animal.gender].some((field) =>
-            field.toLowerCase().includes(search.toLowerCase())
+            String(field ?? "").toLowerCase().includes(search.toLowerCase())
         )
     );
 
@@ -32,7 +35,7 @@ export default function SheepTable() {
                     placeholder="Search by tag, breed, gender..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="p-2 w-full max-w-sm rounded-2xl bg-white  border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-2 w-full max-w-sm rounded-2xl bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
             </div>
 
@@ -47,7 +50,7 @@ export default function SheepTable() {
                                 "Breed",
                                 "Gender",
                                 "Weight",
-                                "Last AI Date",
+                                "Mating Date",
                                 "Pregnancy Status",
                                 "Expected Lambing Date",
                                 "Actions",
@@ -63,64 +66,73 @@ export default function SheepTable() {
                         </thead>
                         <tbody>
                         {filteredSheep.length > 0 ? (
-                            filteredSheep.map((animal, idx) => (
-                                <tr
-                                    key={animal.tag}
-                                    className={`cursor-pointer hover:bg-blue-50 transition-colors ${
-                                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                                    }`}
-                                    onClick={() => goToDetails(animal.tag)}
-                                >
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.tag}
-                                    </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.breed}
-                                    </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.gender}
-                                    </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.weight}
-                                    </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.lastAiDate || "-"}
-                                    </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.pregnancyStatus || "-"}
-                                    </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
-                                        {animal.expectedLambingDate || "-"}
-                                    </td>
-                                    <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
-                                        <div className="flex gap-1 md:gap-2 justify-center">
-                                            <button
-                                                onClick={(e) => {
-                                                    stop(e);
-                                                    router.push(`/edit/${animal.tag}`);
-                                                }}
-                                                className="text-yellow-600 hover:text-yellow-800 p-1 rounded hover:bg-yellow-100 transition"
-                                                title="Edit"
-                                            >
-                                                <SquarePen className="h-4 w-4 md:h-5 md:w-5" />
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    stop(e);
-                                                    if (confirm(`Delete ${animal.tag}?`)) deleteAnimal(animal.tag);
-                                                }}
-                                                className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
-                                                title="Delete"
-                                            >
-                                                <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
+                            filteredSheep.map((animal, idx) => {
+                                const repro = animal.reproduction?.[0];
+
+                                return (
+                                    <tr
+                                        key={animal.tag}
+                                        className={`cursor-pointer hover:bg-blue-50 transition-colors ${
+                                            idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                        }`}
+                                        onClick={() => goToDetails(animal.tag)}
+                                    >
+                                        <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                            {animal.tag}
+                                        </td>
+                                        <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                            {animal.breed}
+                                        </td>
+                                        <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                            {animal.gender}
+                                        </td>
+                                        <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                            {animal.weight ?? "-"}
+                                        </td>
+                                        <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                            {repro?.matingDate || "-"}
+                                        </td>
+                                        <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                            {repro?.pregnancyStatus || "-"}
+                                        </td>
+                                        <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300 whitespace-nowrap">
+                                            {repro?.expectedCalvingDate || "-"}
+                                        </td>
+                                        <td className="py-1 px-1 md:py-2 md:px-4 border border-gray-300">
+                                            <div className="flex gap-1 md:gap-2 justify-center">
+                                                <button
+                                                    onClick={(e) => {
+                                                        stop(e);
+                                                        router.push(`/edit/${animal.tag}`);
+                                                    }}
+                                                    className="text-yellow-600 hover:text-yellow-800 p-1 rounded hover:bg-yellow-100 transition"
+                                                    title="Edit"
+                                                >
+                                                    <SquarePen className="h-4 w-4 md:h-5 md:w-5" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        stop(e);
+                                                        if (confirm(`Delete ${animal.tag}?`)) {
+                                                            deleteAnimal(animal.tag);
+                                                        }
+                                                    }}
+                                                    className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         ) : (
                             <tr>
-                                <td colSpan={8} className="text-center py-4 text-gray-500 border border-gray-300">
+                                <td
+                                    colSpan={8}
+                                    className="text-center py-4 text-gray-500 border border-gray-300"
+                                >
                                     No Sheep records found.
                                 </td>
                             </tr>
@@ -130,55 +142,67 @@ export default function SheepTable() {
                 </div>
             </div>
 
-
-            {/* Mobile - Card View with Y-axis scroll */}
+            {/* Mobile - Card View */}
             <div className="md:hidden border rounded-lg shadow overflow-y-auto min-h-[300px] max-h-[500px]">
                 <div className="flex flex-col">
                     {filteredSheep.length > 0 ? (
-                        filteredSheep.map((animal) => (
-                            <div
-                                key={animal.tag}
-                                onClick={() => goToDetails(animal.tag)}
-                                className="border-b last:border-b-0 p-3 bg-white hover:bg-blue-50 transition cursor-pointer"
-                            >
-                                <div className="flex justify-between items-center mb-2">
-                                    <h3 className="font-semibold text-blue-800 text-sm">Tag No:{animal.tag}</h3>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={(e) => {
-                                                stop(e);
-                                                router.push(`/edit/${animal.tag}`);
-                                            }}
-                                            className="text-yellow-600 hover:text-yellow-800 p-1 rounded hover:bg-yellow-100 transition"
-                                        >
-                                            <SquarePen className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                stop(e);
-                                                if (confirm(`Delete ${animal.tag}?`)) deleteAnimal(animal.tag);
-                                            }}
-                                            className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
+                        filteredSheep.map((animal) => {
+                            const repro = animal.reproduction?.[0];
+
+                            return (
+                                <div
+                                    key={animal.tag}
+                                    onClick={() => goToDetails(animal.tag)}
+                                    className="border-b last:border-b-0 p-3 bg-white hover:bg-blue-50 transition cursor-pointer"
+                                >
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="font-semibold text-blue-800 text-sm">
+                                            Tag No: {animal.tag}
+                                        </h3>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    stop(e);
+                                                    router.push(`/edit/${animal.tag}`);
+                                                }}
+                                                className="text-yellow-600 hover:text-yellow-800 p-1 rounded hover:bg-yellow-100 transition"
+                                                title="Edit"
+                                            >
+                                                <SquarePen className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    stop(e);
+                                                    if (confirm(`Delete ${animal.tag}?`)) {
+                                                        deleteAnimal(animal.tag);
+                                                    }
+                                                }}
+                                                className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    <p className="text-xs text-gray-600">Breed: {animal.breed ?? "-"}</p>
+                                    <p className="text-xs text-gray-600">Gender: {animal.gender ?? "-"}</p>
+                                    <p className="text-xs text-gray-600">Weight: {animal.weight ?? "-"}</p>
+                                    <p className="text-xs text-gray-600">Mating Date: {repro?.matingDate || "-"}</p>
+                                    <p className="text-xs text-gray-600">
+                                        Pregnancy Status: {repro?.pregnancyStatus || "-"}
+                                    </p>
+                                    <p className="text-xs text-gray-600">
+                                        Expected Lambing Date: {repro?.expectedCalvingDate || "-"}
+                                    </p>
                                 </div>
-                                <p className="text-xs text-gray-600">Breed: {animal.breed}</p>
-                                <p className="text-xs text-gray-600">Gender: {animal.gender}</p>
-                                <p className="text-xs text-gray-600">Weight: {animal.weight}</p>
-                                <p className="text-xs text-gray-600">Last AI Date: {animal.lastAiDate || "-"}</p>
-                                <p className="text-xs text-gray-600">Pregnancy: {animal.pregnancyStatus || "-"}</p>
-                                <p className="text-xs text-gray-600">Calving Date: {animal.expectedLambingDate || "-"}</p>
-                            </div>
-                        ))
+                            );
+                        })
                     ) : (
-                        <p className="text-center text-gray-500 p-4">No sheep records found.</p>
+                        <p className="text-center text-gray-500 p-4">No Sheep records found.</p>
                     )}
                 </div>
             </div>
-
-
         </div>
     );
 }

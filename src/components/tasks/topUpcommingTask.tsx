@@ -1,18 +1,58 @@
 "use client";
 
 import { useTasks } from "@/context/TasksContext";
+import { useUserContext } from "@/context/UserContext";
+import type { Task, AssignedUser } from "@/types/Task";
 import { format, isAfter } from "date-fns";
 
 export default function UpcomingTasksCard() {
-    const { tasks, completed, markCompleted, showCompleted, setShowCompleted } = useTasks();
+    const { tasks, completed, markCompleted, showCompleted } = useTasks();
+    const { currentUser } = useUserContext();
 
     const now = new Date();
 
-    // Filter tasks based on completed toggle and sort by nextDate
+    const canViewTask = (task: Task) => {
+        if (!currentUser) return false;
+
+        // admin can see all tasks
+        if (currentUser.role === "admin") return true;
+
+        // non-admin users only see assigned tasks
+        if (!task.assignType) return false;
+
+        if (task.assignType === "all_students" && currentUser.role === "student") {
+            return true;
+        }
+
+        if (task.assignType === "all_employees" && currentUser.role === "employee") {
+            return true;
+        }
+
+        if (task.assignType === "all_doctors" && currentUser.role === "doctor") {
+            return true;
+        }
+
+        if (task.assignType === "specific_users") {
+            return (task.assignedUsers || []).some(
+                (assignedUser: AssignedUser) => assignedUser.id === currentUser.id
+            );
+        }
+
+        return false;
+    };
+
     const upcomingTasks = tasks
-        .filter(t => t.nextDate && (showCompleted || !completed[t.key]))
-        .sort((a, b) => new Date(a.nextDate!).getTime() - new Date(b.nextDate!).getTime())
-        .slice(0, 5); // show top 5
+        .filter(
+            (task) =>
+                task.nextDate &&
+                (showCompleted || !completed[task.key]) &&
+                canViewTask(task)
+        )
+        .sort(
+            (a, b) =>
+                new Date(a.nextDate!).getTime() - new Date(b.nextDate!).getTime()
+        )
+        .slice(0, 5);
 
     return (
         <div className="bg-white rounded-xl shadow p-4 w-full max-w-md mx-auto">
@@ -24,9 +64,11 @@ export default function UpcomingTasksCard() {
             )}
 
             <ul className="space-y-3">
-                {upcomingTasks.map(task => {
+                {upcomingTasks.map((task) => {
                     const isDone = !!completed[task.key];
-                    const isOverdue = task.nextDate ? !isAfter(new Date(task.nextDate), now) : false;
+                    const isOverdue = task.nextDate
+                        ? !isAfter(new Date(task.nextDate), now)
+                        : false;
 
                     return (
                         <li
@@ -36,11 +78,16 @@ export default function UpcomingTasksCard() {
                             } ${isDone ? "opacity-60" : ""}`}
                         >
                             <div>
-                                <p className="text-sm text-black font-medium">{task.type} - {task.animalTag}</p>
+                                <p className="text-sm text-black font-medium">
+                                    {task.type} - {task.animalTag}
+                                </p>
                                 <p className="text-xs text-gray-500">
-                                    {task.nextDate ? format(new Date(task.nextDate), "yyyy-MM-dd") : ""}
+                                    {task.nextDate
+                                        ? format(new Date(task.nextDate), "yyyy-MM-dd")
+                                        : ""}
                                 </p>
                             </div>
+
                             {!isDone && (
                                 <button
                                     onClick={() => markCompleted(task)}

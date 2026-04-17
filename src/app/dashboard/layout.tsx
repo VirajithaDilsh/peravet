@@ -6,6 +6,7 @@ import ProfileSidebar from "@/components/ProfileSidebar";
 import UnionIcon from "@/icons/union.svg";
 import Image from "next/image";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useUserContext } from "@/context/UserContext";
 
 export default function DashboardLayout({
                                             children,
@@ -13,6 +14,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const { currentUser, loading } = useUserContext();
 
     return (
         <ProtectedRoute>
@@ -26,10 +28,20 @@ export default function DashboardLayout({
                             {/* Desktop layout */}
                             <div className="hidden sm:flex items-center justify-between h-16">
                                 <GlobalSearchBar />
+
                                 <div
-                                    className="hidden md:block lg:block cursor-pointer"
+                                    className="hidden md:flex items-center gap-3 cursor-pointer"
                                     onClick={() => setIsProfileOpen(true)}
                                 >
+                                    <div className="text-right">
+                                        <p className="text-sm font-semibold text-gray-800">
+                                            {loading ? "Loading..." : currentUser?.name || "User"}
+                                        </p>
+                                        <p className="text-xs text-gray-500 capitalize">
+                                            {loading ? "" : currentUser?.role || ""}
+                                        </p>
+                                    </div>
+
                                     <UnionIcon className="w-8 h-8 hover:scale-105 transition-transform" />
                                 </div>
                             </div>
