@@ -16,9 +16,11 @@ export default function CattleTable() {
 
     // ✅ Search filter
     const filteredCattle = cattleOnly.filter((animal) =>
-        [animal.tag, animal.breed, animal.gender].some((field) =>
-            field.toLowerCase().includes(search.toLowerCase())
-        )
+        [animal.tag, animal.breed, animal.gender]
+            .filter(Boolean)
+            .some((field) =>
+                field.toString().toLowerCase().includes(search.toLowerCase())
+            )
     );
 
     const goToDetails = (tag: string) => {

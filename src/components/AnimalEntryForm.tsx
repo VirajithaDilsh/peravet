@@ -99,6 +99,7 @@ const AnimalEntryForm: React.FC<AnimalEntryFormProps> = ({
 
         // ✅ Redirect back to species page
         router.push(`/dashboard/${data.species.toLowerCase()}#table`);
+        console.log("FORM DATA:", data);
     };
 
     return (
