@@ -3,111 +3,121 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Animal } from "@/types/animals";
 
-// FUTURE: API service (currently not used)
-// import {
-//     getAnimalsAPI,
-//     createAnimalAPI,
-//     updateAnimalAPI,
-//     deleteAnimalAPI,
-// } from "@/services/animalApi";
+import {
+    getAnimalsAPI,
+    createAnimalAPI,
+    updateAnimalAPI,
+    deleteAnimalAPI,
+} from "@/services/animalApi";
+
+type AnimalWithId = Animal & { _id: string };
 
 interface AnimalContextProps {
-    animals: Animal[];
-    addAnimal: (animal: Animal) => void;
-    deleteAnimal: (tag: string) => void;
-    editAnimal: (animal: Animal) => void;
-    getAnimalByTag: (tag: string) => Animal | undefined;
-    updateAnimal: (tag: string, updater: (animal: Animal) => Animal) => void;
+    animals: AnimalWithId[];
+
+    addAnimal: (animal: Animal) => Promise<void>;
+    deleteAnimal: (id: string) => Promise<void>;
+    editAnimal: (animal: AnimalWithId) => Promise<void>;
+
+    getAnimalById: (id: string) => AnimalWithId | undefined;
+    getAnimalByTag: (tag: string) => AnimalWithId | undefined;
+
+    updateAnimal: (
+        id: string,
+        updater: (animal: AnimalWithId) => AnimalWithId
+    ) => Promise<void>;
+
+    reloadAnimals: () => Promise<void>;
 }
 
 const AnimalContext = createContext<AnimalContextProps | undefined>(undefined);
 
 export const AnimalProvider = ({ children }: { children: React.ReactNode }) => {
-    const [animals, setAnimals] = useState<Animal[]>([]);
+    const [animals, setAnimals] = useState<AnimalWithId[]>([]);
 
-    // ------------------------------------------------
-    // Load animals (currently from localStorage)
-    // ------------------------------------------------
-    useEffect(() => {
-
-        // FUTURE BACKEND VERSION
-        /*
-        const loadAnimals = async () => {
+    // ---------------- LOAD ----------------
+    const reloadAnimals = async () => {
+        try {
             const data = await getAnimalsAPI();
             setAnimals(data);
-        };
-        loadAnimals();
-        */
-
-        const stored = localStorage.getItem("animalData");
-        if (stored) {
-            setAnimals(JSON.parse(stored));
+        } catch (err) {
+            console.error("Load error:", err);
         }
+    };
+
+    useEffect(() => {
+        reloadAnimals();
     }, []);
 
-    // ------------------------------------------------
-    // Sync animals to localStorage
-    // ------------------------------------------------
-    useEffect(() => {
-        localStorage.setItem("animalData", JSON.stringify(animals));
-    }, [animals]);
-
-    // ------------------------------------------------
-    // Add Animal
-    // ------------------------------------------------
-    const addAnimal = (animal: Animal) => {
-
-        // FUTURE BACKEND
-        // await createAnimalAPI(animal);
-
-        setAnimals((prev) => [...prev, animal]);
+    // ---------------- ADD ----------------
+    const addAnimal = async (animal: Animal) => {
+        try {
+            const created = await createAnimalAPI(animal);
+            setAnimals((prev) => [...prev, created]);
+        } catch (err) {
+            console.error("Add error:", err);
+        }
     };
 
-    // ------------------------------------------------
-    // Delete Animal
-    // ------------------------------------------------
-    const deleteAnimal = (tag: string) => {
+    // ---------------- DELETE ----------------
+    const deleteAnimal = async (tag: string) => {
+  try {
+    await deleteAnimalAPI(tag);
 
-        // FUTURE BACKEND
-        // await deleteAnimalAPI(tag);
+    setAnimals((prev) =>
+      prev.filter((a) => a.tag !== tag)
+    );
+  } catch (err) {
+    console.error("Delete error:", err);
+  }
+};
 
-        setAnimals((prev) => prev.filter((a) => a.tag !== tag));
+    // ---------------- EDIT (full replace) ----------------
+    const editAnimal = async (animal: AnimalWithId) => {
+        try {
+            const updated = await updateAnimalAPI(animal._id, animal);
+
+            setAnimals((prev) =>
+                prev.map((a) => (a._id === animal._id ? updated : a))
+            );
+        } catch (err) {
+            console.error("Edit error:", err);
+        }
     };
 
-    // ------------------------------------------------
-    // Edit Animal
-    // ------------------------------------------------
-    const editAnimal = (updatedAnimal: Animal) => {
-
-        // FUTURE BACKEND
-        // await updateAnimalAPI(updatedAnimal.tag, updatedAnimal);
-
-        setAnimals((prev) =>
-            prev.map((a) => (a.tag === updatedAnimal.tag ? updatedAnimal : a))
-        );
+    // ---------------- GET BY ID ----------------
+    const getAnimalById = (id: string) => {
+        return animals.find((a) => a._id === id);
     };
+    // ---------------- GET BY TAG ----------------
+const getAnimalByTag = (tag: string) => {
+    return animals.find((a) => a.tag === tag);
+};
 
-    // ------------------------------------------------
-    // Get Animal
-    // ------------------------------------------------
-    const getAnimalByTag = (tag: string): Animal | undefined => {
-        return animals.find((a) => a.tag === tag);
-    };
+    // ---------------- UPDATE (safe partial update) ----------------
+    const updateAnimal = async (
+        id: string,
+        updater: (animal: AnimalWithId) => AnimalWithId
+    ) => {
+        try {
+            const current = animals.find((a) => a._id === id);
 
-    // ------------------------------------------------
-    // Update Animal (Updater Pattern)
-    // ------------------------------------------------
-    const updateAnimal = (tag: string, updater: (animal: Animal) => Animal) => {
+            if (!current) {
+                console.error("Animal not found:", id);
+                return;
+            }
 
-        // FUTURE BACKEND
-        // const updatedAnimal = updater(animals.find(a => a.tag === tag)!);
-        // await updateAnimalAPI(tag, updatedAnimal);
+            const updatedAnimal = updater(current);
 
-        setAnimals((prev) =>
-            prev.map((animal) =>
-                animal.tag === tag ? updater(animal) : animal
-            )
-        );
+            // 🔥 IMPORTANT FIX: send only updated fields (safer for MongoDB)
+            const updated = await updateAnimalAPI(id, updatedAnimal);
+
+            setAnimals((prev) =>
+                prev.map((a) => (a._id === id ? updated : a))
+            );
+        } catch (err) {
+            console.error("Update error:", err);
+        }
     };
 
     return (
@@ -117,8 +127,10 @@ export const AnimalProvider = ({ children }: { children: React.ReactNode }) => {
                 addAnimal,
                 deleteAnimal,
                 editAnimal,
-                getAnimalByTag,
+                getAnimalById,
                 updateAnimal,
+                reloadAnimals,
+                getAnimalByTag,
             }}
         >
             {children}
@@ -126,10 +138,13 @@ export const AnimalProvider = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
+// ---------------- HOOK ----------------
 export const useAnimalContext = () => {
     const context = useContext(AnimalContext);
+
     if (!context) {
         throw new Error("useAnimalContext must be used within AnimalProvider");
     }
+
     return context;
 };

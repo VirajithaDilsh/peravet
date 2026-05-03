@@ -7,13 +7,24 @@ type FieldConfig<T> = {
     key: keyof T;
     type: string;
     placeholder?: string;
-    displayName?: string; // Added for custom display
+    displayName?: string;
+};
+
+// ✅ ONLY ADD THIS
+const formatDateForInput = (date?: string | Date) => {
+    if (!date) return "";
+
+    if (date instanceof Date) {
+        return date.toISOString().split("T")[0];
+    }
+
+    return date.split("T")[0];
 };
 
 export default function PigHealthTables({
-                                               animal,
-                                               onUpdateAction,
-                                           }: {
+    animal,
+    onUpdateAction,
+}: {
     animal: Pig;
     onUpdateAction: (updated: Pig) => void;
 }) {
@@ -45,10 +56,9 @@ export default function PigHealthTables({
 
     const formatHeader = (key: string, displayName?: string) => {
         if (displayName) return displayName;
-        // Convert camelCase to "Title Case"
         return key
-            .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-            .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
+            .replace(/([A-Z])/g, " $1")
+            .replace(/^./, (str) => str.toUpperCase());
     };
 
     const renderTable = <T extends object>(
@@ -69,109 +79,98 @@ export default function PigHealthTables({
                 </button>
             </div>
 
-            {/* Desktop Table */}
+            {/* Desktop */}
             <div className="hidden md:block overflow-x-auto">
                 <table className="min-w-full border border-gray-200 text-sm md:text-base table-auto">
                     <thead className="bg-gray-50">
-                    <tr>
-                        {fields.map((f) => (
-                            <th
-                                key={String(f.key)}
-                                className="border-r border-gray-200 px-3 py-2 text-left font-medium text-gray-700"
-                            >
-                                {formatHeader(String(f.key), f.displayName)}
-                            </th>
-                        ))}
-                        <th className="px-3 py-2 text-center font-medium text-gray-700 border-l border-gray-200">
-                            Actions
-                        </th>
-                    </tr>
+                        <tr>
+                            {fields.map((f) => (
+                                <th key={String(f.key)} className="border-r px-3 py-2 text-left">
+                                    {formatHeader(String(f.key), f.displayName)}
+                                </th>
+                            ))}
+                            <th className="px-3 py-2 text-center">Actions</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {data.map((row, i) => (
-                        <tr
-                            key={i}
-                            className="hover:bg-gray-50 border-b border-gray-200 transition"
-                        >
-                            {fields.map((f) => (
-                                <td key={String(f.key)} className="px-3 py-2 border-r border-gray-200">
-                                    <input
-                                        type={f.type}
-                                        placeholder={f.placeholder}
-                                        value={(row[f.key] as string) || ""}
-                                        onChange={(e) =>
-                                            handleChange(data, setData, i, f.key, e.target.value)
+                        {data.map((row, i) => (
+                            <tr key={i} className="border-b hover:bg-gray-50">
+                                {fields.map((f) => (
+                                    <td key={String(f.key)} className="px-3 py-2">
+                                        <input
+                                            type={f.type}
+                                            placeholder={f.placeholder}
+                                            value={
+                                                f.type === "date"
+                                                    ? formatDateForInput(row[f.key] as string | Date)
+                                                    : (row[f.key] as string) || ""
+                                            }
+                                            onChange={(e) =>
+                                                handleChange(data, setData, i, f.key, e.target.value)
+                                            }
+                                            className="w-full px-2 py-1 border rounded"
+                                        />
+                                    </td>
+                                ))}
+                                <td className="text-center">
+                                    <button
+                                        onClick={() =>
+                                            setData(data.filter((_, idx) => idx !== i))
                                         }
-                                        className={`w-full rounded-md px-2 py-1 text-sm focus:outline-none ${
-                                            editing[`${i}-${String(f.key)}`]
-                                                ? "border border-blue-500 focus:ring-2 focus:ring-blue-500"
-                                                : "border-none"
-                                        }`}
-                                    />
+                                    >
+                                        <Trash2 className="text-red-500 w-4 h-4" />
+                                    </button>
                                 </td>
-                            ))}
-                            <td className="text-center border-l border-gray-200">
-                                <button
-                                    onClick={() => setData(data.filter((_, idx) => idx !== i))}
-                                    className="p-1.5 rounded-full hover:bg-red-100"
-                                >
-                                    <Trash2 className="w-4 h-4 text-red-500" />
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
 
-            {/* Mobile Cards */}
+            {/* Mobile */}
             <div className="md:hidden mt-4 space-y-3">
                 {data.map((row, i) => (
-                    <div
-                        key={i}
-                        className="border border-gray-200 rounded-xl p-4 shadow-sm bg-gray-50"
-                    >
+                    <div key={i} className="border p-4 rounded bg-gray-50">
                         {fields.map((f) => (
-                            <div key={String(f.key)} className="mb-3">
-                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                            <div key={String(f.key)} className="mb-2">
+                                <label className="text-xs">
                                     {formatHeader(String(f.key), f.displayName)}
                                 </label>
                                 <input
                                     type={f.type}
-                                    placeholder={f.placeholder}
-                                    value={(row[f.key] as string) || ""}
+                                    value={
+                                        f.type === "date"
+                                            ? formatDateForInput(row[f.key] as string | Date)
+                                            : (row[f.key] as string) || ""
+                                    }
                                     onChange={(e) =>
                                         handleChange(data, setData, i, f.key, e.target.value)
                                     }
-                                    className={`w-full rounded-md px-2 py-1 text-sm focus:outline-none ${
-                                        editing[`${i}-${String(f.key)}`]
-                                            ? "border border-blue-500 focus:ring-2 focus:ring-blue-500"
-                                            : "border border-gray-200"
-                                    }`}
+                                    className="w-full border px-2 py-1 rounded"
                                 />
                             </div>
                         ))}
                         <button
-                            onClick={() => setData(data.filter((_, idx) => idx !== i))}
-                            className="flex items-center text-red-500 text-sm mt-2 hover:underline"
+                            onClick={() =>
+                                setData(data.filter((_, idx) => idx !== i))
+                            }
+                            className="text-red-500 text-sm"
                         >
-                            <Trash2 className="w-4 h-4 mr-1" /> Delete
+                            Delete
                         </button>
                     </div>
                 ))}
             </div>
 
             {/* Add Row */}
-            <div className="mt-4">
-                <button
-                    onClick={() =>
-                        setData([...data, Object.fromEntries(fields.map((f) => [f.key, ""])) as T])
-                    }
-                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                    <Plus className="w-4 h-4" /> Add Row
-                </button>
-            </div>
+            <button
+                onClick={() =>
+                    setData([...data, Object.fromEntries(fields.map((f) => [f.key, ""])) as T])
+                }
+                className="mt-4 flex items-center gap-1 text-blue-600"
+            >
+                <Plus className="w-4 h-4" /> Add Row
+            </button>
         </div>
     );
 
@@ -183,10 +182,10 @@ export default function PigHealthTables({
                 setVaccinations,
                 "vaccinations",
                 [
-                    { key: "type", type: "text", placeholder: "Vaccine Type" },
-                    { key: "dueDate", type: "date", displayName: "Due Date" },
-                    { key: "nextDate", type: "date", displayName: "Next Date" },
-                    { key: "comment", type: "text", placeholder: "Comment" },
+                    { key: "type", type: "text" },
+                    { key: "dueDate", type: "date" },
+                    { key: "nextDate", type: "date" },
+                    { key: "comment", type: "text" },
                 ]
             )}
 
@@ -196,10 +195,10 @@ export default function PigHealthTables({
                 setDeworming,
                 "deworming",
                 [
-                    { key: "type", type: "text", placeholder: "Deworming Type" },
-                    { key: "dueDate", type: "date", displayName: "Due Date" },
-                    { key: "nextDate", type: "date", displayName: "Next Date" },
-                    { key: "comment", type: "text", placeholder: "Comment" },
+                    { key: "type", type: "text" },
+                    { key: "dueDate", type: "date" },
+                    { key: "nextDate", type: "date" },
+                    { key: "comment", type: "text" },
                 ]
             )}
 
@@ -209,12 +208,12 @@ export default function PigHealthTables({
                 setDiseases,
                 "diseases",
                 [
-                    { key: "date", type: "date", displayName: "Date" },
-                    { key: "condition", type: "text", placeholder: "Condition" },
-                    { key: "medication", type: "text", placeholder: "Medication" },
-                    { key: "dosage", type: "text", placeholder: "Dosage" },
-                    { key: "withdrawalDate", type: "date", displayName: "Withdrawal Date" },
-                    { key: "comment", type: "text", placeholder: "Comment" },
+                    { key: "date", type: "date" },
+                    { key: "condition", type: "text" },
+                    { key: "medication", type: "text" },
+                    { key: "dosage", type: "text" },
+                    { key: "withdrawalDate", type: "date" },
+                    { key: "comment", type: "text" },
                 ]
             )}
         </div>
