@@ -17,30 +17,21 @@ interface StepFormProps {
 
 const speciesFieldsMap: Record<string, (keyof AnimalForm)[]> = {
     Cattle: [
-        "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
-        "lastCalvingDate","lactationStage","lastAiDate","nextAiDate",
-        "pregnancyStatus","expectedCalvingDate","diseaseComment","weight","lastHeatDate","reproductiveComment"
+        "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight","weight"
     ],
     Buffalo: [
-        "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight",
-        "lastCalvingDate","lactationStage","lastAiDate","nextAiDate",
-        "pregnancyStatus","expectedCalvingDate","diseaseComment","weight","lastHeatDate","reproductiveComment"
+        "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight","weight"
     ],
     Pig: [
         "species","tag","status","breed","gender","dam","sire","birthDate","birthWeight","weight",
-        "litterSize","lastFarrowingDate","nextExpectedFarrowingDate","pregnancyStatus",
-        "parity","weaningDate","currentWeight","weaningWeight","vaccinationType",
-        "vaccinationDate","nextVaccinationDate","dewormingType","lastDewormingDate",
-        "nextDewormingDate","diseaseComment","treatmentComment","generalComment","dateOfEntry",
     ],
-    Goat: ["species","tag","status","breed","gender","weight","dam","sire","diseaseComment","treatmentComment"],
-    Sheep: ["species","tag","breed","gender","dam","weight","sire","diseaseComment","treatmentComment"],
+    Goat: ["species","tag","status","breed","gender","weight","dam","sire"],
+    Sheep: ["species","tag","breed","gender","dam","weight","sire",],
     Layer: [
-        "species","tag","status","breed","gender","initialFlockSize","currentFlockSize","diseaseComment","treatmentComment"
+        "species","tag","status","breed","gender","initialFlockSize","currentFlockSize"
     ],
     Broiler: [
         "species","tag","status","breed","gender","initialFlockSize","currentFlockSize",
-        "diseaseComment","treatmentComment"
     ],
 };
 

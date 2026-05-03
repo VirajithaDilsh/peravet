@@ -16,6 +16,7 @@ export type TaskAssignType =
     | "all_doctors"
     | "specific_users";
 
+
 export interface AssignedUser {
     id: string;
     name: string;
@@ -117,6 +118,7 @@ export interface ReproductionInfo extends AssignmentInfo {
 
 // ------------------- Base -------------------
 export interface BaseAnimal {
+    _id?: string;
     species: string;
     tag: string; // flock ID (birds)
     breed: string; // strains (birds)

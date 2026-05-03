@@ -10,49 +10,37 @@ import {
     deleteAnimalAPI,
 } from "@/services/animalApi";
 
-// ======================
-// CONTEXT TYPE
-// ======================
+type AnimalWithId = Animal & { _id: string };
+
 interface AnimalContextProps {
-    animals: Animal[];
+    animals: AnimalWithId[];
 
     addAnimal: (animal: Animal) => Promise<void>;
     deleteAnimal: (id: string) => Promise<void>;
-    editAnimal: (animal: Animal) => Promise<void>;
+    editAnimal: (animal: AnimalWithId) => Promise<void>;
 
-    getAnimalById: (id: string) => Animal | undefined;
+    getAnimalById: (id: string) => AnimalWithId | undefined;
 
     updateAnimal: (
         id: string,
-        updater: (animal: Animal) => Animal
+        updater: (animal: AnimalWithId) => AnimalWithId
     ) => Promise<void>;
 
     reloadAnimals: () => Promise<void>;
 }
 
-const AnimalContext = createContext<AnimalContextProps | undefined>(
-    undefined
-);
+const AnimalContext = createContext<AnimalContextProps | undefined>(undefined);
 
-// ======================
-// PROVIDER
-// ======================
-export const AnimalProvider = ({
-                                   children,
-                               }: {
-    children: React.ReactNode;
-}) => {
-    const [animals, setAnimals] = useState<Animal[]>([]);
+export const AnimalProvider = ({ children }: { children: React.ReactNode }) => {
+    const [animals, setAnimals] = useState<AnimalWithId[]>([]);
 
-    // ======================
-    // LOAD FROM BACKEND
-    // ======================
+    // ---------------- LOAD ----------------
     const reloadAnimals = async () => {
         try {
             const data = await getAnimalsAPI();
             setAnimals(data);
         } catch (err) {
-            console.log("Load error:", err);
+            console.error("Load error:", err);
         }
     };
 
@@ -60,80 +48,67 @@ export const AnimalProvider = ({
         reloadAnimals();
     }, []);
 
-    // ======================
-    // ADD ANIMAL
-    // ======================
+    // ---------------- ADD ----------------
     const addAnimal = async (animal: Animal) => {
         try {
-            console.log("🚀 Sending animal to backend:", animal); // 👈 ADD THIS
-
             const created = await createAnimalAPI(animal);
-
             setAnimals((prev) => [...prev, created]);
         } catch (err) {
-            console.log(err);
+            console.error("Add error:", err);
         }
     };
 
-    // ======================
-    // DELETE ANIMAL
-    // ======================
+    // ---------------- DELETE ----------------
     const deleteAnimal = async (id: string) => {
         try {
             await deleteAnimalAPI(id);
-            setAnimals((prev) => prev.filter((a: any) => a._id !== id));
+            setAnimals((prev) => prev.filter((a) => a._id !== id));
         } catch (err) {
-            console.log(err);
+            console.error("Delete error:", err);
         }
     };
 
-    // ======================
-    // EDIT ANIMAL
-    // ======================
-    const editAnimal = async (animal: Animal & { _id?: string }) => {
+    // ---------------- EDIT (full replace) ----------------
+    const editAnimal = async (animal: AnimalWithId) => {
         try {
-            const updated = await updateAnimalAPI(
-                (animal as any)._id,
-                animal
-            );
+            const updated = await updateAnimalAPI(animal._id, animal);
 
             setAnimals((prev) =>
-                prev.map((a: any) =>
-                    a._id === (animal as any)._id ? updated : a
-                )
+                prev.map((a) => (a._id === animal._id ? updated : a))
             );
         } catch (err) {
-            console.log(err);
+            console.error("Edit error:", err);
         }
     };
 
-    // ======================
-    // GET BY ID
-    // ======================
+    // ---------------- GET BY ID ----------------
     const getAnimalById = (id: string) => {
-        return animals.find((a: any) => a._id === id);
+        return animals.find((a) => a._id === id);
     };
 
-    // ======================
-    // UPDATE WITH FUNCTION
-    // ======================
+    // ---------------- UPDATE (safe partial update) ----------------
     const updateAnimal = async (
         id: string,
-        updater: (animal: Animal) => Animal
+        updater: (animal: AnimalWithId) => AnimalWithId
     ) => {
         try {
-            const current = animals.find((a: any) => a._id === id);
-            if (!current) return;
+            const current = animals.find((a) => a._id === id);
+
+            if (!current) {
+                console.error("Animal not found:", id);
+                return;
+            }
 
             const updatedAnimal = updater(current);
 
+            // 🔥 IMPORTANT FIX: send only updated fields (safer for MongoDB)
             const updated = await updateAnimalAPI(id, updatedAnimal);
 
             setAnimals((prev) =>
-                prev.map((a: any) => (a._id === id ? updated : a))
+                prev.map((a) => (a._id === id ? updated : a))
             );
         } catch (err) {
-            console.log(err);
+            console.error("Update error:", err);
         }
     };
 
@@ -154,15 +129,13 @@ export const AnimalProvider = ({
     );
 };
 
-// ======================
-// HOOK
-// ======================
+// ---------------- HOOK ----------------
 export const useAnimalContext = () => {
     const context = useContext(AnimalContext);
+
     if (!context) {
-        throw new Error(
-            "useAnimalContext must be used within AnimalProvider"
-        );
+        throw new Error("useAnimalContext must be used within AnimalProvider");
     }
+
     return context;
 };
