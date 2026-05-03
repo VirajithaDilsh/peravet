@@ -6,7 +6,7 @@ import {
   PoultryFeedManagement,
   WaterManagement,
 } from "@/types/animals";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { addDays, addWeeks, format } from "date-fns";
 
@@ -48,6 +48,11 @@ export default function PoultryHealthTables({
 
   const [editing, setEditing] = useState<{ [key: string]: boolean }>({});
   const [startDate, setStartDate] = useState<string>("");
+
+  useEffect(() => {
+    const savedDate = localStorage.getItem(`poultry-start-date-${animal._id}`);
+    if (savedDate) setStartDate(savedDate);
+  }, [animal._id]);
 
   const handleSave = (type: "vaccinations" | "feed" | "water") => {
     if (type === "vaccinations")
@@ -275,7 +280,11 @@ export default function PoultryHealthTables({
     },
     { age: "Day 16", vaccine: "IB and ND (Avinew+H120)", route: "DW" },
     { age: "Day 19", vaccine: "IBD (D78)", route: "DW" },
-    { age: "Day 23", vaccine: "IB (IB 1/96 or IB 88 or IB 4/91)", route: "DW" },
+    {
+      age: "Day 23",
+      vaccine: "IB (IB 1/96 or IB 88 or IB 4/91)",
+      route: "DW",
+    },
     { age: "Week 5", vaccine: "Fowl pox", route: "WW" },
     {
       age: "Week 6",
@@ -330,7 +339,13 @@ export default function PoultryHealthTables({
         <input
           type="date"
           value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
+          onChange={(e) => {
+            setStartDate(e.target.value);
+            localStorage.setItem(
+              `poultry-start-date-${animal._id}`,
+              e.target.value
+            );
+          }}
           className="border rounded px-2 py-1"
         />
       </div>
