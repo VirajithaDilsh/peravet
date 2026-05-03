@@ -2,7 +2,7 @@ import axios from "axios";
 import { Animal } from "@/types/animals";
 
 const API =
-    "https://silver-memory-g4pp67xgrx6v39rqw-5000.app.github.dev/api/animals";
+    "https://peravtf-express-backend.onrender.com/api/animals";
 
 type AnimalBody = Animal & {
     _id?: string;
