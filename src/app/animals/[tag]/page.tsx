@@ -22,6 +22,7 @@ import BuffaloHealthTables from "@/components/tables/BuffaloHealthTable";
 import PigHealthTables from "@/components/tables/PigHealthTable";
 import GoatHealthTables from "@/components/tables/GoatHealthTable";
 import SheepHealthTables from "@/components/tables/SheepHealthTable";
+import BackTopage from "@/components/Button/BackButtontwo";
 
 // Type guards
 function isCattle(animal: Animal): animal is Cattle {
@@ -162,7 +163,9 @@ export default function AnimalDetailPage() {
 
   return (
     <div className="w-full min-h-screen p-4 md:p-6 text-black bg-gray-50 overflow-auto">
+      <BackTopage />
       <div className="w-full h-full bg-white rounded-none md:rounded-2xl shadow-lg p-4 md:p-6">
+        
         <h1 className="text-2xl md:text-3xl font-bold text-blue-700 mb-4 md:mb-6 border-b pb-2 md:pb-3">
           ID: {animal.tag}
         </h1>
