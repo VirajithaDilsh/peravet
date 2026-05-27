@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, MouseEvent, KeyboardEvent } from "react";
+import React, { useState} from "react";
 import { User, StudentUser } from "@/types/users";
-import { useRouter } from "next/navigation";
 
 interface StudentTableProps {
   users: User[];
@@ -10,7 +9,6 @@ interface StudentTableProps {
 
 export default function StudentTable({ users }: StudentTableProps) {
   const [search, setSearch] = useState("");
-  const router = useRouter();
 
   // Filter only students
   const studentOnly = (users || []).filter(
