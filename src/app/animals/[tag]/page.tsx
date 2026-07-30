@@ -23,6 +23,9 @@ import PigHealthTables from "@/components/tables/PigHealthTable";
 import GoatHealthTables from "@/components/tables/GoatHealthTable";
 import SheepHealthTables from "@/components/tables/SheepHealthTable";
 import BackTopage from "@/components/Button/BackButtontwo";
+import { useTasks } from "@/context/TasksContext";
+import { isAfter, format } from "date-fns";
+import { toast } from "sonner";
 
 // Type guards
 function isCattle(animal: Animal): animal is Cattle {
@@ -76,9 +79,17 @@ type AnimalKeys = keyof (Cattle &
 export default function AnimalDetailPage() {
   const { tag } = useParams();
   const { animals, deleteAnimal, editAnimal } = useAnimalContext();
+  const { tasks, markCompleted, undoCompleted, snooze } = useTasks();
   const router = useRouter();
 
   const animal = animals.find((a) => a.tag === tag);
+  const animalTasks = tasks
+    .filter((task) => task.animalTag === tag)
+    .sort((a, b) => {
+      if (!a.nextDate) return 1;
+      if (!b.nextDate) return -1;
+      return new Date(a.nextDate).getTime() - new Date(b.nextDate).getTime();
+    });
 
   const [initialFlockSize, setInitialFlockSize] = useState<number>(0);
   const [currentFlockSize, setCurrentFlockSize] = useState<number>(0);
@@ -396,6 +407,93 @@ export default function AnimalDetailPage() {
             )}
           </>
         )}
+
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-gray-700 mb-3 border-b">
+            Tasks
+          </h2>
+
+          {animalTasks.length === 0 ? (
+            <p className="text-gray-500 text-sm">No tasks for this animal.</p>
+          ) : (
+            <div className="space-y-2">
+              {animalTasks.map((task) => {
+                const isDone = task.status === "completed";
+                const isOverdue = task.nextDate
+                  ? !isAfter(new Date(task.nextDate), new Date())
+                  : false;
+
+                return (
+                  <div
+                    key={task._id}
+                    className={`flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg shadow-sm ${
+                      isOverdue && !isDone ? "bg-red-100" : "bg-gray-100"
+                    } ${isDone ? "opacity-60" : ""}`}
+                  >
+                    <div>
+                      <p className="font-semibold text-gray-800">{task.type}</p>
+                      {task.nextDate && (
+                        <p className="text-sm text-gray-500">
+                          {format(new Date(task.nextDate), "yyyy-MM-dd")}
+                        </p>
+                      )}
+                      {task.comment && (
+                        <p className="text-sm text-gray-600">{task.comment}</p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {!isDone ? (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await markCompleted(task);
+                              toast.success("Task marked as done");
+                            } catch {
+                              toast.error("Could not update task");
+                            }
+                          }}
+                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition"
+                        >
+                          Done
+                        </button>
+                      ) : (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await undoCompleted(task);
+                            } catch {
+                              toast.error("Could not update task");
+                            }
+                          }}
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm font-medium transition"
+                        >
+                          Undo
+                        </button>
+                      )}
+
+                      {!isDone && task.nextDate && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await snooze(task._id, 3);
+                              toast.success("Snoozed 3 days");
+                            } catch {
+                              toast.error("This task has no date to snooze");
+                            }
+                          }}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium transition"
+                        >
+                          Snooze 3d
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         <div className="mt-4 md:mt-6 flex flex-wrap gap-2 md:gap-3">
           <button

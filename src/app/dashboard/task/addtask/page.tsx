@@ -3,24 +3,12 @@
 import { useMemo, useState } from "react";
 import { useAnimalContext } from "@/context/AnimalContext";
 import { useUserContext } from "@/context/UserContext";
-import {
-    Animal,
-    Cattle,
-    Buffalo,
-    Goat,
-    Sheep,
-    Pig,
-    Layer,
-    Broiler,
-    Treatment,
-    Vaccine,
-    Deworming,
-    Disease,
-    ReproductionInfo,
-    PoultryVaccination,
-    PoultryFeedManagement,
-    WaterManagement,
-} from "@/types/animals";
+import { useTasks } from "@/context/TasksContext";
+import { createTaskAPI } from "@/services/taskApi";
+import { toast } from "sonner";
+import { Animal, Layer, Broiler } from "@/types/animals";
+import { NewTaskInput } from "@/types/Task";
+import { appendTaskToHealthRecords } from "@/lib/taskHealthSync";
 
 import { User } from "@/types/users";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,17 +39,13 @@ interface AssignedUser {
 }
 
 // ---------------- TYPE GUARDS ----------------
-const isCattle = (animal: Animal): animal is Cattle => animal.species === "Cattle";
-const isBuffalo = (animal: Animal): animal is Buffalo => animal.species === "Buffalo";
-const isGoat = (animal: Animal): animal is Goat => animal.species === "Goat";
-const isSheep = (animal: Animal): animal is Sheep => animal.species === "Sheep";
-const isPig = (animal: Animal): animal is Pig => animal.species === "Pig";
 const isLayerOrBroiler = (animal: Animal): animal is Layer | Broiler =>
     animal.species === "Layer" || animal.species === "Broiler";
 
 export default function AddTaskPage() {
-    const { animals, updateAnimal } = useAnimalContext();
+    const { animals, editAnimal } = useAnimalContext();
     const { users } = useUserContext();
+    const { reloadTasks } = useTasks();
 
     const [selectedTag, setSelectedTag] = useState("");
     const [animalInput, setAnimalInput] = useState("");
@@ -87,7 +71,7 @@ export default function AddTaskPage() {
     const [waterRequirement, setWaterRequirement] = useState("");
     const [chlorinating, setChlorinating] = useState("");
 
-    const selectedAnimal: Animal | undefined = animals.find(
+    const selectedAnimal = animals.find(
         (a: Animal) => a.tag === selectedTag
     );
 
@@ -146,184 +130,69 @@ export default function AddTaskPage() {
 
     const validateForm = () => {
         if (!selectedTag) {
-            alert("Please select an animal");
+            toast.error("Please select an animal");
             return false;
         }
 
         if (!taskType) {
-            alert("Please select a task type");
+            toast.error("Please select a task type");
             return false;
         }
 
         if (taskType !== "Feed" && taskType !== "Water" && !dueDate) {
-            alert("Please select a date");
+            toast.error("Please select a date");
             return false;
         }
 
         if (assignType === "specific_users" && selectedUsers.length === 0) {
-            alert("Please select at least one user");
+            toast.error("Please select at least one user");
             return false;
         }
 
         return true;
     };
 
-    const handleAddTask = () => {
+    const handleAddTask = async () => {
         if (!validateForm()) return;
 
-        updateAnimal(selectedTag, (animal) => {
-            const updatedAnimal: Animal = { ...animal };
+        const payload: NewTaskInput = {
+            animalTag: selectedTag,
+            type: taskType as NewTaskInput["type"],
+            dueDate: dueDate || undefined,
+            nextDate: nextDate || undefined,
+            comment: comment || undefined,
+            drug: drug || undefined,
+            dosage: dosage === "" ? undefined : dosage,
+            route: route || undefined,
+            prescribe: prescribe || undefined,
+            feedType,
+            feedIntake: feedIntake || undefined,
+            feedRequirement: feedRequirement || undefined,
+            waterIntake: waterIntake || undefined,
+            waterRequirement: waterRequirement || undefined,
+            chlorinating: chlorinating || undefined,
+            ...assignmentPayload,
+        };
 
-            switch (taskType) {
-                case "Treatment":
-                    updatedAnimal.treatments = [
-                        ...(updatedAnimal.treatments || []),
-                        {
-                            dueDate,
-                            nextDate,
-                            comment,
-                            drug,
-                            dosage: dosage === "" ? undefined : dosage,
-                            route,
-                            prescribe,
-                            ...assignmentPayload,
-                        } as Treatment,
-                    ];
-                    break;
+        try {
+            await createTaskAPI(payload);
 
-                case "Vaccination":
-                    if (isLayerOrBroiler(updatedAnimal)) {
-                        updatedAnimal.vaccinations = [
-                            ...(updatedAnimal.vaccinations || []),
-                            {
-                                date: dueDate,
-                                nextDate,
-                                vaccine: comment,
-                                route,
-                                ...assignmentPayload,
-                            } as PoultryVaccination,
-                        ];
-                    } else {
-                        updatedAnimal.vaccinations = [
-                            ...(updatedAnimal.vaccinations || []),
-                            {
-                                dueDate,
-                                nextDate,
-                                type: comment,
-                                ...assignmentPayload,
-                            } as Vaccine,
-                        ];
-                    }
-                    break;
-
-                case "Deworming":
-                    if (
-                        isCattle(updatedAnimal) ||
-                        isBuffalo(updatedAnimal) ||
-                        isGoat(updatedAnimal) ||
-                        isSheep(updatedAnimal) ||
-                        isPig(updatedAnimal)
-                    ) {
-                        updatedAnimal.deworming = [
-                            ...(updatedAnimal.deworming || []),
-                            {
-                                dueDate,
-                                nextDate,
-                                comment,
-                                ...assignmentPayload,
-                            } as Deworming,
-                        ];
-                    } else {
-                        alert(`${updatedAnimal.species} cannot have Deworming task`);
-                    }
-                    break;
-
-                case "Disease":
-                    updatedAnimal.diseases = [
-                        ...(updatedAnimal.diseases || []),
-                        {
-                            dueDate,
-                            nextDate,
-                            comment,
-                            treatment: drug,
-                            ...assignmentPayload,
-                        } as Disease,
-                    ];
-                    break;
-
-                case "Artificial Insemination":
-                    if (isCattle(updatedAnimal) || isBuffalo(updatedAnimal)) {
-                        updatedAnimal.reproduction = [
-                            ...(updatedAnimal.reproduction || []),
-                            {
-                                lastAiDate: dueDate,
-                                nextAiDate: nextDate || undefined,
-                                reproductiveComment: comment,
-                                ...assignmentPayload,
-                            } as ReproductionInfo,
-                        ];
-                    } else {
-                        alert(`${updatedAnimal.species} cannot have Artificial Insemination task`);
-                    }
-                    break;
-
-                case "Expected Calving":
-                    if (isCattle(updatedAnimal) || isBuffalo(updatedAnimal)) {
-                        updatedAnimal.reproduction = [
-                            ...(updatedAnimal.reproduction || []),
-                            {
-                                expectedCalvingDate: dueDate,
-                                reproductiveComment: comment,
-                                ...assignmentPayload,
-                            } as ReproductionInfo,
-                        ];
-                    } else {
-                        alert(`${updatedAnimal.species} cannot have Expected Calving task`);
-                    }
-                    break;
-
-                case "Feed":
-                    if (isLayerOrBroiler(updatedAnimal)) {
-                        updatedAnimal.feedManagement = [
-                            ...(updatedAnimal.feedManagement || []),
-                            {
-                                type: feedType,
-                                feedIntake,
-                                feedRequirement,
-                                ...assignmentPayload,
-                            } as PoultryFeedManagement,
-                        ];
-                    } else {
-                        alert(`${updatedAnimal.species} cannot have Feed task`);
-                    }
-                    break;
-
-                case "Water":
-                    if (isLayerOrBroiler(updatedAnimal)) {
-                        updatedAnimal.waterManagement = [
-                            ...(updatedAnimal.waterManagement || []),
-                            {
-                                waterIntake,
-                                waterRequirement,
-                                chlorinating,
-                                ...assignmentPayload,
-                            } as WaterManagement,
-                        ];
-                    } else {
-                        alert(`${updatedAnimal.species} cannot have Water task`);
-                    }
-                    break;
-
-                default:
-                    alert("Invalid task type");
-                    break;
+            if (selectedAnimal) {
+                const updatedAnimal = appendTaskToHealthRecords(selectedAnimal, payload);
+                if (updatedAnimal) {
+                    await editAnimal(updatedAnimal);
+                }
             }
 
-            return updatedAnimal;
-        });
-
-        alert("Task Added Successfully!");
-        resetForm();
+            await reloadTasks();
+            toast.success("Task added successfully!");
+            resetForm();
+        } catch (err) {
+            const message =
+                (err as { response?: { data?: { message?: string } } })?.response?.data
+                    ?.message || "Could not create task";
+            toast.error(message);
+        }
     };
 
     const resetForm = () => {

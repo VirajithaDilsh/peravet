@@ -1,52 +1,19 @@
 "use client";
 
 import { useTasks } from "@/context/TasksContext";
-import { useUserContext } from "@/context/UserContext";
-import type { Task, AssignedUser } from "@/types/Task";
 import { format, isAfter } from "date-fns";
 
 export default function UpcomingTasksCard() {
-    const { tasks, completed, markCompleted, showCompleted } = useTasks();
-    const { currentUser } = useUserContext();
+    // The backend only ever returns tasks this user is allowed to see, so no
+    // client-side role filtering is needed here.
+    const { tasks, markCompleted, showCompleted } = useTasks();
 
     const now = new Date();
-
-    const canViewTask = (task: Task) => {
-        if (!currentUser) return false;
-
-        // admin can see all tasks
-        if (currentUser.role === "admin") return true;
-
-        // non-admin users only see assigned tasks
-        if (!task.assignType) return false;
-
-        if (task.assignType === "all_students" && currentUser.role === "student") {
-            return true;
-        }
-
-        if (task.assignType === "all_employees" && currentUser.role === "employee") {
-            return true;
-        }
-
-        if (task.assignType === "all_doctors" && currentUser.role === "doctor") {
-            return true;
-        }
-
-        if (task.assignType === "specific_users") {
-            return (task.assignedUsers || []).some(
-                (assignedUser: AssignedUser) => assignedUser.id === currentUser.id
-            );
-        }
-
-        return false;
-    };
 
     const upcomingTasks = tasks
         .filter(
             (task) =>
-                task.nextDate &&
-                (showCompleted || !completed[task.key]) &&
-                canViewTask(task)
+                task.nextDate && (showCompleted || task.status !== "completed")
         )
         .sort(
             (a, b) =>
@@ -65,14 +32,14 @@ export default function UpcomingTasksCard() {
 
             <ul className="space-y-3">
                 {upcomingTasks.map((task) => {
-                    const isDone = !!completed[task.key];
+                    const isDone = task.status === "completed";
                     const isOverdue = task.nextDate
                         ? !isAfter(new Date(task.nextDate), now)
                         : false;
 
                     return (
                         <li
-                            key={task.key}
+                            key={task._id}
                             className={`flex justify-between items-center p-3 rounded-md cursor-pointer transition ${
                                 isOverdue && !isDone ? "bg-red-100" : "bg-gray-50"
                             } ${isDone ? "opacity-60" : ""}`}

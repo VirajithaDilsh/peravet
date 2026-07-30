@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Pig, Vaccine, Deworming, Disease } from "@/types/animals";
+import { useTasks } from "@/context/TasksContext";
+import { syncHealthRowsToTasks } from "@/lib/taskHealthSync";
 
 type FieldConfig<T> = {
     key: keyof T;
@@ -33,11 +35,58 @@ export default function PigHealthTables({
     const [diseases, setDiseases] = useState<Disease[]>(animal.diseases || []);
 
     const [editing, setEditing] = useState<{ [key: string]: boolean }>({});
+    const { tasks, reloadTasks } = useTasks();
 
-    const handleSave = (type: "vaccinations" | "deworming" | "diseases") => {
-        if (type === "vaccinations") onUpdateAction({ ...animal, vaccinations });
-        if (type === "deworming") onUpdateAction({ ...animal, deworming });
-        if (type === "diseases") onUpdateAction({ ...animal, diseases });
+    const handleSave = async (type: "vaccinations" | "deworming" | "diseases") => {
+        if (type === "vaccinations") {
+            onUpdateAction({ ...animal, vaccinations });
+
+            const created = await syncHealthRowsToTasks(
+                animal.tag,
+                vaccinations.map((row) => ({
+                    type: "Vaccination",
+                    dueDate: row.dueDate,
+                    nextDate: row.nextDate,
+                    comment: row.comment || row.type,
+                })),
+                tasks
+            );
+            if (created) await reloadTasks();
+        }
+
+        if (type === "deworming") {
+            onUpdateAction({ ...animal, deworming });
+
+            const created = await syncHealthRowsToTasks(
+                animal.tag,
+                deworming.map((row) => ({
+                    type: "Deworming",
+                    dueDate: row.dueDate,
+                    nextDate: row.nextDate,
+                    comment: row.comment || row.type,
+                })),
+                tasks
+            );
+            if (created) await reloadTasks();
+        }
+
+        if (type === "diseases") {
+            onUpdateAction({ ...animal, diseases });
+
+            const created = await syncHealthRowsToTasks(
+                animal.tag,
+                diseases.map((row) => ({
+                    type: "Disease",
+                    dueDate: row.date,
+                    nextDate: row.withdrawalDate,
+                    comment: row.comment || row.condition,
+                    drug: row.medication,
+                })),
+                tasks
+            );
+            if (created) await reloadTasks();
+        }
+
         setEditing({});
     };
 

@@ -2,11 +2,14 @@
 export type Role = "admin" | "doctor" | "student" | "employee";
 
 // Base User
+// `password` is never present on a user loaded from the backend (it's hashed
+// server-side and stripped from every response) — it only appears transiently
+// when submitting a create/change-password form.
 interface BaseUser {
     id: string;
     name: string;
     email: string;
-    password: string;
+    password?: string;
     role: Role;
 }
 
@@ -21,7 +24,6 @@ export type User = AdminUser | DoctorUser | StudentUser | EmployeeUser;
 
 // Form type (for React Hook Form)
 export interface FormValues {
-    id: string;
     name: string;
     email: string;
     password: string;
@@ -31,16 +33,3 @@ export interface FormValues {
     confirmPassword?: string;
 }
 
-
-
-
-
-
-// Sample users
-export const sampleUsers: User[] = [
-    { id: "1", name: "Admin User", email: "admin@example.com", password: "admin123", role: "admin" },
-    { id: "2", name: "Dr. Smith", email: "doctor@example.com", password: "doctor123", role: "doctor" },
-    { id: "3", name: "John Student", email: "student@example.com", password: "student123", role: "student", department: "Veterinary Science", year: 3 },
-    { id: "4", name: "Jane Employee", email: "employee@example.com", password: "employee123", role: "employee" },
-    { id: "5", name: "Peravtf Admin User", email: "peravtfadm@gmail.com", password: "2328687Al", role: "admin" },
-];

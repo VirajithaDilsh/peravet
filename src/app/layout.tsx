@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { AnimalProvider } from "@/context/AnimalContext";
 import { TasksProvider } from "@/context/TasksContext";
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </AnimalProvider>
             </ProductionProvider>
         </UserProvider>
+        <Toaster richColors position="top-right" />
         </body>
         </html>
     );

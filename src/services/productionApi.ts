@@ -1,8 +1,6 @@
-import axios from "axios";
+import axios from "@/lib/axios";
 import { ProductionRecord } from "@/types/Production";
-
-const API =
-    "https://peravtf-express-backend.onrender.com/api/production";
+import { API_PRODUCTION as API } from "@/config/api";
 
 type ProductionRecordBody = Omit<ProductionRecord, "id"> & {
     id?: string;

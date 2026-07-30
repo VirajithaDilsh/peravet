@@ -8,6 +8,8 @@ import {
 } from "@/types/animals";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { useTasks } from "@/context/TasksContext";
+import { syncHealthRowsToTasks } from "@/lib/taskHealthSync";
 
 const formatDateForInput = (date?: string | Date) => {
   if (!date) return "";
@@ -36,9 +38,55 @@ export default function BroilerHealthTables({
     animal.waterManagement || []
   );
 
-  const saveVaccinations = () => onUpdateAction({ ...animal, vaccinations });
-  const saveFeed = () => onUpdateAction({ ...animal, feedManagement: feed });
-  const saveWater = () => onUpdateAction({ ...animal, waterManagement: water });
+  const { tasks, reloadTasks } = useTasks();
+
+  const saveVaccinations = async () => {
+    onUpdateAction({ ...animal, vaccinations });
+
+    const created = await syncHealthRowsToTasks(
+      animal.tag,
+      vaccinations.map((row) => ({
+        type: "Vaccination",
+        dueDate: row.date,
+        nextDate: row.nextDate,
+        comment: row.vaccine,
+      })),
+      tasks
+    );
+    if (created) await reloadTasks();
+  };
+
+  const saveFeed = async () => {
+    onUpdateAction({ ...animal, feedManagement: feed });
+
+    const created = await syncHealthRowsToTasks(
+      animal.tag,
+      feed.map((row) => ({
+        type: "Feed",
+        feedType: row.type,
+        feedIntake: row.feedIntake,
+        feedRequirement: row.feedRequirement,
+      })),
+      tasks
+    );
+    if (created) await reloadTasks();
+  };
+
+  const saveWater = async () => {
+    onUpdateAction({ ...animal, waterManagement: water });
+
+    const created = await syncHealthRowsToTasks(
+      animal.tag,
+      water.map((row) => ({
+        type: "Water",
+        waterIntake: row.waterIntake,
+        waterRequirement: row.waterRequirement,
+        chlorinating: row.chlorinating,
+      })),
+      tasks
+    );
+    if (created) await reloadTasks();
+  };
 
   return (
     <div className="space-y-8 mt-6">
