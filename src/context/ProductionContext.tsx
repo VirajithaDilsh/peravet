@@ -2,23 +2,29 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { ProductionRecord } from "@/types/Production";
-
-// FUTURE: API service (not used yet)
-// import {
-//   getProductionRecordsAPI,
-//   createProductionRecordAPI,
-//   updateProductionRecordAPI,
-//   deleteProductionRecordAPI,
-// } from "@/services/productionApi";
+import {
+    getProductionRecordsAPI,
+    createProductionRecordAPI,
+    updateProductionRecordAPI,
+    deleteProductionRecordAPI,
+} from "@/services/productionApi";
 
 interface ProductionContextType {
     records: ProductionRecord[];
-    addRecord: (record: ProductionRecord) => void;
-    updateRecord: (id: string, record: ProductionRecord) => void;
-    deleteRecord: (id: string) => void;
+    addRecord: (record: ProductionRecord) => Promise<void>;
+    updateRecord: (id: string, record: ProductionRecord) => Promise<void>;
+    deleteRecord: (id: string) => Promise<void>;
 }
 
 const ProductionContext = createContext<ProductionContextType | undefined>(undefined);
+
+// Mongo docs come back as { _id, date: <ISO datetime>, ... } — normalize to
+// the `id` + yyyy-mm-dd shape the form/table already expect.
+const toRecord = (doc: ProductionRecord & { _id: string }): ProductionRecord => ({
+    ...doc,
+    id: doc._id,
+    date: doc.date ? String(doc.date).split("T")[0] : doc.date,
+});
 
 export const ProductionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [records, setRecords] = useState<ProductionRecord[]>([]);
@@ -27,62 +33,53 @@ export const ProductionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // Load records
     // ------------------------------------------------
     useEffect(() => {
-
-        // FUTURE BACKEND
-        /*
         const loadRecords = async () => {
-            const data = await getProductionRecordsAPI();
-            setRecords(data);
+            try {
+                const data = await getProductionRecordsAPI();
+                setRecords(data.map(toRecord));
+            } catch (err) {
+                console.error("Load production records error:", err);
+            }
         };
         loadRecords();
-        */
-
-        const saved = localStorage.getItem("productionRecords");
-        if (saved) setRecords(JSON.parse(saved));
     }, []);
-
-    // ------------------------------------------------
-    // Save records to localStorage
-    // ------------------------------------------------
-    useEffect(() => {
-        localStorage.setItem("productionRecords", JSON.stringify(records));
-    }, [records]);
 
     // ------------------------------------------------
     // Add Record
     // ------------------------------------------------
-    const addRecord = (record: ProductionRecord) => {
-
-        const newRecord = { ...record, id: Date.now().toString() };
-
-        // FUTURE BACKEND
-        // await createProductionRecordAPI(newRecord);
-
-        setRecords((prev) => [...prev, newRecord]);
+    const addRecord = async (record: ProductionRecord) => {
+        try {
+            const created = await createProductionRecordAPI(record);
+            setRecords((prev) => [...prev, toRecord(created)]);
+        } catch (err) {
+            console.error("Add production record error:", err);
+        }
     };
 
     // ------------------------------------------------
     // Update Record
     // ------------------------------------------------
-    const updateRecord = (id: string, record: ProductionRecord) => {
-
-        // FUTURE BACKEND
-        // await updateProductionRecordAPI(id, record);
-
-        setRecords((prev) =>
-            prev.map((r) => (r.id === id ? { ...record, id } : r))
-        );
+    const updateRecord = async (id: string, record: ProductionRecord) => {
+        try {
+            const updated = await updateProductionRecordAPI(id, record);
+            setRecords((prev) =>
+                prev.map((r) => (r.id === id ? toRecord(updated) : r))
+            );
+        } catch (err) {
+            console.error("Update production record error:", err);
+        }
     };
 
     // ------------------------------------------------
     // Delete Record
     // ------------------------------------------------
-    const deleteRecord = (id: string) => {
-
-        // FUTURE BACKEND
-        // await deleteProductionRecordAPI(id);
-
-        setRecords((prev) => prev.filter((r) => r.id !== id));
+    const deleteRecord = async (id: string) => {
+        try {
+            await deleteProductionRecordAPI(id);
+            setRecords((prev) => prev.filter((r) => r.id !== id));
+        } catch (err) {
+            console.error("Delete production record error:", err);
+        }
     };
 
     return (
