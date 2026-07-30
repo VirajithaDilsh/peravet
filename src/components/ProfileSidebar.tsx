@@ -30,8 +30,8 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
             setFormData({
                 name: currentUser.name,
                 email: currentUser.email,
-                password: currentUser.password,
-                confirmPassword: currentUser.password,
+                password: "",
+                confirmPassword: "",
                 department: currentUser.role === "student" ? currentUser.department || "" : "",
                 year: currentUser.role === "student" ? currentUser.year || 0 : 0,
             });
@@ -48,7 +48,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
         }));
     };
 
-    const handleSaveProfile = () => {
+    const handleSaveProfile = async () => {
         const updatedUser: User = {
             ...currentUser,
             name: formData.name,
@@ -56,19 +56,31 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
             ...(currentUser.role === "student"
                 ? { department: formData.department, year: formData.year }
                 : {}),
-            password: formData.password,
         };
-        editUser(updatedUser);
-        setMessage({ text: "Profile updated successfully!", type: "success" });
+        try {
+            await editUser(updatedUser);
+            setMessage({ text: "Profile updated successfully!", type: "success" });
+        } catch {
+            setMessage({ text: "Could not update profile", type: "error" });
+        }
     };
 
-    const handleChangePassword = () => {
+    const handleChangePassword = async () => {
+        if (!formData.password) {
+            setMessage({ text: "Enter a new password", type: "error" });
+            return;
+        }
         if (formData.password !== formData.confirmPassword) {
             setMessage({ text: "Passwords do not match!", type: "error" });
             return;
         }
-        editUser({ ...currentUser, password: formData.password });
-        setMessage({ text: "Password changed successfully!", type: "success" });
+        try {
+            await editUser({ ...currentUser, password: formData.password });
+            setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+            setMessage({ text: "Password changed successfully!", type: "success" });
+        } catch {
+            setMessage({ text: "Could not change password", type: "error" });
+        }
     };
 
     return (

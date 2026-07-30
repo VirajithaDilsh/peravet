@@ -1,8 +1,6 @@
-import axios from "axios";
+import axios from "@/lib/axios";
 import { Animal } from "@/types/animals";
-
-const API =
-    "https://peravtf-express-backend.onrender.com/api/animals";
+import { API_ANIMALS as API } from "@/config/api";
 
 type AnimalBody = Animal & {
     _id?: string;

@@ -2,11 +2,12 @@
 
 import StudentTable from "@/components/tables/StudentTable";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { sampleUsers } from "@/types/users";
+import { useUserContext } from "@/context/UserContext";
 
 export default function Home() {
+    const { users } = useUserContext();
     // Only pass students to the table
-    const studentUsers = sampleUsers.filter(user => user.role === "student");
+    const studentUsers = users.filter(user => user.role === "student");
 
     return (
         <ProtectedRoute allowedRoles={["admin","doctor"]}>

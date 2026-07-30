@@ -2,16 +2,18 @@
 
 import { useTasks } from "@/context/TasksContext";
 import { useUserContext } from "@/context/UserContext";
-import type { Task, AssignedUser } from "@/types/Task";
+import type { Task } from "@/types/Task";
 import { isAfter, format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function TasksPage() {
     const {
         tasks,
-        completed,
         markCompleted,
         undoCompleted,
+        snooze,
+        deleteTask,
         showCompleted,
         setShowCompleted,
     } = useTasks();
@@ -20,37 +22,9 @@ export default function TasksPage() {
     const now = new Date();
     const router = useRouter();
 
-    const canViewTask = (task: Task) => {
-        if (!currentUser) return false;
-
-        // admin can see all tasks
-        if (currentUser.role === "admin") return true;
-
-        if (!task.assignType) return false;
-
-        if (task.assignType === "all_students" && currentUser.role === "student") {
-            return true;
-        }
-
-        if (task.assignType === "all_employees" && currentUser.role === "employee") {
-            return true;
-        }
-
-        if (task.assignType === "all_doctors" && currentUser.role === "doctor") {
-            return true;
-        }
-
-        if (task.assignType === "specific_users") {
-            return (task.assignedUsers || []).some(
-                (assignedUser: AssignedUser) => assignedUser.id === currentUser.id
-            );
-        }
-
-        return false;
-    };
-
-    const canSeeAssignmentDetails =
-        currentUser?.role === "admin" || currentUser?.role === "doctor";
+    // Visibility is already enforced server-side (GET /api/tasks only returns
+    // what this user is allowed to see) — this is just the "hide completed" view filter.
+    const canManage = currentUser?.role === "admin" || currentUser?.role === "doctor";
 
     const getAssignedToText = (task: Task) => {
         if (task.assignType === "all_students") return "All Students";
@@ -68,14 +42,95 @@ export default function TasksPage() {
         return "Not assigned";
     };
 
-    const filtered = tasks.filter((task) => {
-        const visibleByCompleted = showCompleted || !completed[task.key];
-        const visibleByRole = canViewTask(task);
-        return visibleByCompleted && visibleByRole;
-    });
+    const handleComplete = async (task: Task) => {
+        try {
+            await markCompleted(task);
+            toast.success("Task marked as done");
+        } catch {
+            toast.error("Could not update task");
+        }
+    };
+
+    const handleUndo = async (task: Task) => {
+        try {
+            await undoCompleted(task);
+        } catch {
+            toast.error("Could not update task");
+        }
+    };
+
+    const handleSnooze = async (task: Task) => {
+        try {
+            await snooze(task._id, 3);
+            toast.success("Snoozed 3 days");
+        } catch {
+            toast.error("This task has no date to snooze");
+        }
+    };
+
+    const handleDelete = async (task: Task) => {
+        if (!confirm(`Delete this ${task.type} task for ${task.animalTag}?`)) return;
+        try {
+            await deleteTask(task._id);
+            toast.success("Task deleted");
+        } catch {
+            toast.error("Could not delete task");
+        }
+    };
+
+    const filtered = tasks.filter((task) => showCompleted || task.status !== "completed");
+
+    const renderActions = (task: Task) => (
+        <>
+            {task.status !== "completed" ? (
+                <button
+                    onClick={() => handleComplete(task)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition"
+                >
+                    Done
+                </button>
+            ) : (
+                <button
+                    onClick={() => handleUndo(task)}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm font-medium transition"
+                >
+                    Undo
+                </button>
+            )}
+
+            {canManage && task.status !== "completed" && task.nextDate && (
+                <button
+                    onClick={() => handleSnooze(task)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-medium transition"
+                >
+                    Snooze 3d
+                </button>
+            )}
+
+            {canManage && (
+                <button
+                    onClick={() => handleDelete(task)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium transition"
+                >
+                    Delete
+                </button>
+            )}
+        </>
+    );
 
     return (
         <div className="p-4 md:p-6 lg:p-8 min-h-screen">
+            <div className="flex justify-end mb-4">
+                <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={showCompleted}
+                        onChange={(e) => setShowCompleted(e.target.checked)}
+                    />
+                    Show completed
+                </label>
+            </div>
+
             <div className="overflow-x-auto bg-white rounded-xl shadow-md">
                 <table className="hidden md:table min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-100">
@@ -90,7 +145,7 @@ export default function TasksPage() {
                             Species
                         </th>
 
-                        {canSeeAssignmentDetails && (
+                        {canManage && (
                             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
                                 Assigned To
                             </th>
@@ -107,14 +162,14 @@ export default function TasksPage() {
 
                     <tbody className="divide-y divide-gray-200">
                     {filtered.map((task) => {
-                        const isDone = !!completed[task.key];
+                        const isDone = task.status === "completed";
                         const isOverdue = task.nextDate
                             ? !isAfter(new Date(task.nextDate), now)
                             : false;
 
                         return (
                             <tr
-                                key={task.key}
+                                key={task._id}
                                 onClick={() => router.push(`/animals/${task.animalTag}`)}
                                 className={`cursor-pointer transition duration-200 hover:bg-gray-50 ${
                                     isOverdue && !isDone ? "bg-red-100" : ""
@@ -132,7 +187,7 @@ export default function TasksPage() {
                                     {task.species}
                                 </td>
 
-                                {canSeeAssignmentDetails && (
+                                {canManage && (
                                     <td className="px-4 py-3 text-sm text-gray-700 max-w-xs">
                                         <div className="whitespace-normal break-words">
                                             {getAssignedToText(task)}
@@ -150,21 +205,7 @@ export default function TasksPage() {
                                     className="px-4 py-3 flex flex-wrap justify-center gap-2"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    {!isDone ? (
-                                        <button
-                                            onClick={() => markCompleted(task)}
-                                            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition"
-                                        >
-                                            Done
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => undoCompleted(task)}
-                                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm font-medium transition"
-                                        >
-                                            Undo
-                                        </button>
-                                    )}
+                                    {renderActions(task)}
                                 </td>
                             </tr>
                         );
@@ -174,14 +215,14 @@ export default function TasksPage() {
 
                 <div className="md:hidden divide-y divide-gray-200">
                     {filtered.map((task) => {
-                        const isDone = !!completed[task.key];
+                        const isDone = task.status === "completed";
                         const isOverdue = task.nextDate
                             ? !isAfter(new Date(task.nextDate), now)
                             : false;
 
                         return (
                             <div
-                                key={task.key}
+                                key={task._id}
                                 onClick={() => router.push(`/animals/${task.animalTag}`)}
                                 className={`p-4 space-y-2 transition rounded-lg m-2 shadow-sm cursor-pointer ${
                                     isOverdue && !isDone ? "bg-red-100" : "bg-white"
@@ -204,7 +245,7 @@ export default function TasksPage() {
                                     <span className="font-medium">Species:</span> {task.species}
                                 </p>
 
-                                {canSeeAssignmentDetails && (
+                                {canManage && (
                                     <p className="text-sm text-gray-600">
                                         <span className="font-medium">Assigned To:</span>{" "}
                                         {getAssignedToText(task)}
@@ -212,24 +253,10 @@ export default function TasksPage() {
                                 )}
 
                                 <div
-                                    className="flex gap-2 pt-2"
+                                    className="flex flex-wrap gap-2 pt-2"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    {!isDone ? (
-                                        <button
-                                            onClick={() => markCompleted(task)}
-                                            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition"
-                                        >
-                                            Done
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => undoCompleted(task)}
-                                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm font-medium transition"
-                                        >
-                                            Undo
-                                        </button>
-                                    )}
+                                    {renderActions(task)}
                                 </div>
                             </div>
                         );

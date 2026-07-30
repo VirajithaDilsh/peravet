@@ -1,19 +1,26 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, sampleUsers } from "@/types/users";
+import { User } from "@/types/users";
+import {
+    loginAPI,
+    getUsersAPI,
+    createUserAPI,
+    updateUserAPI,
+    deleteUserAPI,
+} from "@/services/userApi";
 
 interface UserContextProps {
     users: User[];
     currentUser: User | null;
-    loading: boolean; // ✅ expose loading state
+    loading: boolean;
 
-    login: (email: string, password: string) => boolean;
+    login: (email: string, password: string) => Promise<boolean>;
 
     logout: () => void;
-    addUser: (user: User) => void;
-    editUser: (user: User) => void;
-    deleteUser: (id: string) => void;
+    addUser: (user: Partial<User>) => Promise<void>;
+    editUser: (user: User) => Promise<void>;
+    deleteUser: (id: string) => Promise<void>;
     getUserById: (id: string) => User | undefined;
 }
 
@@ -24,55 +31,70 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Load users + currentUser from localStorage
-    useEffect(() => {
-        const storedUsers = localStorage.getItem("userData");
-        const dynamicUsers = storedUsers ? JSON.parse(storedUsers) : [];
-
-        // ✅ Combine sampleUsers + dynamic users
-        setUsers([...sampleUsers, ...dynamicUsers]);
-
-        const storedCurrentUser = localStorage.getItem("currentUser");
-        if (storedCurrentUser) setCurrentUser(JSON.parse(storedCurrentUser));
-
-        setLoading(false);
-    }, []);
-
-    // Persist only dynamic users
-    useEffect(() => {
-        const dynamicUsers = users.filter(
-            u => !sampleUsers.some(su => su.id === u.id) // skip sampleUsers
-        );
-        localStorage.setItem("userData", JSON.stringify(dynamicUsers));
-    }, [users]);
-
-    // Persist currentUser
-    useEffect(() => {
-        if (currentUser) localStorage.setItem("currentUser", JSON.stringify(currentUser));
-        else localStorage.removeItem("currentUser");
-    }, [currentUser]);
-
-    const login = (email: string, password: string): boolean => {
-        const user = users.find(u => u.email === email && u.password === password);
-        if (user) {
-            setCurrentUser(user);
-            return true;
+    const reloadUsers = async () => {
+        try {
+            const data = await getUsersAPI();
+            setUsers(data);
+        } catch (err) {
+            console.error("Load users error:", err);
         }
-        return false;
     };
 
-    const logout = () => setCurrentUser(null);
+    // Hydrate session from localStorage on first load
+    useEffect(() => {
+        const storedCurrentUser = localStorage.getItem("currentUser");
+        const token = localStorage.getItem("authToken");
 
-    const addUser = (user: User) => setUsers(prev => [...prev, user]);
+        if (storedCurrentUser && token) {
+            setCurrentUser(JSON.parse(storedCurrentUser));
+            reloadUsers().finally(() => setLoading(false));
+        } else {
+            setLoading(false);
+        }
+    }, []);
 
-    const editUser = (updatedUser: User) =>
-        setUsers(prev => prev.map(u => (u.id === updatedUser.id ? updatedUser : u)));
+    const login = async (email: string, password: string): Promise<boolean> => {
+        try {
+            const { token, user } = await loginAPI(email, password);
+            localStorage.setItem("authToken", token);
+            localStorage.setItem("currentUser", JSON.stringify(user));
+            setCurrentUser(user as User);
+            await reloadUsers();
+            return true;
+        } catch {
+            return false;
+        }
+    };
 
-    const deleteUser = (id: string) =>
-        setUsers(prev => prev.filter(u => u.id !== id));
+    const logout = () => {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("currentUser");
+        setCurrentUser(null);
+        setUsers([]);
+    };
+
+    const addUser = async (user: Partial<User>) => {
+        await createUserAPI(user);
+        await reloadUsers();
+    };
+
+    const editUser = async (updatedUser: User) => {
+        const saved = await updateUserAPI(updatedUser.id, updatedUser);
+        setUsers((prev) => prev.map((u) => (u.id === saved.id ? saved : u)));
+        if (currentUser?.id === saved.id) {
+            const merged = { ...currentUser, ...saved };
+            setCurrentUser(merged);
+            localStorage.setItem("currentUser", JSON.stringify(merged));
+        }
+    };
+
+    const deleteUser = async (id: string) => {
+        await deleteUserAPI(id);
+        setUsers((prev) => prev.filter((u) => u.id !== id));
+    };
 
     const getUserById = (id: string): User | undefined =>
-        users.find(u => u.id === id);
+        users.find((u) => u.id === id);
 
     return (
         <UserContext.Provider

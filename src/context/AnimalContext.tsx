@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Animal } from "@/types/animals";
+import { useUserContext } from "@/context/UserContext";
 
 import {
   getAnimalsAPI,
@@ -33,6 +34,7 @@ interface AnimalContextProps {
 const AnimalContext = createContext<AnimalContextProps | undefined>(undefined);
 
 export const AnimalProvider = ({ children }: { children: React.ReactNode }) => {
+  const { currentUser } = useUserContext();
   const [animals, setAnimals] = useState<AnimalWithId[]>([]);
 
   // ---------------- LOAD ----------------
@@ -45,9 +47,15 @@ export const AnimalProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Requests need a JWT now, so (re)load once a user is actually logged in
+  // rather than once on initial mount.
   useEffect(() => {
-    reloadAnimals();
-  }, []);
+    if (currentUser) {
+      reloadAnimals();
+    } else {
+      setAnimals([]);
+    }
+  }, [currentUser]);
 
   // ---------------- ADD ----------------
   const addAnimal = async (animal: Animal) => {

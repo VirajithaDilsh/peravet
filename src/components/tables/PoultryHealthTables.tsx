@@ -9,6 +9,8 @@ import {
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { addDays, addWeeks, format } from "date-fns";
+import { useTasks } from "@/context/TasksContext";
+import { syncHealthRowsToTasks } from "@/lib/taskHealthSync";
 
 type FieldConfig<T> = {
   key: keyof T;
@@ -48,19 +50,61 @@ export default function PoultryHealthTables({
 
   const [editing, setEditing] = useState<{ [key: string]: boolean }>({});
   const [startDate, setStartDate] = useState<string>("");
+  const { tasks, reloadTasks } = useTasks();
 
   useEffect(() => {
     const savedDate = localStorage.getItem(`poultry-start-date-${animal._id}`);
     if (savedDate) setStartDate(savedDate);
   }, [animal._id]);
 
-  const handleSave = (type: "vaccinations" | "feed" | "water") => {
-    if (type === "vaccinations")
+  const handleSave = async (type: "vaccinations" | "feed" | "water") => {
+    if (type === "vaccinations") {
       onUpdateAction({ ...animal, vaccinations: customVaccines });
 
-    if (type === "feed") onUpdateAction({ ...animal, feedManagement: feed });
+      const created = await syncHealthRowsToTasks(
+        animal.tag,
+        customVaccines.map((row) => ({
+          type: "Vaccination",
+          dueDate: row.date,
+          nextDate: row.nextDate,
+          comment: row.vaccine,
+        })),
+        tasks
+      );
+      if (created) await reloadTasks();
+    }
 
-    if (type === "water") onUpdateAction({ ...animal, waterManagement: water });
+    if (type === "feed") {
+      onUpdateAction({ ...animal, feedManagement: feed });
+
+      const created = await syncHealthRowsToTasks(
+        animal.tag,
+        feed.map((row) => ({
+          type: "Feed",
+          feedType: row.type,
+          feedIntake: row.feedIntake,
+          feedRequirement: row.feedRequirement,
+        })),
+        tasks
+      );
+      if (created) await reloadTasks();
+    }
+
+    if (type === "water") {
+      onUpdateAction({ ...animal, waterManagement: water });
+
+      const created = await syncHealthRowsToTasks(
+        animal.tag,
+        water.map((row) => ({
+          type: "Water",
+          waterIntake: row.waterIntake,
+          waterRequirement: row.waterRequirement,
+          chlorinating: row.chlorinating,
+        })),
+        tasks
+      );
+      if (created) await reloadTasks();
+    }
 
     setEditing({});
   };

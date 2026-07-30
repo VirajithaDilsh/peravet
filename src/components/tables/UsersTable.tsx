@@ -3,6 +3,7 @@
 import React, { useState, MouseEvent, KeyboardEvent } from "react";
 import { Trash2, SquarePen } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useUserContext } from "@/context/UserContext";
 import { StudentUser, User as UserType } from "@/types/users";
 
@@ -10,6 +11,15 @@ export default function AllUsersTable() {
     const { users, deleteUser } = useUserContext();
     const [search, setSearch] = useState("");
     const router = useRouter();
+
+    const handleDelete = async (id: string, name: string) => {
+        try {
+            await deleteUser(id);
+            toast.success(`${name} deleted`);
+        } catch {
+            toast.error(`Could not delete ${name}`);
+        }
+    };
 
     // Filter users based on search
     const filteredUsers = users.filter((user: UserType) =>
@@ -95,7 +105,7 @@ export default function AllUsersTable() {
                                             <button
                                                 onClick={(e) => {
                                                     stop(e);
-                                                    if (confirm(`Delete ${user.name}?`)) deleteUser(user.id);
+                                                    if (confirm(`Delete ${user.name}?`)) handleDelete(user.id, user.name);
                                                 }}
                                                 className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-100 transition"
                                                 title="Delete"

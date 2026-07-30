@@ -24,13 +24,38 @@ export type TaskType =
     | "Water";
 
 export interface Task {
-    key: string;
+    _id: string;
+    animal: string;
     type: TaskType;
     species: string;
     animalTag: string;
-    dueDate: string;
+    dueDate?: string;
     nextDate?: string;
     comment?: string;
+
+    drug?: string;
+    dosage?: number;
+    route?: string;
+    prescribe?: string;
+
+    feedType?: "Starter" | "Grower" | "Layer Feed";
+    feedIntake?: string;
+    feedRequirement?: string;
+
+    waterIntake?: string;
+    waterRequirement?: string;
+    chlorinating?: string;
+
     assignType?: TaskAssignType;
     assignedUsers?: AssignedUser[];
+
+    status: "pending" | "completed";
+    completedAt?: string;
+    completedBy?: { id: string; name: string };
+    createdBy?: { id: string; name: string };
 }
+
+export type NewTaskInput = Omit<
+    Task,
+    "_id" | "animal" | "species" | "status" | "completedAt" | "completedBy" | "createdBy"
+> & { animalTag: string };

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { ProductionRecord } from "@/types/Production";
+import { useUserContext } from "@/context/UserContext";
 import {
     getProductionRecordsAPI,
     createProductionRecordAPI,
@@ -27,10 +28,12 @@ const toRecord = (doc: ProductionRecord & { _id: string }): ProductionRecord => 
 });
 
 export const ProductionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { currentUser } = useUserContext();
     const [records, setRecords] = useState<ProductionRecord[]>([]);
 
     // ------------------------------------------------
-    // Load records
+    // Load records (requests need a JWT, so (re)load once a user is
+    // actually logged in rather than once on initial mount)
     // ------------------------------------------------
     useEffect(() => {
         const loadRecords = async () => {
@@ -41,8 +44,13 @@ export const ProductionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
                 console.error("Load production records error:", err);
             }
         };
-        loadRecords();
-    }, []);
+
+        if (currentUser) {
+            loadRecords();
+        } else {
+            setRecords([]);
+        }
+    }, [currentUser]);
 
     // ------------------------------------------------
     // Add Record

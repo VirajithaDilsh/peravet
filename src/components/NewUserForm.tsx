@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useUserContext } from "@/context/UserContext";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { FormValues, Role, User } from "@/types/users";
 
 interface UserStepFormProps {
@@ -38,9 +39,7 @@ const UserStepForm: React.FC<UserStepFormProps> = ({
                     return (
                         <div key={field} className="flex flex-col">
                             <label className="mb-1 capitalize">
-                                {field === "id"
-                                    ? "User ID"
-                                    : field.replace(/([A-Z])/g, " $1")}
+                                {field.replace(/([A-Z])/g, " $1")}
                             </label>
 
                             {field === "role" ? (
@@ -128,7 +127,7 @@ export default function NewUserForm({
     let stepsConfig: { title: string; fields: (keyof FormValues)[] }[] = [
         {
             title: "Basic Information",
-            fields: ["id", "name", "email", "password", "role"],
+            fields: ["name", "email", "password", "role"],
         },
         { title: "Student Information", fields: ["department", "year"] },
     ];
@@ -153,14 +152,9 @@ export default function NewUserForm({
             }
         });
 
-        // Check duplicate ID and email
-        const idValue = methods.getValues("id");
+        // Check duplicate email
         const emailValue = methods.getValues("email");
-        if (users.some((u) => u.id === idValue && u.id !== defaultValues?.id)) {
-            newErrors["id"] = "This ID is already taken";
-            valid = false;
-        }
-        if (users.some((u) => u.email === emailValue && u.id !== defaultValues?.id)) {
+        if (users.some((u) => u.email === emailValue)) {
             newErrors["email"] = "This email is already registered";
             valid = false;
         }
@@ -176,13 +170,12 @@ export default function NewUserForm({
 
     const handleBack = () => setStep((s) => s - 1);
 
-    const submitHandler = (data: FormValues) => {
+    const submitHandler = async (data: FormValues) => {
         if (!validateStep()) return;
 
-        const user: User =
+        const user: Partial<User> =
             data.role === "student"
                 ? {
-                    id: data.id,
                     name: data.name,
                     email: data.email,
                     password: data.password,
@@ -191,17 +184,25 @@ export default function NewUserForm({
                     year: data.year!,
                 }
                 : {
-                    id: data.id,
                     name: data.name,
                     email: data.email,
                     password: data.password,
                     role: data.role as Exclude<Role, "student">,
                 };
 
-        if (isEdit) onSubmit?.(user);
-        else addUser(user);
-
-        router.push("/dashboard/admin#userTable");
+        try {
+            if (isEdit) {
+                onSubmit?.(user as User);
+            } else {
+                await addUser(user);
+            }
+            router.push("/dashboard/admin#userTable");
+        } catch (err) {
+            const message =
+                (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                "Could not save user";
+            toast.error(message);
+        }
     };
 
     return (
